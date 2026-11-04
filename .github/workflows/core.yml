@@ -1,0 +1,99 @@
+# Purpose: build and test the engine-independent game logic in core/ on every push
+# and pull request, with GCC on Linux and Apple clang on macOS, so a change that
+# only breaks on the owner's Mac compiler is caught before it is merged.
+
+# The name shown for this workflow on GitHub's "Actions" tab and on pull requests.
+name: core
+
+# "on" lists the events that start this workflow.
+on:
+  # Run whenever commits are pushed to any branch.
+  push:
+  # Run whenever a pull request is opened or gets new commits.
+  pull_request:
+
+# Give the workflow's access token read-only access to the repository contents.
+# The jobs only need to download the code, so they get nothing more (least privilege).
+permissions:
+  # "read" lets the job check out the code but not push, comment or change settings.
+  contents: read
+
+# "jobs" are independent pieces of work; GitHub runs them in parallel on separate machines.
+jobs:
+  # First job: build and test on Linux with the GCC compiler (g++).
+  linux_gcc:
+    # The label shown for this job in the GitHub interface.
+    name: Linux (g++), normal and sanitizer builds
+    # Run on a fresh virtual machine with the latest Ubuntu Linux that GitHub provides.
+    runs-on: ubuntu-latest
+    # Stop the job if it runs longer than 15 minutes (for example, a test stuck in a loop).
+    timeout-minutes: 15
+    # "steps" run one after another on that machine; if one fails, the job stops and fails.
+    steps:
+      # Step 1: the label for downloading the repository's code onto the machine.
+      - name: Check out the code
+        # Use GitHub's official checkout action, version 4.
+        uses: actions/checkout@v4
+
+      # Step 2: the label for installing Ninja, the build tool our CMake commands ask for.
+      - name: Install Ninja
+        # Refresh the list of available packages, then install Ninja ("-y" answers yes to prompts).
+        run: sudo apt-get update && sudo apt-get install -y ninja-build
+
+      # Step 3: the label for the normal build, the same as the first command in CLAUDE.md.
+      - name: Normal build and tests (g++)
+        # "|" lets the following indented lines be several shell commands, run in order.
+        run: |
+          # Configure: read core/CMakeLists.txt and write Ninja build files into core/build using g++.
+          cmake -S core -B core/build -G Ninja -DCMAKE_CXX_COMPILER=g++
+          # Compile the library, the tests and the demo.
+          cmake --build core/build
+          # Run every test and print the output of any test that fails.
+          ctest --test-dir core/build --output-on-failure
+
+      # Step 4: the label for the sanitizer build, the same as the second command in CLAUDE.md.
+      - name: Sanitizer build and tests (g++, AddressSanitizer + UndefinedBehaviorSanitizer)
+        # Several shell commands, run in order.
+        run: |
+          # Configure a separate build folder with sanitizers switched on (BODHI_SANITIZE=ON).
+          cmake -S core -B core/build-sanitize -G Ninja -DCMAKE_CXX_COMPILER=g++ -DBODHI_SANITIZE=ON
+          # Compile with the extra checking code the sanitizers add.
+          cmake --build core/build-sanitize
+          # Run the tests; a memory or arithmetic error makes the sanitizer stop the test with a failure.
+          ctest --test-dir core/build-sanitize --output-on-failure
+
+  # Second job: build and test on macOS with Apple clang, the compiler Unreal uses on the Mac and for iOS.
+  macos_apple_clang:
+    # The label shown for this job in the GitHub interface.
+    name: macOS (Apple clang), normal build (non-blocking)
+    # Run on a fresh virtual machine with the latest macOS that GitHub provides.
+    runs-on: macos-latest
+    # Stop the job if it runs longer than 15 minutes.
+    timeout-minutes: 15
+    # Non-blocking: if this job fails or is cancelled, the workflow as a whole still passes.
+    # Reason: on this account GitHub often never assigns a Mac and cancels the job after
+    # 15 minutes of waiting (cause not yet known; see pull request #1). Remove this line
+    # once Mac jobs start reliably, so an Apple-clang-only error blocks merging again.
+    continue-on-error: true
+    # The steps for this job, run one after another.
+    steps:
+      # Step 1: the label for downloading the repository's code onto the machine.
+      - name: Check out the code
+        # Use GitHub's official checkout action, version 4.
+        uses: actions/checkout@v4
+
+      # Step 2: the label for installing Ninja with Homebrew, the macOS package manager.
+      - name: Install Ninja
+        # Install Ninja; if it is already installed, Homebrew prints a note and carries on.
+        run: brew install ninja
+
+      # Step 3: the label for the normal build with Apple clang.
+      - name: Normal build and tests (Apple clang)
+        # Several shell commands, run in order.
+        run: |
+          # Configure with clang++, which on macOS is Apple's own build of the clang compiler.
+          cmake -S core -B core/build -G Ninja -DCMAKE_CXX_COMPILER=clang++
+          # Compile; the -Werror flag in CMakeLists.txt turns any clang-only warning into a failure.
+          cmake --build core/build
+          # Run every test and print the output of any test that fails.
+          ctest --test-dir core/build --output-on-failure
