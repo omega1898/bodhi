@@ -16,30 +16,41 @@ const flipbook = {
 };
 
 // How each animation plays when it isn't driven by distance or by jumping speed.
-//   loop: round and round at `rate` frames a second.
-//   once: through once, then holds the last frame.
-//   intro: the first frame once (getting down), then loops the rest at `loop_rate`.
+//   loop: round and round at `rate` drawings a second.
+//   once: through once at `rate`, then holds the last drawing.
+//   intro: the first `intro_frames` drawings once at `rate` (getting down), then loops the rest
+//   at `loop_rate` (breathing while down).
 const flipbook_playback = {
     her: {
-        idle: { mode: 'loop', rate: 2.5 },
-        land: { mode: 'once', rate: 14 },
-        turn: { mode: 'once', rate: 14 },
-        kneel: { mode: 'intro', rate: 9, loop_rate: 1.2 },
-        embrace: { mode: 'loop', rate: 1.2 },
-        sit: { mode: 'loop', rate: 1.2 },
+        idle: { mode: 'loop', rate: 5 },  // 12 drawings: one breath every 2.4 seconds.
+        land: { mode: 'once', rate: 20 },
+        turn: { mode: 'once', rate: 22 },
+        stop: { mode: 'once', rate: 18 },
+        kneel: { mode: 'intro', rate: 14, intro_frames: 5, loop_rate: 3 },
+        embrace: { mode: 'loop', rate: 4 },
+        sit: { mode: 'loop', rate: 4 },
     },
     bodhi: {
-        idle: { mode: 'loop', rate: 4 },
-        land: { mode: 'once', rate: 14 },
-        turn: { mode: 'once', rate: 14 },
-        sit: { mode: 'intro', rate: 8, loop_rate: 2 },
-        sniff: { mode: 'loop', rate: 7 },
-        bark: { mode: 'once', rate: 10 },
-        sleep: { mode: 'loop', rate: 0.8 },
-        lean: { mode: 'loop', rate: 1.5 },
-        embrace: { mode: 'loop', rate: 1.2 },
+        idle: { mode: 'loop', rate: 6 },  // Faster when happy: see choose_flipbook_frame.
+        land: { mode: 'once', rate: 20 },
+        turn: { mode: 'once', rate: 22 },
+        stop: { mode: 'once', rate: 18 },
+        sit: { mode: 'intro', rate: 14, intro_frames: 5, loop_rate: 3 },
+        sniff: { mode: 'loop', rate: 10 },
+        bark: { mode: 'once', rate: 14 },
+        sleep: { mode: 'loop', rate: 3 },
+        lean: { mode: 'loop', rate: 4 },
+        embrace: { mode: 'loop', rate: 4 },
     },
 };
+
+// The vertical speeds at the start of a jump (character_specs in game.js) and of a fast fall.
+// The jump drawings run from the first speed, through the top of the arc, to the second.
+const flipbook_jump_speeds = { her: { rise: 620, fall: 700 }, bodhi: { rise: 690, fall: 700 } };
+
+// Where in its cycle a walk or trot starts: just before the back foot swings through, which
+// reads as a first step. Starting wherever the cycle last stopped would begin mid-stride.
+const walk_start_phase = 0.2;
 
 // Loads every animation sheet. Tries the path next to the page first (the app), then the
 // repository's art folder (playing prototype/web/index.html from a checkout); the likely one first.
@@ -78,7 +89,8 @@ function update_flipbook() {
     if (flipbook.sheets_expected === 0) {
         return;
     }
-    const wanted = Math.max(1.5, game.pixel_scale * (game.camera.close_zoom || 1) * 1.35);
+    // Screen pixels per game unit at the closest camera, plus a fifth for crisp edges.
+    const wanted = Math.max(1.5, game.pixel_scale * (game.camera.close_zoom || 1) * 1.2);
     if (flipbook.pixels_per_unit === 0) {
         flipbook.pixels_per_unit = wanted;
     }
@@ -100,20 +112,22 @@ function update_flipbook() {
 }
 
 // Paints one sheet into a canvas at screen resolution. The sheet's filters (fur, grain) are
-// worked out once here, not every frame. Each frame is a fixed-size cell of that canvas.
+// worked out once here, not every frame. Frames sit in rows of fixed-size cells.
 function paint_flipbook_sheet(character_name, animation_name) {
     const cell = frames_atlas[character_name].cell;
     const entry = frames_atlas[character_name].animations[animation_name];
+    const columns = entry.columns || entry.frames;
+    const rows = Math.ceil(entry.frames / columns);
     const frame_width = Math.round(cell.width * flipbook.pixels_per_unit);
     const frame_height = Math.round(cell.height * flipbook.pixels_per_unit);
-    const canvas = make_sprite_canvas(frame_width * entry.frames, frame_height);
+    const canvas = make_sprite_canvas(frame_width * columns, frame_height * rows);
     canvas.getContext('2d').drawImage(flipbook.sheets[character_name][animation_name], 0, 0, canvas.width, canvas.height);
-    flipbook.frames[character_name][animation_name] = { canvas: canvas, frame_width: frame_width, frame_height: frame_height };
+    flipbook.frames[character_name][animation_name] = { canvas: canvas, frame_width: frame_width, frame_height: frame_height, columns: columns };
 }
 
-// Remembers, per character, what it was doing last frame: to notice landings, turns and pose
-// changes, and to add up the distance walked. Figures made fresh each frame (the title scene)
-// start "settled", so they never replay a getting-down frame.
+// Remembers, per character, what it was doing last frame: to notice landings, turns, stops and
+// pose changes, and how far it moved. Figures made fresh each frame (the title scene) start
+// "settled", so they never replay a getting-down drawing.
 function flipbook_state_of(character, time_seconds) {
     const x = character.x || 0;
     const on_ground = character.on_ground !== false;
@@ -121,14 +135,15 @@ function flipbook_state_of(character, time_seconds) {
     const pose = character.pose || 'stand';
     let state = character.flipbook_state;
     if (!state) {
-        state = { last_x: x, distance: 0, was_on_ground: on_ground, facing: facing, pose: pose, pose_started: -100, one_shot: null, one_shot_started: -100, gait: null };
+        state = { last_x: x, moved: 0, phase: 0, fast_until: -100, was_on_ground: on_ground, facing: facing, pose: pose, pose_started: -100, one_shot: null, one_shot_started: -100, gait: null };
         character.flipbook_state = state;
     }
     const moved = Math.abs(x - state.last_x);
-    if (moved < 40) {
-        state.distance += moved;  // A bigger jump is a scene change, not a step.
-    }
+    state.moved = moved < 40 ? moved : 0;  // A bigger jump is a scene change, not a step.
     state.last_x = x;
+    if (Math.abs(character.velocity_x || 0) > 100) {
+        state.fast_until = time_seconds + 0.2;  // Moving briskly: stopping soon gets a stop.
+    }
     if (on_ground && !state.was_on_ground) {
         state.one_shot = 'land';
         state.one_shot_started = time_seconds;
@@ -139,6 +154,13 @@ function flipbook_state_of(character, time_seconds) {
     }
     if (pose !== state.pose) {
         state.pose_started = time_seconds;
+        if (pose === 'walk') {
+            state.phase = walk_start_phase;
+        }
+        if (state.pose === 'walk' && pose === 'stand' && time_seconds < state.fast_until) {
+            state.one_shot = 'stop';
+            state.one_shot_started = time_seconds;
+        }
     }
     state.was_on_ground = on_ground;
     state.facing = facing;
@@ -163,11 +185,13 @@ function timed_frame(playback, frame_count, seconds) {
         return safe_frame(played, frame_count);
     }
     if (playback.mode === 'intro') {
-        if (played < 1) {
-            return 0;
+        const intro_frames = Math.min(frame_count, playback.intro_frames || 1);
+        const loop_count = frame_count - intro_frames;
+        if (played < intro_frames || loop_count <= 0) {
+            return safe_frame(played, intro_frames);
         }
-        const looped = (seconds - 1 / rate) * playback.loop_rate;
-        return 1 + safe_frame(Math.floor(looped) % (frame_count - 1), frame_count - 1);
+        const looped = (seconds - intro_frames / rate) * playback.loop_rate;
+        return intro_frames + safe_frame(Math.floor(looped) % loop_count, loop_count);
     }
     return safe_frame(Math.floor(played) % frame_count, frame_count);
 }
@@ -180,17 +204,19 @@ function choose_flipbook_frame(character, character_name, time_seconds) {
     const pose = state.pose;
     const speed = Math.abs(character.velocity_x || 0);
 
-    // In the air: rising, then falling, picked by vertical speed.
+    // In the air: one arc of drawings, picked by vertical speed. Take-off speed shows the first,
+    // the top of the jump (no vertical speed) the middle one, a fast fall the last.
     if (pose === 'jump') {
+        const frame_count = animations.jump.frames;
+        const speeds = flipbook_jump_speeds[character_name];
         const velocity_y = character.velocity_y || 0;
-        if (velocity_y < 0) {
-            return ['jump_rise', velocity_y < -300 ? 0 : 1];
-        }
-        return ['jump_fall', velocity_y < 250 ? 0 : 1];
+        const through_arc = velocity_y < 0 ? 1 + velocity_y / speeds.rise : 1 + velocity_y / speeds.fall;
+        return ['jump', safe_frame(Math.round(clamp_between(through_arc, 0, 2) * (frame_count - 1) / 2), frame_count)];
     }
-    // A landing or a turn plays briefly when standing or setting off slowly; at speed the
-    // stride simply carries on.
-    if (state.one_shot && speed < 110 && (pose === 'stand' || pose === 'walk')) {
+    // A landing, turn or stop plays briefly when standing (or, for landings and turns, setting off
+    // slowly); at speed the stride simply carries on.
+    const one_shot_allowed = state.one_shot === 'stop' ? pose === 'stand' : pose === 'stand' || pose === 'walk';
+    if (state.one_shot && speed < 110 && one_shot_allowed) {
         const playback = playbacks[state.one_shot];
         const frame_count = animations[state.one_shot].frames;
         const seconds = time_seconds - state.one_shot_started;
@@ -210,16 +236,18 @@ function choose_flipbook_frame(character, character_name, time_seconds) {
         } else if (state.gait !== slow_gait && speed < switch_speed - 10) {
             state.gait = slow_gait;
         }
+        // The cycle moves on by the distance covered, so a planted foot stays planted. Walk and
+        // run share one position in the cycle, so changing gait never skips a step.
         const gait = state.gait || slow_gait;
         const entry = animations[gait];
-        const position = (state.distance / entry.cycle_length) % 1;
-        return [gait, safe_frame(Math.floor(position * entry.frames) % entry.frames, entry.frames)];
+        state.phase = (state.phase + state.moved / entry.cycle_length) % 1;
+        return [gait, safe_frame(Math.floor(state.phase * entry.frames), entry.frames)];
     }
     // Everything else: the pose's own animation, or standing still.
     const animation_name = pose === 'stand' || !animations[pose] ? 'idle' : pose;
     const playback = Object.assign({}, playbacks[animation_name]);
     if (character_name === 'bodhi' && animation_name === 'idle') {
-        playback.rate = 3 + clamp_between(character.wag || 0, 0, 1) * 8;  // A happier dog wags faster.
+        playback.rate = 6 + clamp_between(character.wag || 0, 0, 1) * 14;  // A happier dog wags faster.
     }
     const started = animation_name === 'idle' ? 0 : state.pose_started;
     return [animation_name, timed_frame(playback, animations[animation_name].frames, time_seconds - started)];
@@ -236,7 +264,9 @@ function draw_flipbook_character(context, character, character_name, time_second
     context.save();
     context.translate(character.x + character.width / 2, character.y + character.height);
     context.scale((character.facing || 1) * (character.squash_x || 1), character.squash_y || 1);
-    context.drawImage(painted.canvas, frame_index * painted.frame_width, 0, painted.frame_width, painted.frame_height,
+    const column = frame_index % painted.columns;
+    const row = Math.floor(frame_index / painted.columns);
+    context.drawImage(painted.canvas, column * painted.frame_width, row * painted.frame_height, painted.frame_width, painted.frame_height,
         -cell.feet_x, -cell.feet_y, cell.width, cell.height);
     if (character_name === 'bodhi') {
         draw_dog_blink(context, character, animation_name, points.eye);

@@ -143,6 +143,83 @@ for (const name of ['head', 'ear']) {
 // Far-side limbs sit in the character's own shadow: this filter darkens them a little.
 const shade_filter = '<filter id="far_side"><feColorMatrix type="matrix" values="0.64 0 0 0 0 0 0.64 0 0 0 0 0 0.7 0 0 0 0 0 1 0"/></filter>';
 
+// ---------- In-betweens ----------
+// Animators draw the key poses first, then the drawings in between them. These functions make
+// the in-betweens from the keyed poses along smooth curves (Catmull-Rom splines), not straight
+// lines, so the motion flows through each key instead of turning sharply at it.
+
+// Points that stand on the floor. Between two keys where one is planted, it moves in a straight
+// line at an even speed (so it never slides), and no in-between pushes it below the floor.
+const floor_points = new Set(['near_foot', 'far_foot', 'near_front', 'far_front', 'near_back', 'far_back']);
+
+// One number partway (t from 0 to 1) from b to c, on a smooth curve through a, b, c and d.
+function spline_number(a, b, c, d, t) {
+    return 0.5 * (2 * b + (c - a) * t + (2 * a - 5 * b + 4 * c - d) * t * t + (3 * b - a - 3 * c + d) * t * t * t);
+}
+
+// One pose partway from pose b to pose c, field by field. Numbers and [x, y] points follow the
+// curve, nested groups (the dog's legs) are blended the same way, and words such as 'closed'
+// switch halfway. A field a neighbouring key leaves out counts as unchanged.
+function spline_pose(a, b, c, d, t) {
+    const result = {};
+    for (const name of Object.keys(b)) {
+        const value = b[name];
+        const before = a[name] === undefined ? value : a[name];
+        const after = c[name] === undefined ? value : c[name];
+        const later = d[name] === undefined ? after : d[name];
+        if (typeof value === 'number') {
+            result[name] = spline_number(before, value, after, later, t);
+        } else if (Array.isArray(value)) {
+            if (floor_points.has(name) && value[1] === 0 && after[1] === 0) {
+                result[name] = [value[0] + (after[0] - value[0]) * t, 0];
+            } else {
+                result[name] = value.map(function blend(coordinate, index) {
+                    return spline_number(before[index], coordinate, after[index], later[index], t);
+                });
+                if (floor_points.has(name)) {
+                    result[name][1] = Math.min(0, result[name][1]);
+                }
+            }
+        } else if (value && typeof value === 'object') {
+            result[name] = spline_pose(before, value, after, later, t);
+        } else {
+            result[name] = t < 0.5 ? value : after;
+        }
+    }
+    return result;
+}
+
+// Makes `steps` drawings from each key to the next. A loop (a walk, a trot) wraps round, so the
+// last key flows back into the first; a one-off move (a landing) ends exactly on its last key.
+function in_between(keys, steps, loops) {
+    const count = keys.length;
+    const key_at = function key_at(index) {
+        return loops ? keys[(index + count) % count] : keys[Math.max(0, Math.min(count - 1, index))];
+    };
+    const frames = [];
+    const segments = loops ? count : count - 1;
+    for (let index = 0; index < segments; index++) {
+        for (let step = 0; step < steps; step++) {
+            frames.push(spline_pose(key_at(index - 1), key_at(index), key_at(index + 1), key_at(index + 2), step / steps));
+        }
+    }
+    if (!loops) {
+        frames.push(keys[count - 1]);
+    }
+    return frames;
+}
+
+// A gentle loop of `count` drawings. `make(breath, turn)` gives the pose for breath 0 (out) to
+// 1 (in), with turn going from 0 to 1 once round the loop, for swaying things like a tail.
+function breathing(count, make) {
+    const frames = [];
+    for (let index = 0; index < count; index++) {
+        const turn = index / count;
+        frames.push(make((1 - Math.cos(2 * Math.PI * turn)) / 2, turn));
+    }
+    return frames;
+}
+
 // ---------- Her ----------
 
 // The bone (from shoulder to hip) angle, so the painted coat hangs along her body.
@@ -272,58 +349,87 @@ function cycle_length_of(keys) {
     return (keys[0].near_foot[0] - keys[1].near_foot[0]) * keys.length * 2;
 }
 
-// Turns a cycle's keys into full poses: the second half mirrors the first with arms swapped.
-function her_cycle(keys, lean, hand_drop) {
-    const frames = [];
+// Fills in the values a key pose leaves out, so every key has the same fields to blend.
+function her_values(values) {
+    return Object.assign({ hip_x: 0, lean: 0, near_foot_angle: 0, far_foot_angle: 0, hair: 0, hem: 0, scarf: 0.3, head_tilt: 0, eyes: 'open' }, values);
+}
+
+// Turns a cycle's four keys into eight: the second half mirrors the first with arms swapped.
+function her_cycle_keys(keys, lean, hand_drop) {
+    const result = [];
     for (const half of [0, 1]) {
         for (const key of keys) {
-            let values = {
+            let values = her_values({
                 hip_y: key.hip_y, lean: lean, near_foot: key.near_foot, far_foot: key.far_foot,
                 near_foot_angle: key.near_foot_angle, far_foot_angle: key.far_foot_angle,
                 near_hand: [key.swing + 1, hand_drop], far_hand: [-key.swing + 1, hand_drop],
                 hair: key.hair, hem: key.hem, scarf: 0.35 + key.hair,
-            };
+            });
             if (half === 1) {
                 values = mirror_her(values);
             }
-            frames.push(her_pose(values));
+            result.push(values);
         }
     }
-    return frames;
+    return result;
 }
 
+// Her home stance. Every landing, turn and stop settles into it, and idle breathes from it, so
+// one move hands over to the next without a jump.
+const her_standing = her_values({ hip_y: -43.6, near_foot: [4.5, 0], far_foot: [-4.5, 0], near_hand: [1.5, 25.5], far_hand: [-0.5, 25.5] });
+
+// Her jump as one arc: take-off, knees tucked, the top (the middle drawing), falling, reaching
+// for the ground. The game picks the drawing from how fast she is rising or falling.
+const her_jump_keys = [
+    { hip_y: -46, lean: 0.08, near_foot: [4, -2], far_foot: [-6, -1], near_foot_angle: -0.6, far_foot_angle: -0.8, near_hand: [11, 6], far_hand: [-5, 9], hair: -0.1 },
+    { hip_y: -45, lean: 0.05, near_foot: [6, -12], far_foot: [-2, -14], near_foot_angle: -0.2, far_foot_angle: -0.3, near_hand: [12, 1], far_hand: [-8, 4], hair: -0.15 },
+    { hip_y: -45.5, lean: 0.04, near_foot: [6, -9], far_foot: [-4, -11], near_foot_angle: -0.1, far_foot_angle: -0.3, near_hand: [12, 5], far_hand: [-9, 6], hair: 0.05, hem: -0.02 },
+    { hip_y: -45, lean: 0.02, near_foot: [5, -4], far_foot: [-5, -6], far_foot_angle: -0.3, near_hand: [12, 10], far_hand: [-10, 8], hair: 0.2, hem: -0.05 },
+    { hip_y: -44, lean: 0.02, near_foot: [4.5, -0.5], far_foot: [-4.5, -1], near_foot_angle: 0.1, far_foot_angle: -0.1, near_hand: [9, 16], far_hand: [-7, 14], hair: 0.25, hem: -0.06 },
+].map(her_values);
+
+// Her kneeling pose, breathing (0 = out, 1 = in).
+function her_kneeling(breath) {
+    return her_values({ hip_y: -23 - breath * 0.3, hip_x: -1, lean: 0.24 - breath * 0.01, near_foot: [13, 0], far_foot: [-19, 0], far_foot_angle: -1.3, near_hand: [9, 23], far_hand: [5, 24], hair: 0.1 - breath * 0.03, hem: 0.06 });
+}
+
+// Every animation as a list of poses. Loops get two drawings per key; one-off moves get
+// in-betweens too, so nothing snaps from one pose to the next.
 const her_animations = {
-    idle: [0, 1, 2, 1].map(function breathe(step) {
-        return her_pose({ hip_y: -43.6 - step * 0.2, near_foot: [3, 0], far_foot: [-3, 0], near_hand: [1.5, 25.5 - step * 0.2], far_hand: [-0.5, 25.5 - step * 0.2], hair: step * 0.02, scarf: 0.3 + step * 0.03 });
+    idle: breathing(12, function idle_pose(breath) {
+        return her_pose(Object.assign({}, her_standing, { hip_y: -43.6 - breath * 0.4, near_hand: [1.5, 25.5 - breath * 0.4], far_hand: [-0.5, 25.5 - breath * 0.4], hair: breath * 0.04, scarf: 0.3 + breath * 0.06 }));
     }),
-    walk: her_cycle(her_walk_keys, 0.04, 25),
-    run: her_cycle(her_run_keys, 0.14, 17),
-    jump_rise: [
-        her_pose({ hip_y: -46, lean: 0.08, near_foot: [4, -2], far_foot: [-6, -1], near_foot_angle: -0.6, far_foot_angle: -0.8, near_hand: [11, 6], far_hand: [-5, 9], hair: -0.1 }),
-        her_pose({ hip_y: -45, lean: 0.05, near_foot: [6, -12], far_foot: [-2, -14], near_foot_angle: -0.2, far_foot_angle: -0.3, near_hand: [12, 1], far_hand: [-8, 4], hair: -0.15 }),
-    ],
-    jump_fall: [
-        her_pose({ hip_y: -45, lean: 0.02, near_foot: [5, -4], far_foot: [-5, -6], near_foot_angle: 0, far_foot_angle: -0.3, near_hand: [12, 10], far_hand: [-10, 8], hair: 0.2, hem: -0.05 }),
-        her_pose({ hip_y: -44, lean: 0.02, near_foot: [4, 0], far_foot: [-4, -1], near_foot_angle: 0.1, far_foot_angle: -0.1, near_hand: [9, 16], far_hand: [-7, 14], hair: 0.25, hem: -0.06 }),
-    ],
-    land: [
-        her_pose({ hip_y: -33, lean: 0.16, near_foot: [7, 0], far_foot: [-6, 0], near_hand: [9, 18], far_hand: [-3, 20], hair: -0.1, hem: 0.06 }),
-        her_pose({ hip_y: -40, lean: 0.06, near_foot: [4, 0], far_foot: [-4, 0], near_hand: [3, 24], far_hand: [-1, 24], hair: 0.06, hem: 0.02 }),
-    ],
-    turn: [
-        her_pose({ hip_y: -42, lean: -0.1, near_foot: [6, 0], far_foot: [-3, 0], near_hand: [-5, 24], far_hand: [6, 23], hair: 0.25, scarf: 0.6, hem: -0.06 }),
-        her_pose({ hip_y: -43, lean: 0.05, near_foot: [4, 0], far_foot: [-4, 0], near_hand: [2, 25], far_hand: [0, 25], hair: 0.12, scarf: 0.45, hem: 0.03 }),
-    ],
-    kneel: [
-        her_pose({ hip_y: -35, hip_x: 0, lean: 0.12, near_foot: [11, 0], far_foot: [-10, 0], far_foot_angle: -0.5, near_hand: [8, 22], far_hand: [3, 23], hair: 0.05, hem: 0.04 }),
-        her_pose({ hip_y: -23, hip_x: -1, lean: 0.24, near_foot: [13, 0], far_foot: [-19, 0], far_foot_angle: -1.3, near_hand: [9, 23], far_hand: [5, 24], hair: 0.1, hem: 0.06 }),
-        her_pose({ hip_y: -23.3, hip_x: -1, lean: 0.23, near_foot: [13, 0], far_foot: [-19, 0], far_foot_angle: -1.3, near_hand: [9, 23], far_hand: [5, 24], hair: 0.07, hem: 0.05 }),
-    ],
-    embrace: [0, 1].map(function hold(step) {
-        return her_pose({ hip_y: -23 - step * 0.4, hip_x: -1, lean: 0.2, near_foot: [13, 0], far_foot: [-19, 0], far_foot_angle: -1.3, near_hand: [11, 19], far_hand: [16, 14], head_tilt: 0.14, eyes: 'closed', hair: 0.05 });
+    walk: in_between(her_cycle_keys(her_walk_keys, 0.04, 25), 2, true).map(her_pose),
+    run: in_between(her_cycle_keys(her_run_keys, 0.14, 17), 2, true).map(her_pose),
+    jump: in_between(her_jump_keys, 2, false).map(her_pose),
+    land: in_between([
+        her_values({ hip_y: -33, lean: 0.16, near_foot: [4.5, 0], far_foot: [-4.5, 0], near_hand: [9, 18], far_hand: [-3, 20], hair: -0.1, hem: 0.06 }),
+        her_values({ hip_y: -40, lean: 0.06, near_foot: [4.5, 0], far_foot: [-4.5, 0], near_hand: [3, 24], far_hand: [-1, 24], hair: 0.06, hem: 0.02 }),
+        her_standing,
+    ], 2, false).map(her_pose),
+    turn: in_between([
+        her_values({ hip_y: -42, lean: -0.1, near_foot: [5.5, -1], far_foot: [-4, 0], near_hand: [-5, 24], far_hand: [6, 23], hair: 0.25, scarf: 0.6, hem: -0.06 }),
+        her_values({ hip_y: -43, lean: 0.05, near_foot: [4.5, 0], far_foot: [-4.5, 0], near_hand: [2, 25], far_hand: [0, 25], hair: 0.12, scarf: 0.45, hem: 0.03 }),
+        her_standing,
+    ], 2, false).map(her_pose),
+    // Stopping from a run: the front foot brakes, the back foot steps up, the coat and hair
+    // carry on forward a moment, then everything settles.
+    stop: in_between([
+        her_values({ hip_y: -41, lean: -0.08, near_foot: [5, 0], far_foot: [-8, -1.5], far_foot_angle: -0.5, near_hand: [6, 22], far_hand: [-4, 23], hair: 0.3, scarf: 0.65, hem: -0.08 }),
+        her_values({ hip_y: -42.8, lean: 0.03, near_foot: [5, 0], far_foot: [-3, -1.2], far_foot_angle: -0.2, near_hand: [3, 24.5], far_hand: [-1, 25], hair: 0.12, scarf: 0.4, hem: 0.03 }),
+        her_standing,
+    ], 2, false).map(her_pose),
+    // Getting down (five drawings, played once), then breathing while kneeling (four, looped).
+    kneel: in_between([
+        her_standing,
+        her_values({ hip_y: -35, lean: 0.12, near_foot: [10, -2], far_foot: [-10, -2], far_foot_angle: -0.5, near_hand: [8, 22], far_hand: [3, 23], hair: 0.05, hem: 0.04 }),
+        her_kneeling(0),
+    ], 2, false).map(her_pose).concat(breathing(4, function kneeling_pose(breath) { return her_pose(her_kneeling(breath)); })),
+    embrace: breathing(8, function hold(breath) {
+        return her_pose(her_values({ hip_y: -23 - breath * 0.4, hip_x: -1, lean: 0.2, near_foot: [13, 0], far_foot: [-19, 0], far_foot_angle: -1.3, near_hand: [11, 19], far_hand: [16, 14], head_tilt: 0.14, eyes: 'closed', hair: 0.05 }));
     }),
-    sit: [0, 1].map(function breathe(step) {
-        return her_pose({ hip_y: -22 - step * 0.3, hip_x: 0, lean: 0.05, near_foot: [21, 0], far_foot: [18, 0], near_hand: [15, 22], far_hand: [12, 22], hair: 0.02 * step });
+    sit: breathing(8, function seated(breath) {
+        return her_pose(her_values({ hip_y: -22 - breath * 0.3, lean: 0.05, near_foot: [21, 0], far_foot: [18, 0], near_hand: [15, 22], far_hand: [12, 22], hair: 0.02 * breath }));
     }),
 };
 
@@ -431,17 +537,17 @@ function dog_pose(changes) {
     return result;
 }
 
-// The trot: diagonal legs move together. One leg's path over 8 frames: planted and pushed back
-// for five frames (weight on it), then a quick lifted swing forward for three.
+// The trot: diagonal legs move together. One leg's path over the 8 keys: planted and pushed
+// back for five (weight on it), then a quick lifted swing forward for three.
 const trot_paw_path = [[8, 0], [4, 0], [0, 0], [-4, 0], [-8, -0.6], [-5, -4.5], [2, -5.5], [6, -2]];
 const trot_body_lift = [-0.4, 0.4, -0.3, -1.0, -0.4, 0.4, -0.3, -1.0];
-const dog_trot = trot_paw_path.map(function trot_frame(unused, frame) {
-    const pair_one = trot_paw_path[frame];
-    const pair_two = trot_paw_path[(frame + 4) % 8];
-    const lift = trot_body_lift[frame];
+const dog_trot_keys = trot_paw_path.map(function trot_key(unused, key) {
+    const pair_one = trot_paw_path[key];
+    const pair_two = trot_paw_path[(key + 4) % 8];
+    const lift = trot_body_lift[key];
     return dog_pose({
-        pelvis: [-11, -27 + lift], withers: [11, -28 + lift], head: [19, -39 + lift * 0.4], head_angle: [0, 0.04, 0, -0.03][frame % 4],
-        ear: [0.3, 0.42, 0.36, 0.26][frame % 4], tail: [0.5, 0.42, 0.48, 0.58][frame % 4],
+        pelvis: [-11, -27 + lift], withers: [11, -28 + lift], head: [19, -39 + lift * 0.4], head_angle: [0, 0.04, 0, -0.03][key % 4],
+        ear: [0.3, 0.42, 0.36, 0.26][key % 4], tail: [0.5, 0.42, 0.48, 0.58][key % 4],
         legs: {
             near_front: [13 + pair_one[0], pair_one[1]], far_back: [-11 + pair_one[0], pair_one[1]],
             far_front: [11 + pair_two[0], pair_two[1]], near_back: [-8 + pair_two[0], pair_two[1]],
@@ -452,7 +558,7 @@ const dog_trot = trot_paw_path.map(function trot_frame(unused, frame) {
 // The gallop (a "rotary" gallop): stretch out, front feet land, gather the back feet under a
 // rounded spine, back feet land, push, fly. The spine extending and gathering is what makes a
 // running dog look alive.
-const dog_gallop = [
+const dog_gallop_keys = [
     dog_pose({ pelvis: [-12.5, -28], withers: [12.5, -29], arch: -1.5, head: [22, -37], head_angle: 0.1, ear: 0.7, tail: 0.15,
         legs: { near_front: [22, -3], far_front: [20, -4], near_back: [-21, -2], far_back: [-19, -3] } }),
     dog_pose({ pelvis: [-11.5, -29.5], withers: [11.5, -27], arch: 0, head: [20, -37], head_angle: 0.06, ear: 0.6, tail: 0.2,
@@ -467,59 +573,76 @@ const dog_gallop = [
         legs: { near_front: [20, -4], far_front: [18, -5], near_back: [-15, 0], far_back: [-18, -1] } }),
 ];
 
+// The dog's home stance, which every landing, turn and stop settles into.
+const dog_standing = dog_pose({});
+
+// The dog sitting: hips down, front legs straight, the tail sweeping the floor.
+function dog_sitting(breath, turn) {
+    return dog_pose({ pelvis: [-7, -12], withers: [8, -28 - breath * 0.3], arch: -1, head: [16, -43 - breath * 0.3], ear: 0.22 + breath * 0.02, tail: -0.2 + 0.2 * Math.sin(2 * Math.PI * turn),
+        legs: { near_front: [12, 0], far_front: [10, 0], near_back: [1, 0], far_back: [-2, 0] } });
+}
+
 const dog_animations = {
-    idle: [0.55, 0.78, 0.55, 0.32].map(function wag(tail, frame) {
-        const breath = [0, -0.2, -0.3, -0.2][frame];
-        return dog_pose({ pelvis: [-11, -27 + breath], withers: [11, -28 + breath], head: [19, -39 + breath * 0.5], tail: tail, ear: 0.22 + frame * 0.01 });
+    idle: breathing(8, function idle_pose(breath, turn) {
+        return dog_pose({ pelvis: [-11, -27 - breath * 0.3], withers: [11, -28 - breath * 0.3], head: [19, -39 - breath * 0.15], tail: 0.55 + 0.23 * Math.sin(2 * Math.PI * turn), ear: 0.22 + breath * 0.03 });
     }),
-    trot: dog_trot,
-    gallop: dog_gallop,
-    jump_rise: [
+    trot: in_between(dog_trot_keys, 2, true),
+    gallop: in_between(dog_gallop_keys, 2, true),
+    // One arc: take-off, rising, the top (the middle drawing), falling, reaching for the ground.
+    jump: in_between([
         dog_pose({ pelvis: [-11, -26], withers: [11, -33], arch: 0, head: [20, -44], head_angle: -0.15, ear: 0.1, tail: 0.6,
             legs: { near_front: [17, -12], far_front: [15, -11], near_back: [-19, -2], far_back: [-21, -1] } }),
         dog_pose({ pelvis: [-11, -28], withers: [11, -31], arch: 1.5, head: [20, -42], head_angle: -0.05, ear: 0.0, tail: 0.5,
             legs: { near_front: [20, -9], far_front: [18, -9], near_back: [-8, -9], far_back: [-10, -8] } }),
-    ],
-    jump_fall: [
+        dog_pose({ pelvis: [-11, -29], withers: [11, -29.5], arch: 1, head: [21, -40], head_angle: 0.02, ear: 0.3, tail: 0.45,
+            legs: { near_front: [20, -7], far_front: [18, -7], near_back: [-11, -8], far_back: [-12, -7] } }),
         dog_pose({ pelvis: [-11, -30], withers: [11, -27], arch: 0, head: [21, -37], head_angle: 0.1, ear: 0.55, tail: 0.35,
             legs: { near_front: [19, -5], far_front: [17, -6], near_back: [-15, -6], far_back: [-13, -7] } }),
         dog_pose({ pelvis: [-11, -29], withers: [11, -26], arch: 0, head: [21, -37], head_angle: 0.08, ear: 0.65, tail: 0.3,
             legs: { near_front: [16, -1], far_front: [14, -2], near_back: [-12, -4], far_back: [-10, -5] } }),
-    ],
-    land: [
-        dog_pose({ pelvis: [-10.5, -22], withers: [10.5, -21], arch: -0.5, head: [19, -32], head_angle: 0.12, ear: 0.75, tail: 0.3,
-            legs: { near_front: [14, 0], far_front: [12, 0], near_back: [-9, 0], far_back: [-12, 0] } }),
+    ], 2, false),
+    land: in_between([
+        dog_pose({ pelvis: [-10.5, -22], withers: [10.5, -21], arch: -0.5, head: [19, -32], head_angle: 0.12, ear: 0.75, tail: 0.3 }),
         dog_pose({ pelvis: [-11, -25.5], withers: [11, -26.5], head: [19, -37], head_angle: 0.04, ear: 0.45, tail: 0.4 }),
-    ],
-    turn: [
+        dog_standing,
+    ], 2, false),
+    turn: in_between([
         dog_pose({ pelvis: [-8, -27], withers: [8, -28], arch: 2, head: [16, -38], head_angle: -0.12, ear: 0.5, tail: 0.7,
-            legs: { near_front: [9, 0], far_front: [7, 0], near_back: [-5, 0], far_back: [-7, 0] } }),
+            legs: { near_front: [9, -1], far_front: [7, -1], near_back: [-5, -1], far_back: [-7, -1] } }),
         dog_pose({ pelvis: [-10, -27], withers: [10, -28], arch: 0.5, head: [18, -39], head_angle: -0.04, ear: 0.32, tail: 0.6 }),
-    ],
-    sit: [
-        dog_pose({ pelvis: [-9, -18], withers: [10, -28], head: [18, -41], ear: 0.25, tail: 0.1, legs: { near_back: [-3, 0], far_back: [-6, 0] } }),
-        dog_pose({ pelvis: [-7, -12], withers: [8, -28], arch: -1, head: [16, -43], ear: 0.22, tail: -0.25, legs: { near_front: [12, 0], far_front: [10, 0], near_back: [1, 0], far_back: [-2, 0] } }),
-        dog_pose({ pelvis: [-7, -12], withers: [8, -28.3], arch: -1, head: [16, -43.3], ear: 0.24, tail: -0.05, legs: { near_front: [12, 0], far_front: [10, 0], near_back: [1, 0], far_back: [-2, 0] } }),
-        dog_pose({ pelvis: [-7, -12], withers: [8, -28], arch: -1, head: [16, -43], ear: 0.22, tail: -0.4, legs: { near_front: [12, 0], far_front: [10, 0], near_back: [1, 0], far_back: [-2, 0] } }),
-    ],
-    sniff: [-16, -15, -16.5, -17].map(function nose(head_y, frame) {
-        return dog_pose({ pelvis: [-11, -27.5], withers: [11, -26], head: [25, head_y], head_angle: 0.4 + frame * 0.02, ear: 0.0, tail: 0.5 + (frame % 2) * 0.15,
+        dog_standing,
+    ], 2, false),
+    // Stopping from a run: front paws brace, the hips sink back, the ears swing forward.
+    stop: in_between([
+        dog_pose({ pelvis: [-12, -25], withers: [10, -26.5], arch: -1, head: [20, -36], head_angle: 0.08, ear: 0.7, tail: 0.3,
+            legs: { near_back: [-6, -1.5], far_back: [-8, -1] } }),
+        dog_pose({ pelvis: [-11, -26.5], withers: [11, -27.8], head: [19, -38.5], ear: 0.4, tail: 0.4, legs: { far_back: [-10, -0.8] } }),
+        dog_standing,
+    ], 2, false),
+    // Sitting down (five drawings, played once), then sitting and breathing (four, looped).
+    sit: in_between([
+        dog_standing,
+        dog_pose({ pelvis: [-9, -18], withers: [10, -28], head: [18, -41], ear: 0.25, tail: 0.1, legs: { near_back: [-3, -1.5], far_back: [-6, -1.5] } }),
+        dog_sitting(0, 0),
+    ], 2, false).concat(breathing(4, dog_sitting)),
+    sniff: breathing(8, function nose(breath, turn) {
+        return dog_pose({ pelvis: [-11, -27.5], withers: [11, -26], head: [25 + 0.5 * Math.sin(4 * Math.PI * turn), -16 + breath * 1.2], head_angle: 0.42, ear: 0.0, tail: 0.55 + 0.15 * Math.sin(4 * Math.PI * turn),
             legs: { near_front: [14, 0], far_front: [12, 0] } });
     }),
-    bark: [
+    bark: in_between([
         dog_pose({ pelvis: [-11, -26], withers: [11, -26.5], head: [17, -36], head_angle: 0.1, ear: 0.3, tail: 0.5 }),
         dog_pose({ pelvis: [-11, -27.5], withers: [11, -29.5], head: [21, -43], head_angle: -0.3, ear: 0.0, tail: 0.65, mouth: 'open' }),
         dog_pose({ pelvis: [-11, -27], withers: [11, -28.5], head: [20, -41], head_angle: -0.15, ear: 0.15, tail: 0.55 }),
-    ],
-    sleep: [0, 1].map(function breathe(step) {
-        return dog_pose({ pelvis: [-10, -10 - step * 0.4], withers: [10, -11 - step * 0.4], arch: -2, tuck: 0, head: [21, -10], head_angle: 0.15, ear: 0.6, tail: -0.15, tail_curl: -1,
+    ], 2, false),
+    sleep: breathing(6, function breathe(breath) {
+        return dog_pose({ pelvis: [-10, -10 - breath * 0.4], withers: [10, -11 - breath * 0.4], arch: -2, tuck: 0, head: [21, -10], head_angle: 0.15, ear: 0.6, tail: -0.15, tail_curl: -1,
             eyes: 'closed', folded: true, legs: { near_front: [22, -2], far_front: [20, -2], near_back: [-1, -1], far_back: [-4, -1] } });
     }),
-    lean: [0, 1].map(function nuzzle(step) {
-        return dog_pose({ pelvis: [-11, -27], withers: [11, -27.5], head: [21, -35 + step * 0.4], head_angle: -0.2, ear: 0.3, tail: 0.7 - step * 0.35, eyes: 'closed' });
+    lean: breathing(6, function nuzzle(breath, turn) {
+        return dog_pose({ pelvis: [-11, -27], withers: [11, -27.5], head: [21, -35 + breath * 0.4], head_angle: -0.2, ear: 0.3, tail: 0.55 + 0.2 * Math.sin(2 * Math.PI * turn), eyes: 'closed' });
     }),
-    embrace: [0, 1].map(function hug(step) {
-        return dog_pose({ pelvis: [-5, -14], withers: [2, -36 - step * 0.4], arch: 0, tuck: 0, head: [8, -50 - step * 0.4], head_angle: 0.35, ear: 0.25, tail: 0.2 + step * 0.25,
+    embrace: breathing(6, function hug(breath, turn) {
+        return dog_pose({ pelvis: [-5, -14], withers: [2, -36 - breath * 0.4], arch: 0, tuck: 0, head: [8, -50 - breath * 0.4], head_angle: 0.35, ear: 0.25, tail: 0.3 + 0.2 * Math.sin(2 * Math.PI * turn),
             eyes: 'closed', reaching: true, legs: { near_front: [19, -47], far_front: [16, -45], near_back: [-4, 0], far_back: [-7, 0] } });
     }),
 };
@@ -532,8 +655,8 @@ const cells = {
     bodhi: { width: 90, height: 84, feet_x: 42, feet_y: 76 },
 };
 
-// How far each walking cycle travels, in game units (see cycle_length_of). The gallop's paws
-// move back about 10 units a frame over its 6 frames.
+// How far each walking cycle travels, in game units (see cycle_length_of). The gallop's planted
+// paws move back about 10 units per key over its 6 keys. In-betweens don't change the distance.
 const cycle_lengths = {
     her: { walk: cycle_length_of(her_walk_keys), run: cycle_length_of(her_run_keys) },
     bodhi: { trot: (trot_paw_path[0][0] - trot_paw_path[1][0]) * trot_paw_path.length, gallop: 60 },
@@ -557,26 +680,32 @@ function round_tenth(value) {
     return Math.round(value * 10) / 10;
 }
 
-// Writes one SVG file per animation: frames side by side, each an editable drawing.
+// Frames per row in a sheet. Rows keep the canvas the game paints each sheet into narrow
+// enough for phones, which refuse very wide canvases.
+const sheet_columns = 8;
+
+// Writes one SVG file per animation: frames in rows, left to right, each an editable drawing.
 function write_animation(character, name, frames, definitions, draw) {
     const cell = cells[character];
     const width = cell.width * units_to_pixels;
     const height = cell.height * units_to_pixels;
+    const columns = Math.min(sheet_columns, frames.length);
+    const rows = Math.ceil(frames.length / columns);
     const pieces = frames.map(function frame_group(pose, index) {
-        const feet = [index * width + cell.feet_x * units_to_pixels, cell.feet_y * units_to_pixels];
+        const feet = [(index % columns) * width + cell.feet_x * units_to_pixels, Math.floor(index / columns) * height + cell.feet_y * units_to_pixels];
         return '  <g id="frame_' + index + '" transform="translate(' + feet[0] + ',' + feet[1] + ')">' + draw(pose) + '</g>';
     });
     const svg = [
         '<?xml version="1.0" encoding="UTF-8"?>',
-        '<!-- Purpose: ' + character + ', "' + name + '" animation, ' + frames.length + ' frames side by side, each ' + width + ' wide.',
+        '<!-- Purpose: ' + character + ', "' + name + '" animation, ' + frames.length + ' frames in rows of ' + columns + ', each ' + width + ' x ' + height + '.',
         '     Generated by art/tools/draw_frames.js; any frame can be redrawn by hand afterwards. Feet sit at',
         '     (' + cell.feet_x * units_to_pixels + ', ' + cell.feet_y * units_to_pixels + ') inside each frame. -->',
-        '<svg xmlns="http://www.w3.org/2000/svg" width="' + width * frames.length + '" height="' + height + '" viewBox="0 0 ' + width * frames.length + ' ' + height + '">',
+        '<svg xmlns="http://www.w3.org/2000/svg" width="' + width * columns + '" height="' + height * rows + '" viewBox="0 0 ' + width * columns + ' ' + height * rows + '">',
         '<defs>' + definitions + shade_filter + '</defs>',
     ].concat(pieces, ['</svg>']).join('\n');
     const file_name = character + '_' + name + '.svg';
     fs.writeFileSync(path.join(output_folder, file_name), svg);
-    const entry = { sheet: 'art/animations/' + file_name, frames: frames.length };
+    const entry = { sheet: 'art/animations/' + file_name, frames: frames.length, columns: columns };
     if (cycle_lengths[character][name]) {
         entry.cycle_length = cycle_lengths[character][name];
     }
@@ -597,7 +726,7 @@ function main() {
         atlas.bodhi.animations[name] = write_animation('bodhi', name, frames, dog_definitions, draw_dog);
     }
     const header = [
-        '// Purpose: where each hand-keyed animation frame is: one sheet per animation, frames side by side.',
+        '// Purpose: where each animation frame is: one sheet per animation, frames in rows.',
         '// Generated by art/tools/draw_frames.js. Do not edit by hand: change the poses or the art,',
         '// then run  node art/tools/draw_frames.js',
         "'use strict';",

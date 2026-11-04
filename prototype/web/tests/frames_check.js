@@ -1,7 +1,8 @@
 // Purpose: checks the hand-drawn animation frames (art/animations/, frames_atlas.js) in a real
-// browser. It fails if a sheet is missing or the wrong size, if any drawing is cut off at the
-// edge of its frame, sinks below the floor or is empty, if the game shows the wrong animation for what a character
-// is doing, or if odd input (an unknown pose, missing numbers) makes the drawing code crash.
+// browser. It fails if a sheet is missing or the wrong size; if any drawing is cut off at the
+// edge of its frame, sinks below the floor or is empty; if the game shows the wrong animation
+// for what a character is doing; if running changes drawing too rarely to look fluid; or if odd
+// input (an unknown pose, missing numbers) makes the drawing code crash.
 //
 // Run from the repository root:  node prototype/web/tests/frames_check.js
 'use strict';
@@ -12,6 +13,7 @@ const { chromium } = require('playwright');
 const edge_band = 3;          // Pixels along each frame edge that must stay empty.
 const visible_alpha = 12;     // A pixel more opaque than this (out of 255) counts as drawn.
 const floor_allowance = 3.5;  // Game units a paw, sole or tuft of fur may reach below the feet.
+const fluid_drawings_per_second = 24;  // Running flat out must change drawing at least this often.
 
 // Checks every sheet: its size, and that each frame is drawn and not cut off at its edges.
 async function check_sheets(page) {
@@ -28,26 +30,30 @@ async function check_sheets(page) {
                 }
                 const width = cell.width * 10;
                 const height = cell.height * 10;
-                if (image.naturalWidth !== width * animation.frames || image.naturalHeight !== height) {
-                    problems.push(label + ': sheet is ' + image.naturalWidth + 'x' + image.naturalHeight + ', expected ' + width * animation.frames + 'x' + height);
+                const columns = animation.columns;
+                const rows = Math.ceil(animation.frames / columns);
+                if (image.naturalWidth !== width * columns || image.naturalHeight !== height * rows) {
+                    problems.push(label + ': sheet is ' + image.naturalWidth + 'x' + image.naturalHeight + ', expected ' + width * columns + 'x' + height * rows);
                 }
                 if (animation.points.length !== animation.frames) {
                     problems.push(label + ': ' + animation.points.length + ' sets of points for ' + animation.frames + ' frames');
                 }
                 const canvas = document.createElement('canvas');
-                canvas.width = width * animation.frames;
-                canvas.height = height;
+                canvas.width = width * columns;
+                canvas.height = height * rows;
                 const context = canvas.getContext('2d');
                 context.drawImage(image, 0, 0);
                 const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
                 for (let frame = 0; frame < animation.frames; frame++) {
+                    const left = (frame % columns) * width;
+                    const top = Math.floor(frame / columns) * height;
                     let drawn = 0;
                     let on_edge = 0;
                     let below_floor = 0;
                     const floor_y = (cell.feet_y + allowance) * 10;
                     for (let y = 0; y < height; y++) {
                         for (let x = 0; x < width; x++) {
-                            if (pixels[(y * canvas.width + frame * width + x) * 4 + 3] > alpha_limit) {
+                            if (pixels[((top + y) * canvas.width + left + x) * 4 + 3] > alpha_limit) {
                                 drawn += 1;
                                 below_floor += y > floor_y ? 1 : 0;
                                 if (x < band || y < band || x >= width - band || y >= height - band) {
@@ -86,7 +92,7 @@ async function wait_for_shown(page, kind, check, seconds) {
     return { passed: false, shown: shown };
 }
 
-// Plays a little and checks the game picks the right animation: still, moving, in the air.
+// Plays a little and checks the game picks the right animation: still, moving, stopping, in the air.
 async function check_choices(page) {
     const problems = [];
     await page.evaluate(() => { const debug = window.until_we_find_home_debug; debug.start_level(0); debug.skip_card(); });
@@ -94,7 +100,8 @@ async function check_choices(page) {
     const expectations = [
         ['standing still shows idle', null, (shown) => shown.startsWith('idle')],
         ['moving shows walk or run', async () => page.evaluate(() => window.until_we_find_home_debug.hold('right', true)), (shown) => shown.startsWith('walk') || shown.startsWith('run')],
-        ['jumping shows a jump frame', async () => page.evaluate(() => window.until_we_find_home_debug.press('jump')), (shown) => shown.startsWith('jump_')],
+        ['stopping from a run shows the stop', async () => { await page.waitForTimeout(600); await page.evaluate(() => window.until_we_find_home_debug.hold('right', false)); }, (shown) => shown.startsWith('stop')],
+        ['jumping shows a jump drawing', async () => { await page.waitForTimeout(600); await page.evaluate(() => window.until_we_find_home_debug.press('jump')); }, (shown) => shown.startsWith('jump')],
     ];
     for (const [description, action, check] of expectations) {
         if (action) {
@@ -106,11 +113,54 @@ async function check_choices(page) {
             problems.push(description);
         }
     }
-    await page.evaluate(() => window.until_we_find_home_debug.hold('right', false));
     const dog = await wait_for_shown(page, 'dog', (shown) => shown.length > 0, 3);
     console.log((dog.passed ? '  ok   ' : '  FAIL ') + 'the dog is drawn from frames (showed "' + dog.shown + '")');
     if (!dog.passed) {
         problems.push('the dog is not drawn from frames');
+    }
+    return problems;
+}
+
+// Counts how many times a second the drawing on screen changes while a character runs flat out.
+// Fewer than about 24 reads as steppy rather than fluid.
+async function drawings_per_second_running(page, kind) {
+    await page.evaluate(() => { const debug = window.until_we_find_home_debug; debug.start_level(5); debug.skip_card(); });
+    await page.waitForTimeout(1200);
+    await page.evaluate((who) => window.until_we_find_home_debug.take_control(who), kind);
+    await page.evaluate(() => window.until_we_find_home_debug.hold('right', true));
+    await page.waitForTimeout(900);
+    const result = await page.evaluate((who) => new Promise((resolve) => {
+        let changes = 0;
+        let last = null;
+        const start = performance.now();
+        function look(now) {
+            const shown = window.until_we_find_home_debug.character_state(who).shown;
+            if (last !== null && shown !== last) {
+                changes += 1;
+            }
+            last = shown;
+            if (now - start < 1000) {
+                requestAnimationFrame(look);
+            } else {
+                resolve({ rate: changes / ((now - start) / 1000), shown: shown });
+            }
+        }
+        requestAnimationFrame(look);
+    }), kind);
+    await page.evaluate(() => window.until_we_find_home_debug.hold('right', false));
+    return result;
+}
+
+// Fluid motion: she and the dog must both change drawing often enough at a run.
+async function check_fluidity(page) {
+    const problems = [];
+    for (const kind of ['human', 'dog']) {
+        const result = await drawings_per_second_running(page, kind);
+        const passed = result.rate >= fluid_drawings_per_second;
+        console.log((passed ? '  ok   ' : '  FAIL ') + kind + ' running: ' + result.rate.toFixed(1) + ' drawings a second (at least ' + fluid_drawings_per_second + '; last showed "' + result.shown + '")');
+        if (!passed) {
+            problems.push(kind + ' running changes drawing only ' + result.rate.toFixed(1) + ' times a second');
+        }
     }
     return problems;
 }
@@ -158,11 +208,12 @@ async function main() {
     const sheet_problems = await check_sheets(page);
     console.log('sheets: ' + (sheet_problems.length === 0 ? 'every frame present, sized right and inside its frame' : sheet_problems.length + ' problems'));
     const choice_problems = await check_choices(page);
+    const fluidity_problems = await check_fluidity(page);
     const odd_problems = await check_odd_input(page);
     console.log('odd input: ' + (odd_problems.length === 0 ? 'nothing crashed; an unknown pose falls back to idle' : odd_problems.length + ' problems'));
     await browser.close();
 
-    const problems = sheet_problems.concat(choice_problems, odd_problems, page_errors);
+    const problems = sheet_problems.concat(choice_problems, fluidity_problems, odd_problems, page_errors);
     if (problems.length > 0) {
         console.log('PROBLEMS:\n  ' + problems.join('\n  '));
     }

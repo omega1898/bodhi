@@ -93,13 +93,16 @@ async function main() {
         ['right', true, 900], ['right', false, 120], ['left', true, 700], ['jump', true, 200], ['jump', false, 600], ['left', false, 400],
     ], 2900);
     clearInterval(sampler);
+    const frames_atlas_jump_count = await page.evaluate(() => frames_atlas.her.animations.jump.frames);
 
     // What was actually drawn: each sample says which animation and frame was on screen.
     const shown = samples.map((sample) => sample.shown || '');
     const different_drawings = new Set(shown.filter((name) => name)).size;
     const turn_drawn = shown.some((name) => name.startsWith('turn'));
-    const rise_drawn = shown.some((name) => name.startsWith('jump_rise'));
-    const fall_drawn = shown.some((name) => name.startsWith('jump_fall'));
+    // The jump is one arc of drawings with the top in the middle: lower numbers rise, higher fall.
+    const jump_drawings = frames_atlas_jump_count;
+    const rise_drawn = shown.some((name) => name.startsWith('jump ') && Number(name.split(' ')[1]) < (jump_drawings - 1) / 2);
+    const fall_drawn = shown.some((name) => name.startsWith('jump ') && Number(name.split(' ')[1]) > (jump_drawings - 1) / 2);
     console.log('different drawings shown (at least 10 = alive): ' + different_drawings);
     console.log('turn drawn: ' + turn_drawn + ' | jump rising drawn: ' + rise_drawn + ' | falling drawn: ' + fall_drawn);
     console.log('contact sheet: ' + sheet);

@@ -26,8 +26,10 @@ The game reads these files directly. For an engine that needs plain picture file
 The game animates frame by frame, the way hand-drawn 2D games do: every frame is a whole new drawing of the body, not parts turning on pins.
 
 - **Where the poses come from:** `tools/draw_frames.js` keys the poses as numbers, like an animator's key poses. A walk has contact, down, passing and up. The dog has a real trot and a rotary gallop.
+- **In-betweens:** like an animator, the tool keys a few poses and then makes the drawings in between. It follows smooth curves through the keys rather than straight lines, so movement flows through each key instead of turning sharply at it. A planted foot or paw moves in a straight line at an even speed, so it never slides or dips through the floor. Walks and runs have 16 drawings per cycle, the gallop 12, and idle breathing 12.
+- **Moves that hand over:** landings, turns and stops all settle into the same home stance that idle breathes from, so one move flows into the next. The jump is one arc of 9 drawings, and the game picks the drawing from how fast the character is rising or falling.
 - **How a frame is drawn:** limbs are drawn as one bending shape. The dog's back, chest and legs merge into one furry silhouette. Faces, the coat and the satchel come from the painted sheets in `characters/`, so the style matches.
-- **What it writes:** one SVG per animation into `animations/`, and `prototype/web/js/frames_atlas.js`. The atlas says where each frame is, how far each walking cycle travels, and where her hand and the dog's mouth and eye are in each frame.
+- **What it writes:** one SVG per animation into `animations/`, frames in rows of up to 8 (a very wide sheet is too wide for a phone to paint), and `prototype/web/js/frames_atlas.js`. The atlas says where each frame is, how far each walking cycle travels, and where her hand and the dog's mouth and eye are in each frame.
 - **No sliding feet:** walking and running frames advance with distance covered. The planted foot moves back by the same amount every frame, and the cycle length in the atlas is worked out from that.
 - **Frames:** her frames are 64 × 106 game units with the feet at (30, 99). The dog's are 90 × 84 with the feet at (42, 76).
 
@@ -36,7 +38,10 @@ After changing a pose or a painted part:
 node art/tools/draw_frames.js
 node prototype/web/tests/frames_check.js
 ```
-Expected: `drew 78 frames...`, then `FRAMES CHECK PASSED`. The check fails if a drawing is cut off at its frame's edge, sinks through the floor, or the game picks the wrong animation.
+Expected: `drew 193 frames...`, then `FRAMES CHECK PASSED`. The check fails if:
+- a drawing is cut off at its frame's edge, or sinks through the floor;
+- the game picks the wrong animation;
+- running changes drawing fewer than 24 times a second, which reads as steppy rather than fluid. The current figure is about 45.
 
 ## How the character parts work (painted sheets)
 
