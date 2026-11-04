@@ -13,6 +13,22 @@
 | Depth | Background layers move slower than the world and fade toward the sky colour. Dark foreground shapes move faster, and fade out whenever they would cover the player. | The three-layer depth of film. |
 | Moments | Reunions push the camera in, warm the light and swell the music. The scenes between chapters are drawn large and still. | The player gets time to look at the characters properly. |
 
+### How things move (the numbers the Unreal version should keep)
+
+| Rule | Value in the browser game | Why |
+|---|---|---|
+| Starting, stopping, turning take a moment | She speeds up at 1000 units/s², brakes at 1500, turns at 2300; the dog is quicker (1500 / 1800 / 3000) | Instant speed changes read as weightless |
+| Holding a direction breaks into a jog | Walk 175 → jog 235 after about 0.7 s | A body builds momentum |
+| Falling pulls harder than rising | Gravity 1800 going up, 2500 coming down | Jumps feel weighty, not floaty |
+| Turning rotates through | About 0.15 s (she), 0.12 s (dog); never thinner than half width | A flip in one frame reads as a paper cut-out |
+| The body leans into speed and braking | Up to about 0.13 radians (7°) | An upright post on rails reads as a toy |
+| Knees and elbows bend from where feet and hands are (two-bone joints) | Thigh 23, shin 22; upper arm 14, forearm 13 | Straight sticks read as compasses |
+| Poses blend | 0.16–0.18 s between any two poses | Snapping between poses reads as broken |
+| Ears, tail, hair, scarf, coat hem, satchel are on springs | Each lags and settles at its own rate | Secondary motion is what makes small figures feel alive |
+| The world moves physically | Gates slide into the ceiling, planks break into tumbling boards or swing down, crates fall and bounce, lamps sway and swing their light | Fading things in and out reads as fake |
+
+In Unreal these become: character movement settings (acceleration, braking, gravity scale), animation blend spaces (walk to jog, trot to gallop), two-bone IK on feet, and physics or spring bones on ears, tail and hair.
+
 **The browser game (`prototype/web/`) is the art blueprint, not the final look.** It proves composition, colour, light and timing. The Unreal version keeps those decisions and adds real 3D, materials and fur.
 
 ## 2. Getting close to Unreal quality on an iPhone

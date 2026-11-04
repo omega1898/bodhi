@@ -9,12 +9,15 @@ let view_height = 540;   // How many world units fit vertically on screen. Set o
 let view_width = 960;    // How many fit horizontally. Set on resize.
 const minimum_view_width = 640;
 const fixed_step_seconds = 1 / 60;
-const gravity = 1800;
+const gravity = 1800;          // Pull while rising: sets how high a jump goes.
+const falling_gravity = 2500;  // Stronger pull on the way down: jumps feel weighty, not floaty.
 const maximum_fall_speed = 1100;
 const step_up_height = 14;
 const character_specs = {
-    human: { width: 26, height: 86, walk_speed: 175, jump_speed: 620 },
-    dog: { width: 46, height: 38, walk_speed: 235, jump_speed: 690 },
+    // Speeds are world units per second; accelerations are units per second, per second.
+    // Starting, stopping and turning take a moment, the way a body with weight does.
+    human: { width: 26, height: 86, walk_speed: 175, jog_speed: 235, jump_speed: 620, acceleration: 1000, braking: 1500, turning: 2300, air_control: 1100 },
+    dog: { width: 46, height: 38, walk_speed: 235, jog_speed: 235, jump_speed: 690, acceleration: 1500, braking: 1800, turning: 3000, air_control: 1600 },
 };
 const progress_storage_key = 'until_we_find_home_progress';
 const keepsake_storage_key = 'until_we_find_home_keepsakes';
@@ -455,9 +458,37 @@ function apply_effects(rule) {
 // Opens or closes a gate, collapses a walkway, or adds a plank.
 function set_solid_active(solid_id, active) {
     for (const solid of game.world.solids) {
-        if (solid.id === solid_id) {
-            solid.active = active;
+        if (solid.id !== solid_id) {
+            continue;
         }
+        solid.active = active;
+        // How the change looks. Collision changes at once; the picture catches up physically.
+        if (solid.kind === 'plank' && !active) {
+            break_into_pieces(solid);
+            solid.fade = 0;
+        } else if (solid.kind === 'plank' && active) {
+            solid.motion = { type: 'swing_down', seconds: 0 };
+            solid.fade = 1;
+        } else if (solid.kind === 'crate' && active) {
+            solid.motion = { type: 'fall', seconds: 0 };
+            solid.fade = 1;
+        } else if (['gate', 'bars', 'glass'].includes(solid.kind)) {
+            solid.motion = { type: active ? 'drop_shut' : 'slide_open', seconds: 0 };
+            solid.fade = 1;
+        }
+    }
+}
+
+// A collapsing walkway breaks into boards that tumble and fall, each spinning its own way.
+function break_into_pieces(solid) {
+    const piece_width = 34;
+    for (let piece_x = solid.x; piece_x < solid.x + solid.w; piece_x += piece_width) {
+        const from_middle = (piece_x + piece_width / 2 - (solid.x + solid.w / 2)) / (solid.w / 2);
+        game.world.particles.push({
+            kind: 'board', x: piece_x + piece_width / 2, y: solid.y + solid.h / 2, width: piece_width - 2, height: solid.h,
+            velocity_x: from_middle * 60 + (Math.random() - 0.5) * 50, velocity_y: -40 - Math.random() * 80 + Math.abs(from_middle) * 40,
+            gravity: 1500, life: 2.2, max_life: 2.2, size: 1, angle: 0, spin: (Math.random() - 0.5) * 7, delay: Math.abs(from_middle) * 0.18,
+        });
     }
 }
 
@@ -469,7 +500,7 @@ function start_visual_effect(effect) {
             world.particles.push({
                 kind: 'debris', x: effect.x + (Math.random() - 0.5) * effect.width, y: effect.y,
                 velocity_x: (Math.random() - 0.5) * 160, velocity_y: Math.random() * -160, gravity: 1400,
-                life: 1.6, max_life: 1.6, size: 3 + Math.random() * 5, color: Math.random() < 0.5 ? '#5a4634' : '#3b332b',
+                life: 1.6, max_life: 1.6, size: 3 + Math.random() * 5, color: Math.random() < 0.5 ? '#5a4634' : '#3b332b', angle: Math.random() * 3, spin: (Math.random() - 0.5) * 12,
             });
         }
     } else if (effect.kind === 'photo') {
@@ -575,13 +606,19 @@ function position_is_blocked(character, x, y) {
 // Moves a character one step: walking, jumping, gravity, then pushing it out of anything solid.
 function move_character(character, direction, wants_jump, delta_seconds, speed_scale) {
     const spec = character_specs[character.kind];
-    const speed = spec.walk_speed * (character.in_water ? 0.62 : 1) * (speed_scale || 1);
-    const target_velocity = direction * speed;
-    // Grip: strong on the ground, stronger still when turning around, so changing direction
-    // feels immediate; weaker in the air, so jumps keep their momentum.
+    // Keep pushing one way and she breaks into a jog after a moment.
+    character.push_seconds = direction !== 0 && direction === character.last_direction ? (character.push_seconds || 0) + delta_seconds : 0;
+    character.last_direction = direction;
+    const jog = character.kind === 'human' ? ease_in_out((character.push_seconds - 0.7) / 0.6) : 0;
+    const top_speed = (spec.walk_speed + (spec.jog_speed - spec.walk_speed) * jog) * (character.in_water ? 0.62 : 1) * (speed_scale || 1);
+    const target_velocity = direction * top_speed;
+    // Speed changes at a steady rate: quick to start, quicker to stop, quickest to turn round.
     const turning = direction !== 0 && Math.sign(character.velocity_x) === -direction;
-    const grip = character.on_ground ? (turning ? 26 : 15) : 6;
-    character.velocity_x += (target_velocity - character.velocity_x) * Math.min(1, delta_seconds * grip);
+    let rate = character.on_ground ? (turning ? spec.turning : direction !== 0 ? spec.acceleration : spec.braking) : spec.air_control;
+    if (character.on_ground && Math.abs(character.velocity_x) > top_speed + 1 && direction !== 0) {
+        rate = spec.braking * 0.5;  // Slowing from a jog to a walk is gradual.
+    }
+    character.velocity_x = move_toward(character.velocity_x, target_velocity, rate * delta_seconds);
     if (direction !== 0) {
         character.facing = direction;
     }
@@ -592,9 +629,14 @@ function move_character(character, direction, wants_jump, delta_seconds, speed_s
         character.on_ground = false;
         character.ground_grace = 0;
         character.jump_cut_allowed = true;
-        return_true_jumped(character);
+        character.squash_y = 1.12;  // A stretch as the legs push off.
+        character.squash_x = 0.92;
+        if (game.world && character.kind === game.world.controlled) {
+            play_sound('step', 0.3, 0);
+        }
     }
-    character.velocity_y = Math.min(maximum_fall_speed, character.velocity_y + gravity * delta_seconds);
+    const pull = character.velocity_y < 0 ? gravity : falling_gravity;
+    character.velocity_y = Math.min(maximum_fall_speed, character.velocity_y + pull * delta_seconds);
 
     // Sideways first, so a wall stops you without also stopping a fall.
     const start_x = character.x;
@@ -642,11 +684,11 @@ function move_character(character, direction, wants_jump, delta_seconds, speed_s
         }
         character.velocity_y = 0;
     }
-    // Landing has weight: a quick squash, a puff of dust, a soft sound.
-    if (character.on_ground && !was_on_ground && falling_speed > 320) {
-        const impact = Math.min(1, (falling_speed - 320) / 700);
-        character.squash_y = 1 - 0.16 * impact - 0.04;
-        character.squash_x = 1 + 0.12 * impact + 0.03;
+    // Landing has weight: a squash that springs back, a puff of dust, a soft sound.
+    if (character.on_ground && !was_on_ground && falling_speed > 260) {
+        const impact = Math.min(1, (falling_speed - 260) / 700);
+        character.squash_y = 1 - 0.18 * impact - 0.04;
+        character.squash_x = 1 + 0.14 * impact + 0.03;
         for (let index = 0; index < 6; index++) {
             game.world.particles.push({ kind: 'puff', x: center_x(character) + (index - 2.5) * 6, y: character.y + character.height - 3, velocity_x: (index - 2.5) * 22, velocity_y: -12, gravity: 0, life: 0.45, max_life: 0.45, size: 5 });
         }
@@ -654,14 +696,20 @@ function move_character(character, direction, wants_jump, delta_seconds, speed_s
             play_sound('step', 0.1, 0);
         }
     }
-    character.squash_y = (character.squash_y || 1) + (1 - (character.squash_y || 1)) * Math.min(1, delta_seconds * 12);
-    character.squash_x = (character.squash_x || 1) + (1 - (character.squash_x || 1)) * Math.min(1, delta_seconds * 12);
+    if (character.on_ground) {
+        character.squash_y = (character.squash_y || 1) + (1 - (character.squash_y || 1)) * Math.min(1, delta_seconds * 11);
+        character.squash_x = (character.squash_x || 1) + (1 - (character.squash_x || 1)) * Math.min(1, delta_seconds * 11);
+    }
 
-    // Water slows you down and splashes.
+    // Water slows you down; wading into it splashes.
     const feet_y = character.y + character.height;
+    const was_in_water = character.in_water;
     character.in_water = game.world.water.some(function is_in(water) {
         return center_x(character) > water.x && center_x(character) < water.x + water.w && feet_y > water.current_top + 3;
     });
+    if (character.in_water && !was_in_water) {
+        splash(center_x(character), Math.min(feet_y, water_surface_at(center_x(character))), 10 + Math.abs(falling_speed) / 60);
+    }
     character.shadow_y = character.y + character.height;
 
     // Remember the last safe ground, and return there if something goes wrong and the
@@ -680,21 +728,29 @@ function move_character(character, direction, wants_jump, delta_seconds, speed_s
 
     const moved = Math.abs(character.x - start_x) / Math.max(delta_seconds, 0.0001);
     character.speed_ratio = Math.min(1, moved / spec.walk_speed);
-    character.walk_phase += moved * delta_seconds * (character.kind === 'dog' ? 0.16 : 0.115);
-    // Her ponytail swings behind her, on a spring, a little late: hair has weight.
-    if (character.kind === 'human') {
-        const target_angle = -Math.abs(character.velocity_x) * 0.0022 + character.velocity_y * 0.0007;
-        character.ponytail_speed = ((character.ponytail_speed || 0) + (target_angle - (character.ponytail_angle || 0)) * delta_seconds * 90) * 0.86;
-        character.ponytail_angle = (character.ponytail_angle || 0) + character.ponytail_speed * delta_seconds;
-    }
+    // The walk cycle advances with distance covered, so feet never slide on the ground.
+    character.walk_phase += moved * delta_seconds * (character.kind === 'dog' ? 0.15 : 0.105);
+    update_rig(character, delta_seconds, game.clock_seconds);
 }
 
-// Notes that a character just jumped (used for the soft take-off sound).
-function return_true_jumped(character) {
-    if (game.world && character.kind === game.world.controlled) {
-        play_sound('step', 0.3, 0);
+// The height of the water's surface at a point, for placing splashes.
+function water_surface_at(x) {
+    for (const water of game.world.water) {
+        if (x > water.x && x < water.x + water.w) {
+            return water.current_top;
+        }
     }
-    return true;
+    return game.level.height;
+}
+
+// Throws up droplets and a ring where something enters the water.
+function splash(x, y, strength) {
+    const world = game.world;
+    for (let index = 0; index < Math.min(16, strength); index++) {
+        world.particles.push({ kind: 'drop', x: x + (Math.random() - 0.5) * 16, y: y - 2, velocity_x: (Math.random() - 0.5) * 140, velocity_y: -90 - Math.random() * 150, gravity: 1100, life: 0.6, max_life: 0.6, size: 2 });
+    }
+    world.particles.push({ kind: 'ripple', x: x, y: y, velocity_x: 0, velocity_y: 0, gravity: 0, life: 0.9, max_life: 0.9, size: 1 });
+    play_sound('splash', 0.3, 0);
 }
 
 // Picks the drawing pose from what the character is doing right now.
@@ -814,7 +870,14 @@ function update_companion(companion, leader, delta_seconds) {
     let direction = 0;
     if (target_x !== null) {
         const distance = target_x - center_x(companion);
-        if (Math.abs(distance) > stop_distance) {
+        // Two thresholds ("hysteresis"): set off only when clearly too far, stop when close.
+        // With one threshold the companion would twitch back and forth at the boundary.
+        if (Math.abs(distance) > stop_distance + 26) {
+            companion.following = true;
+        } else if (Math.abs(distance) < stop_distance) {
+            companion.following = false;
+        }
+        if (companion.following) {
             direction = Math.sign(distance);
             if (companion.kind === 'dog' && Math.abs(distance) < 140 && world.dog_run_target === null) {
                 speed_scale *= 0.7;  // Trot when close, run when far.
@@ -860,7 +923,7 @@ function update_companion(companion, leader, delta_seconds) {
     }
     if (direction === 0 && target_x !== null && !companion.pose_override) {
         const toward_leader = Math.sign(center_x(leader) - center_x(companion));
-        if (toward_leader !== 0 && Math.abs(companion.velocity_x) < 10) {
+        if (toward_leader !== 0 && Math.abs(companion.velocity_x) < 10 && Math.abs(center_x(leader) - center_x(companion)) > 24) {
             companion.facing = toward_leader;
         }
     }
@@ -1137,6 +1200,7 @@ function use_action() {
     } else if (prompt.item) {
         const item = prompt.item;
         item.done = true;
+        item.used_at = game.clock_seconds;
         if (item.sound) {
             play_sound(item.sound, 0, 0);
         }
@@ -1322,6 +1386,11 @@ function update_world(delta_seconds) {
     }
     update_footsteps(controlled_character());
     const dog = world.characters.dog;
+    const human = world.characters.human;
+    if (human.head_tilt) {
+        const dog_close = Math.abs(center_x(dog) - center_x(human)) < 110 && Math.abs(dog.y + dog.height - human.y - human.height) < 30;
+        update_spring(human.head_tilt, dog_close && Math.abs(human.velocity_x) < 20 ? 0.16 : 0, 40, 10, delta_seconds);
+    }
     dog.fear = world.bond.fear;
     dog.wag += ((world.bond.fear > 0.5 ? 0.1 : 0.45) - dog.wag) * delta_seconds * 0.4;
 
@@ -1374,7 +1443,36 @@ function check_zones() {
 // Moves particles, call rings, rising or falling water, fading gates, lightning and fireflies.
 function update_effects(delta_seconds) {
     const world = game.world;
+    for (const solid of world.solids) {
+        if (solid.motion) {
+            solid.motion.seconds += delta_seconds;
+            if (solid.motion.type === 'fall' && !solid.motion.landed && solid.motion.seconds > 0.45) {
+                solid.motion.landed = true;
+                play_sound('thud', 0.2, 0);
+                for (let index = 0; index < 8; index++) {
+                    world.particles.push({ kind: 'puff', x: solid.x + Math.random() * solid.w, y: solid.y + solid.h - 2, velocity_x: (Math.random() - 0.5) * 90, velocity_y: -15, gravity: 0, life: 0.6, max_life: 0.6, size: 6 });
+                }
+            }
+        }
+    }
+    for (const prop of game.level.props) {
+        if (prop.kind === 'lamp' && prop.hanging) {
+            // Hanging lamps swing gently in the draught, and hard when the ground shakes.
+            prop.sway = prop.sway || make_spring(0);
+            if (game.camera.shake_seconds > 0) {
+                prop.sway.velocity += (Math.random() - 0.5) * 3;
+            }
+            update_spring(prop.sway, Math.sin(world.elapsed_seconds * 0.9 + prop.x) * 0.025 * (game.level.scenery.wind || 0.2), 9, 0.8, delta_seconds);
+        }
+    }
     for (const particle of world.particles) {
+        if (particle.delay > 0) {
+            particle.delay -= delta_seconds;
+            continue;
+        }
+        if (particle.spin) {
+            particle.angle += particle.spin * delta_seconds;
+        }
         particle.velocity_y += (particle.gravity || 0) * delta_seconds;
         particle.x += particle.velocity_x * delta_seconds;
         particle.y += particle.velocity_y * delta_seconds;
@@ -1389,7 +1487,26 @@ function update_effects(delta_seconds) {
         water.current_top += (water.target_top - water.current_top) * Math.min(1, delta_seconds * 0.8);
     }
     for (const solid of world.solids) {
-        solid.fade += ((solid.active ? 1 : 0) - solid.fade) * Math.min(1, delta_seconds * 4);
+        if (!solid.motion && solid.kind !== 'plank') {
+            solid.fade += ((solid.active ? 1 : 0) - solid.fade) * Math.min(1, delta_seconds * 4);
+        }
+    }
+    // Rain hitting the ground: tiny splashes on open floors near the camera.
+    const rain = game.level.scenery.rain || 0;
+    if (rain > 0.2) {
+        for (let attempt = 0; attempt < rain * 3; attempt++) {
+            const splash_x = game.camera.center_x + (Math.random() - 0.5) * view_width / game.camera.zoom;
+            let floor_top = null;
+            for (const solid of world.solids) {
+                if (solid.active && (solid.kind === 'floor' || solid.kind === 'plank') && splash_x >= solid.x && splash_x <= solid.x + solid.w && (floor_top === null || solid.y < floor_top)) {
+                    floor_top = solid.y;
+                }
+            }
+            const sheltered = game.shelters.some(function covers(shelter) { return splash_x >= shelter.x && splash_x <= shelter.x + shelter.w && floor_top !== null && floor_top <= shelter.y + shelter.h + 2 && floor_top >= shelter.y; });
+            if (floor_top !== null && !sheltered) {
+                world.particles.push({ kind: 'drop', x: splash_x, y: floor_top - 1, velocity_x: (Math.random() - 0.5) * 40, velocity_y: -30 - Math.random() * 50, gravity: 900, life: 0.22, max_life: 0.22, size: 1.5 });
+            }
+        }
     }
     const scenery = game.level.scenery;
     world.lightning_seconds = Math.max(0, world.lightning_seconds - delta_seconds);
@@ -1440,9 +1557,12 @@ function update_camera(delta_seconds) {
     }
     const target_x = game.level.width <= visible_width ? game.level.width / 2
         : Math.max(visible_width / 2, Math.min(game.level.width - visible_width / 2, focus_x));
-    const follow = Math.min(1, delta_seconds * 3.4);
-    camera.center_x += (target_x - camera.center_x) * follow;
-    camera.center_y += (target_y - camera.center_y) * Math.min(1, delta_seconds * 2.6);
+    // Ignore small jumps vertically: only re-aim up or down when she lands, or leaves the frame.
+    if (camera.anchor_y === undefined || player.on_ground || Math.abs(target_y - camera.anchor_y) > 110 || focus_y !== null) {
+        camera.anchor_y = target_y;
+    }
+    camera.center_x = smooth_follow(camera.center_x, target_x, camera, 'velocity_x', 0.32, delta_seconds);
+    camera.center_y = smooth_follow(camera.center_y, camera.anchor_y, camera, 'velocity_y', 0.45, delta_seconds);
 }
 
 // Ends the chapter: fades out, then shows the quiet scene that follows it.
@@ -1742,17 +1862,26 @@ function draw_offscreen_markers(draw_context, markers) {
 
 // Draws the small label above what "use" would do, like "E  Restore power".
 function draw_prompt(draw_context, prompt) {
-    if (!prompt) {
+    const world = game.world;
+    // Fade the label in and out, and keep the last one while it fades, so it never pops.
+    if (prompt) {
+        world.shown_prompt = prompt;
+    }
+    world.prompt_alpha = move_toward(world.prompt_alpha || 0, prompt ? 1 : 0, 1 / 60 * (prompt ? 6 : 4));
+    const shown = world.shown_prompt;
+    if (!shown || world.prompt_alpha <= 0.01) {
         set_touch_glow(null);
         return;
     }
-    set_touch_glow(prompt.control);
-    const key_name = prompt.control === 'low' ? 'S' : 'E';
-    const text = game.last_input === 'touch' ? prompt.text : key_name + '   ' + prompt.text;
+    set_touch_glow(prompt ? prompt.control : null);
+    const key_name = shown.control === 'low' ? 'S' : 'E';
+    const text = game.last_input === 'touch' ? shown.text : key_name + '   ' + shown.text;
+    draw_context.save();
+    draw_context.globalAlpha = ease_in_out(world.prompt_alpha);
     draw_context.font = '700 13px "Atkinson Hyperlegible", Arial, sans-serif';
     const text_width = draw_context.measureText(text).width;
-    const box_x = prompt.x - text_width / 2 - 10;
-    const box_y = prompt.y - 22;
+    const box_x = shown.x - text_width / 2 - 10;
+    const box_y = shown.y - 22 - (1 - world.prompt_alpha) * 6;
     draw_context.fillStyle = 'rgba(13,17,24,0.72)';
     draw_context.beginPath();
     if (draw_context.roundRect) {
@@ -1768,6 +1897,7 @@ function draw_prompt(draw_context, prompt) {
         draw_context.fillStyle = '#f0b65e';
         draw_context.fillText(key_name, box_x + 10, box_y + 12.5);
     }
+    draw_context.restore();
 }
 
 // Makes the matching phone button glow when it would do something useful.
@@ -2049,6 +2179,13 @@ window.until_we_find_home_debug = {
     set_speed: function debug_set_speed(multiplier) { game.speed_multiplier = multiplier; },
     walk_to: function debug_walk_to(x) { game.world.autopilot = { target_x: x }; },
     press: function debug_press(control) { set_control(control, true); set_control(control, false); },
+    hold: function debug_hold(control, pressed) { set_control(control, pressed); },
+    take_control: function debug_take_control(kind) { take_control(kind); },
+    character_state: function debug_character_state(kind) {
+        const character = game.world.characters[kind];
+        return { x: character.x, y: character.y, velocity_x: character.velocity_x, velocity_y: character.velocity_y, facing: character.facing, facing_blend: character.facing_blend, lean: character.lean ? character.lean.value : 0, on_ground: character.on_ground, pose: character.pose };
+    },
+    camera: function debug_camera() { return { center_x: game.camera.center_x, center_y: game.camera.center_y, zoom: game.camera.zoom }; },
     state: function debug_state() {
         const world = game.world;
         if (!world) {

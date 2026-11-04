@@ -105,59 +105,44 @@ function draw_contact_shadow(context, character) {
 // `dog` carries pose, facing, walk_phase, wag, fear, ear_lift, which the game updates.
 function draw_dog(context, dog, time_seconds) {
     const pose = dog.pose || 'stand';
-    const moving = pose === 'walk';
-    const phase = dog.walk_phase || 0;
     const fear = dog.fear || 0;
     context.save();
     context.translate(dog.x + dog.width / 2, dog.y + dog.height);
-    context.scale((dog.facing < 0 ? -1 : 1) * (dog.squash_x || 1), dog.squash_y || 1);
-
-    const breath = Math.sin(time_seconds * 2.4) * 0.5;
-    const bounce = moving ? -Math.abs(Math.sin(phase)) * 2 : 0;
+    context.rotate(dog.lean ? dog.lean.value : 0);
+    context.scale(turn_scale(dog) * (dog.squash_x || 1), dog.squash_y || 1);
+    const shape = blend_pose_shape(dog, pose, dog_shape(pose, dog, time_seconds), time_seconds, 0.18);
+    const moving = pose === 'walk';
     const wag_speed = 7 + (dog.wag || 0) * 13;
     const wag = Math.sin(time_seconds * wag_speed) * (0.18 + (dog.wag || 0) * 0.5);
     // The signature head tilt: every so often, when standing still, the dog tilts its head.
     const tilt_cycle = (time_seconds + (dog.x || 0) * 0.001) % 7.5;
     const head_tilt = !moving && pose !== 'sleep' && tilt_cycle > 6 ? Math.sin((tilt_cycle - 6) / 1.5 * Math.PI) * -0.32 : 0;
+    const head_x = shape.head[0];
+    const head_y = shape.head[1] + (fear > 0.5 && pose !== 'sleep' && pose !== 'embrace' ? 3 : 0);
+    const head_angle = shape.head_angle + head_tilt;
 
-    let body_x = 0;
-    let body_y = -23 + bounce + breath * 0.3;
-    let body_tilt = 0;
-    let head_x = 20;
-    let head_y = -34 + bounce;
-    let head_angle = head_tilt;
-    if (pose === 'sit') { body_tilt = -0.5; body_x = -3; body_y = -19; head_x = 12; head_y = -43; }
-    if (pose === 'sniff') { body_tilt = 0.14; head_x = 25; head_y = -15; head_angle = 0.35; }
-    if (pose === 'bark') { head_y -= 4; head_angle = -0.25; }
-    if (pose === 'jump') { body_tilt = (dog.velocity_y || 0) < 0 ? -0.28 : 0.18; }
-    if (pose === 'embrace') { body_tilt = -1.0; body_x = -7; body_y = -30; head_x = 8; head_y = -60; head_angle = 0.35; }
-    if (pose === 'sleep') { body_y = -11; head_x = 21; head_y = -10; head_angle = 0.15; }
-    if (pose === 'lean') { body_tilt = -0.06; head_x = 21; head_y = -31; head_angle = -0.2; }
-    if (fear > 0.5 && pose !== 'sleep' && pose !== 'embrace') { head_y += 3; }
+    draw_dog_legs(context, [shape.legs[0], shape.legs[1]], dog_shades.shade, dog_shades.base);
 
-    // Legs: far pair first (darker), near pair after the body. Diagonal pairs move together, like a trot.
-    const legs = dog_leg_positions(pose, phase, moving);
-    draw_dog_legs(context, legs.far, dog_shades.shade, dog_shades.base);
-
-    // Tail: a plume, high and busy when happy, low and still when afraid.
+    // Tail: a plume on a spring, plus the wag. High and busy when happy, low when afraid.
     if (pose !== 'embrace') {
         context.save();
-        context.translate(body_x - 18, pose === 'sleep' ? -12 : body_y - 6);
-        context.rotate(pose === 'sleep' ? 2.1 : -0.7 + fear * 1.3 + wag);
+        context.translate(shape.body[0] - 18, pose === 'sleep' ? -12 : shape.body[1] - 6);
+        const tail_angle = pose === 'sleep' ? 2.1 : (dog.tail ? dog.tail.value : -0.7 + fear * 1.3) + wag;
+        context.rotate(tail_angle);
         fluffy_blob(context, -9, -2, 10, 6, 6, 3, dog_shades.light, dog_shades.base);
         context.restore();
     }
 
-    // Body: hindquarters, barrel and chest as three soft curly blobs.
+    // Body: hindquarters, barrel and chest as three soft curly blobs. At a gallop the spine
+    // stretches and gathers, so hindquarters and chest move apart and together.
     context.save();
-    context.translate(body_x, body_y);
-    context.rotate(body_tilt);
+    context.translate(shape.body[0], shape.body[1]);
+    context.rotate(shape.body_tilt);
     const sleep_squash = pose === 'sleep' ? 0.75 : 1;
-    fluffy_blob(context, -11, 0, 12, 12 * sleep_squash, 7, 1, dog_shades.base, dog_shades.shade);
-    fluffy_blob(context, 2, -1, 17, 12 * sleep_squash, 9, 2, dog_shades.light, dog_shades.shade);
-    fluffy_blob(context, 13, 1, 9, 11 * sleep_squash, 6, 4, dog_shades.light, dog_shades.base);
+    fluffy_blob(context, shape.hind_x, 0, 12, 12 * sleep_squash, 7, 1, dog_shades.base, dog_shades.shade);
+    fluffy_blob(context, (shape.hind_x + shape.chest_x) / 2 + 1, -1, 17, 12 * sleep_squash, 9, 2, dog_shades.light, dog_shades.shade);
+    fluffy_blob(context, shape.chest_x, 1, 9, 11 * sleep_squash, 6, 4, dog_shades.light, dog_shades.base);
     curl_marks(context, 0, 0, 20, 10 * sleep_squash, 7, 7, 'rgba(150,104,66,0.28)');
-    // Rim light along the back: the coat catches whatever light is above.
     context.strokeStyle = 'rgba(255,240,210,0.55)';
     context.lineWidth = 1.6;
     context.beginPath();
@@ -165,7 +150,7 @@ function draw_dog(context, dog, time_seconds) {
     context.stroke();
     context.restore();
 
-    draw_dog_legs(context, legs.near, dog_shades.base, dog_shades.light);
+    draw_dog_legs(context, [shape.legs[2], shape.legs[3]], dog_shades.base, dog_shades.light);
 
     // Head: a big soft fluff, a topknot, a lighter bearded muzzle, a dark nose and a bright eye.
     context.save();
@@ -188,7 +173,8 @@ function draw_dog(context, dog, time_seconds) {
         context.ellipse(10, 7.5, 3.5, 2, 0.2, 0, Math.PI * 2);
         context.fill();
     }
-    const eyes_closed = pose === 'sleep' || pose === 'lean' || pose === 'embrace';
+    const blinking = ((dog.x || 0) * 0.29 + performance.now() / 1000) % 3.7 < 0.11;
+    const eyes_closed = pose === 'sleep' || pose === 'lean' || pose === 'embrace' || blinking;
     if (eyes_closed) {
         context.strokeStyle = dog_shades.eye;
         context.lineWidth = 1.3;
@@ -204,23 +190,22 @@ function draw_dog(context, dog, time_seconds) {
         context.beginPath();
         context.arc(5.2, -3.3, 0.75, 0, Math.PI * 2);
         context.fill();
-        // A fluffy brow over the eye gives the face its soft, worried-or-hopeful look.
         context.strokeStyle = 'rgba(184,135,90,0.8)';
         context.lineWidth = 1.4;
         context.beginPath();
         context.arc(4.5, -3.5, 3.6, Math.PI * 1.15, Math.PI * 1.75 + fear * 0.2);
         context.stroke();
     }
-    // The long floppy ear swings when moving and lifts when the dog hears a call.
+    // The long floppy ear hangs on a spring: it streams back at speed and flaps on landing.
     context.save();
     context.translate(-4, -4);
-    const ear_swing = moving ? Math.sin(phase) * 0.22 : Math.sin(time_seconds * 1.4) * 0.05;
-    context.rotate(0.2 + ear_swing - (dog.ear_lift || 0) * 0.6 + fear * 0.3);
+    const ear_angle = dog.ear ? dog.ear.value : 0.2 - (dog.ear_lift || 0) * 0.6 + fear * 0.3;
+    context.rotate(ear_angle + (moving ? Math.sin((dog.walk_phase || 0) * 2) * 0.08 : 0));
     fluffy_blob(context, -1, 9, 5.5, 10, 6, 9, dog_shades.base, dog_shades.deep);
     context.restore();
     context.restore();
 
-    // Collar with its tag.
+    // Collar with its tag, which swings with the head.
     if (pose !== 'sleep') {
         context.strokeStyle = dog_shades.collar;
         context.lineWidth = 3;
@@ -229,7 +214,7 @@ function draw_dog(context, dog, time_seconds) {
         context.stroke();
         context.fillStyle = dog_shades.tag;
         context.beginPath();
-        context.arc(head_x - 4, head_y + 14, 1.8, 0, Math.PI * 2);
+        context.arc(head_x - 4 + Math.sin(time_seconds * 6) * (moving ? 1.2 : 0.2), head_y + 14, 1.8, 0, Math.PI * 2);
         context.fill();
     }
     if (dog.carrying) {
@@ -243,40 +228,78 @@ function draw_dog(context, dog, time_seconds) {
 }
 
 // Where each leg's hip and paw are for the current pose and step.
-function dog_leg_positions(pose, phase, moving) {
-    const step = function step_offset(offset) { return moving ? Math.sin(phase + offset) * 7 : 0; };
-    const lift = function lift_offset(offset) { return moving ? Math.max(0, Math.cos(phase + offset)) * 3 : 0; };
-    if (pose === 'sleep') {
-        return { far: [], near: [[14, -8, 24, -4], [-8, -8, 2, -3]] };
-    }
-    if (pose === 'sit') {
-        return { far: [[9, -17, 11, 0]], near: [[13, -17, 15, 0], [-8, -9, 3, 0]] };
-    }
-    if (pose === 'embrace') {
-        return { far: [[-11, -12, -13, 0]], near: [[-7, -12, -5, 0], [10, -45, 18, -50]] };
-    }
-    if (pose === 'jump') {
-        return { far: [[14, -17, 24, -9], [-12, -17, -23, -10]], near: [[16, -17, 26, -11], [-9, -17, -20, -8]] };
-    }
-    return {
-        far: [[14, -17, 14 + step(Math.PI), -lift(Math.PI)], [-12, -17, -12 + step(0), -lift(0)]],
-        near: [[17, -17, 17 + step(0), -lift(0)], [-9, -17, -9 + step(Math.PI), -lift(Math.PI)]],
+function dog_shape(pose, dog, time_seconds) {
+    const speed = Math.abs(dog.velocity_x || 0);
+    const moving = pose === 'walk';
+    const walking = moving ? clamp_between(speed / 110, 0, 1) : 0;
+    const galloping = moving ? clamp_between((speed - 210) / 50, 0, 1) : 0;
+    const phase = dog.walk_phase || 0;
+    const breath = Math.sin(time_seconds * 2.4) * 0.5;
+    // Trot: diagonal legs move together. Gallop: front legs together, back legs together,
+    // with the spine stretching and gathering. The two blend as speed rises.
+    const offsets = {
+        far_front: 0 + galloping * 0.45 + (1 - galloping) * Math.PI,
+        far_back: Math.PI + galloping * 0.45 - (1 - galloping) * Math.PI,
+        near_front: 0,
+        near_back: Math.PI,
     };
+    const stride = (5.5 + 3.5 * galloping) * walking;
+    const lift = (3.5 + 4 * galloping) * walking;
+    const paw = function paw_at(hip_x, leg_phase) {
+        return [hip_x + stride * Math.sin(leg_phase), -Math.max(0, Math.cos(leg_phase)) * lift];
+    };
+    const bob = -walking * (Math.abs(Math.sin(phase)) * 1.6 * (1 - galloping) + (0.5 + 0.5 * Math.sin(phase)) * 4 * galloping);
+    const spine = galloping * 2.5 * Math.cos(phase);
+    const shape = {
+        body: [0, -23 + bob + breath * 0.3], body_tilt: galloping * 0.1 * Math.sin(phase), hind_x: -11 - spine, chest_x: 13 + spine,
+        head: [20 + galloping * 2, -34 + bob * 0.45], head_angle: 0,
+        legs: [
+            [13, -17].concat(paw(13, phase + offsets.far_front)),
+            [-12, -17].concat(paw(-12, phase + offsets.far_back)),
+            [16, -17].concat(paw(16, phase + offsets.near_front)),
+            [-9, -17].concat(paw(-9, phase + offsets.near_back)),
+        ],
+    };
+    if (pose === 'sit') {
+        Object.assign(shape, { body: [-3, -19], body_tilt: -0.5, head: [12, -43], legs: [[10, -17, 12, 0], [-6, -9, 2, -1], [13, -17, 15, 0], [-8, -9, 3, 0]] });
+    } else if (pose === 'sniff') {
+        Object.assign(shape, { body_tilt: 0.14, head: [25, -15], head_angle: 0.35 });
+    } else if (pose === 'bark') {
+        Object.assign(shape, { head: [20, -38], head_angle: -0.25 });
+    } else if (pose === 'jump') {
+        // Rising: front legs fold up, back legs push out. Falling: front legs reach for the ground.
+        const rising = clamp_between(-(dog.velocity_y || 0) / 690, 0, 1);
+        const falling = clamp_between((dog.velocity_y || 0) / 700, 0, 1);
+        Object.assign(shape, {
+            body_tilt: -0.28 * rising + 0.16 * falling,
+            legs: [
+                [13, -17, 20 - rising * 4 + falling * 4, -9 * rising - 2 + falling * 2],
+                [-12, -17, -22 + falling * 8, -8 + falling * 6],
+                [16, -17, 22 - rising * 4 + falling * 5, -10 * rising - 1 + falling * 2],
+                [-9, -17, -19 + falling * 8, -7 + falling * 6],
+            ],
+        });
+    } else if (pose === 'embrace') {
+        Object.assign(shape, { body: [-7, -30], body_tilt: -1.0, head: [8, -60], head_angle: 0.35, legs: [[8, -45, 15, -49], [-11, -12, -13, 0], [10, -45, 18, -50], [-7, -12, -5, 0]] });
+    } else if (pose === 'sleep') {
+        Object.assign(shape, { body: [0, -11], head: [21, -10], head_angle: 0.15, legs: [[12, -8, 22, -5], [-8, -8, 0, -3], [14, -8, 24, -4], [-10, -8, 2, -3]] });
+    } else if (pose === 'lean') {
+        Object.assign(shape, { body_tilt: -0.06, head: [21, -31], head_angle: -0.2 });
+    }
+    return shape;
 }
 
 // Draws dog legs as soft tapered columns with fluffy paws.
 function draw_dog_legs(context, legs, leg_color, paw_color) {
     for (const leg of legs) {
-        context.strokeStyle = leg_color;
-        context.lineCap = 'round';
-        context.lineWidth = 7;
-        context.beginPath();
-        context.moveTo(leg[0], leg[1]);
-        context.quadraticCurveTo((leg[0] + leg[2]) / 2 + 1.5, (leg[1] + leg[3]) / 2, leg[2], leg[3] - 2);
-        context.stroke();
+        const hip = [leg[0], leg[1]];
+        const paw = [leg[2], leg[3] - 2];
+        // Each leg bends at one joint, pointing backward (a wrist at the front, a hock at the back).
+        const joint = solve_joint(hip, paw, 9.5, 9.5, 1);
+        draw_limb(context, hip, joint, paw, leg_color, 7.5, 6);
         context.fillStyle = paw_color;
         context.beginPath();
-        context.ellipse(leg[2] + 1, leg[3] - 2, 4.6, 3, 0, 0, Math.PI * 2);
+        context.ellipse(paw[0] + 1, paw[1], 4.6, 3, 0, 0, Math.PI * 2);
         context.fill();
     }
 }
@@ -320,43 +343,57 @@ function draw_carried_item(context, item_name, x, y) {
 // ---------- The woman ----------
 
 // Works out where her joints are for each pose. Points are relative to her feet.
-function human_joints(pose, swing, time_seconds) {
+function human_shape(pose, human, time_seconds) {
     const breath = Math.sin(time_seconds * 1.8) * 0.6;
     if (pose === 'kneel' || pose === 'embrace') {
         const hugging = pose === 'embrace';
         return {
-            hip: [-1, -27], knee_back: [-7, -4], foot_back: [-19, 0], knee_front: [12, -25], foot_front: [13, 0],
-            shoulder: [5, -57 + breath], elbow_back: hugging ? [16, -50] : [6, -42], hand_back: hugging ? [22, -40] : [12, -30],
-            elbow_front: hugging ? [18, -46] : [12, -42], hand_front: hugging ? [16, -34] : [17, -30],
-            head: [10, -66 + breath], lean: 0.2,
+            hip: [-1, -27], foot_back: [-19, 0], foot_front: [13, 0],
+            shoulder: [5, -57 + breath], hand_back: hugging ? [22, -40] : [12, -30], hand_front: hugging ? [16, -34] : [17, -30],
+            head: [10, -66 + breath],
         };
     }
     if (pose === 'sit') {
         return {
-            hip: [0, -22], knee_back: [15, -27], foot_back: [18, 0], knee_front: [17, -26], foot_front: [21, 0],
-            shoulder: [1, -53 + breath], elbow_back: [6, -38], hand_back: [14, -28], elbow_front: [8, -38], hand_front: [17, -27],
-            head: [2, -62 + breath], lean: -0.03,
+            hip: [0, -22], foot_back: [18, 0], foot_front: [21, 0],
+            shoulder: [1, -53 + breath], hand_back: [14, -28], hand_front: [17, -27], head: [2, -62 + breath],
         };
     }
     if (pose === 'jump') {
+        // Rising: knees tuck and arms swing up. Falling: legs reach down for the landing, arms out.
+        const rising = clamp_between(-(human.velocity_y || 0) / 620, 0, 1);
+        const falling = clamp_between((human.velocity_y || 0) / 700, 0, 1);
         return {
-            hip: [0, -45], knee_back: [-7, -29], foot_back: [-13, -12], knee_front: [10, -33], foot_front: [7, -15],
-            shoulder: [2, -72], elbow_back: [-9, -66], hand_back: [-14, -74], elbow_front: [12, -66], hand_front: [16, -74],
-            head: [3, -81], lean: 0.05,
+            hip: [0, -45], foot_back: [-8 + falling * 3, -15 * rising - 2], foot_front: [9 - falling * 2, -11 * rising],
+            shoulder: [2, -72], hand_back: [-7 - falling * 8, -76 + falling * 18], hand_front: [11 + falling * 6, -80 + falling * 20],
+            head: [3, -81],
         };
     }
-    const walking = pose === 'walk';
-    const stride = walking ? swing * 10.5 : 0;
-    const lift_back = walking ? Math.max(0, -Math.cos(swing === 0 ? 0 : Math.asin(Math.max(-1, Math.min(1, swing))))) : 0;
-    const bob = walking ? -Math.abs(swing) * 1.4 : 0;
+    // Walking, jogging and standing come from one cycle, blended by speed. Each foot swings
+    // forward in an arc (lifted) and pushes back along the ground, so feet never slide.
+    const speed = Math.abs(human.velocity_x || 0);
+    const walking = pose === 'walk' ? clamp_between(speed / 110, 0, 1) : 0;
+    const jogging = pose === 'walk' ? clamp_between((speed - 185) / 45, 0, 1) : 0;
+    const phase = human.walk_phase || 0;
+    const stride = (9 + 6 * jogging) * walking;
+    const lift = (3.5 + 6 * jogging) * walking;
+    const foot = function foot_at(leg_phase) {
+        return [stride * Math.sin(leg_phase) + 1, -Math.max(0, Math.cos(leg_phase)) * lift];
+    };
+    const legs_apart = Math.abs(Math.sin(phase));
+    // Walking, the body rides highest as the legs pass; jogging, it dips at each footfall.
+    const bob = -walking * (1 - jogging) * (1 - legs_apart) * 1.4 + jogging * (legs_apart * 2.2 + 1.2);
+    const idle_sway = (1 - walking) * Math.sin(time_seconds * 0.55) * 0.8;
+    const hip = [jogging * 2 + idle_sway, -43.5 + bob];
+    const shoulder = [hip[0] + 2 + jogging * 2.5, hip[1] - 27.5 + breath * 0.35];
+    const swing = stride * 0.75 * Math.sin(phase);
+    const hand_height = shoulder[1] + 26 - jogging * 10;
     return {
-        hip: [0, -44 + bob],
-        knee_back: [-stride * 0.45 + 2, -22 + bob * 0.5], foot_back: [-stride, walking && swing > 0 ? -2.5 * lift_back : 0],
-        knee_front: [stride * 0.45 + 2.5, -22 + bob * 0.5], foot_front: [stride, walking && swing < 0 ? -2.5 : 0],
-        shoulder: [2, -71 + bob + breath * 0.4],
-        elbow_back: [stride * 0.35 - 1, -57 + bob], hand_back: [stride * 0.65, -45 + bob],
-        elbow_front: [-stride * 0.35 + 3, -57 + bob], hand_front: [-stride * 0.65 + 3, -45 + bob],
-        head: [3, -80 + bob + breath * 0.4], lean: walking ? 0.05 : 0,
+        hip: hip, foot_back: foot(phase + Math.PI), foot_front: foot(phase),
+        shoulder: shoulder,
+        hand_back: [shoulder[0] + swing - 1, hand_height - Math.abs(swing) * 0.15],
+        hand_front: [shoulder[0] - swing + 1, hand_height - Math.abs(swing) * 0.15],
+        head: [shoulder[0] + 1 + jogging * 1.5, shoulder[1] - 9.5 - bob * 0.3],
     };
 }
 
@@ -368,7 +405,7 @@ function draw_limb(context, from_point, joint_point, to_point, color, upper_widt
     context.lineWidth = upper_width;
     context.beginPath();
     context.moveTo(from_point[0], from_point[1]);
-    context.lineTo(joint_point[0], joint_point[1]);
+    context.quadraticCurveTo((from_point[0] + joint_point[0]) / 2, (from_point[1] + joint_point[1]) / 2, joint_point[0], joint_point[1]);
     context.stroke();
     context.lineWidth = lower_width;
     context.beginPath();
@@ -394,34 +431,43 @@ function draw_human(context, human, time_seconds) {
     const pose = human.pose || 'stand';
     context.save();
     context.translate(human.x + human.width / 2, human.y + human.height);
-    context.scale((human.facing < 0 ? -1 : 1) * (human.squash_x || 1), human.squash_y || 1);
-    const swing = Math.sin(human.walk_phase || 0);
-    const joints = human_joints(pose, swing, time_seconds);
-    const wind = Math.sin(time_seconds * 4.3 + (human.x || 0) * 0.02);
-    const speed = human.speed_ratio || 0;
+    context.rotate(human.lean ? human.lean.value : 0);
+    context.scale(turn_scale(human) * (human.squash_x || 1), human.squash_y || 1);
+    const shape = blend_pose_shape(human, pose, human_shape(pose, human, time_seconds), time_seconds, 0.16);
+    // Knees bend forward and elbows backward, worked out from where hips, feet, shoulders
+    // and hands are. Leg: thigh 23, shin 22. Arm: upper 14, forearm 13.
+    const knee_back = solve_joint(shape.hip, shape.foot_back, 23, 22, -1);
+    const knee_front = solve_joint(shape.hip, shape.foot_front, 23, 22, -1);
+    const elbow_back = solve_joint(shape.shoulder, shape.hand_back, 14, 13, 1);
+    const elbow_front = solve_joint(shape.shoulder, shape.hand_front, 14, 13, 1);
+    const speed = Math.abs(human.velocity_x || 0) / 240;
+    const scarf_flow = human.scarf ? human.scarf.value : speed + Math.sin(time_seconds * 2.1) * 0.25;
+    const hem_flow = human.hem ? human.hem.value : speed;
+    const hair_angle = human.hair ? human.hair.value : (human.ponytail_angle || 0);
 
     // Back arm and back leg: darker, they're further away.
-    draw_limb(context, joints.shoulder, joints.elbow_back, joints.hand_back, human_shades.coat_dark, 6, 5);
-    draw_limb(context, joints.hip, joints.knee_back, joints.foot_back, human_shades.jeans_dark, 8, 6.5);
-    draw_boot(context, joints.foot_back);
+    draw_limb(context, shape.shoulder, elbow_back, shape.hand_back, human_shades.coat_dark, 6, 5);
+    draw_limb(context, shape.hip, knee_back, shape.foot_back, human_shades.jeans_dark, 8, 6.5);
+    draw_boot(context, shape.foot_back);
 
-    // Satchel on her far hip, strap across her chest.
+    // Satchel on her far hip; it bounces a little behind her.
     context.fillStyle = human_shades.bag;
     context.beginPath();
-    context.ellipse(joints.hip[0] - 9, joints.hip[1] - 4, 6.5, 8, 0.15, 0, Math.PI * 2);
+    context.ellipse(shape.hip[0] - 9 - hem_flow * 2, shape.hip[1] - 4, 6.5, 8, 0.15 + hem_flow * 0.3, 0, Math.PI * 2);
     context.fill();
 
-    draw_limb(context, joints.hip, joints.knee_front, joints.foot_front, human_shades.jeans, 8, 6.5);
-    draw_boot(context, joints.foot_front);
+    draw_limb(context, shape.hip, knee_front, shape.foot_front, human_shades.jeans, 8, 6.5);
+    draw_boot(context, shape.foot_front);
 
-    // The raincoat: A-line, gradient lit from above, hem moving with her steps and the wind.
+    // The raincoat: hangs from the shoulders, the hem swinging back with speed and settling.
+    const torso_angle = Math.atan2(shape.shoulder[0] - shape.hip[0], shape.hip[1] - shape.shoulder[1]);
     context.save();
-    context.translate(joints.hip[0], joints.hip[1]);
-    context.rotate(joints.lean);
-    const torso = joints.hip[1] - joints.shoulder[1];
+    context.translate(shape.hip[0], shape.hip[1]);
+    context.rotate(torso_angle);
+    const torso = Math.hypot(shape.shoulder[0] - shape.hip[0], shape.hip[1] - shape.shoulder[1]);
     const crouched = pose === 'kneel' || pose === 'embrace' || pose === 'sit';
     const hem_y = crouched ? 3 : 10;
-    const hem_sway = crouched ? 0 : wind * 1.5 - speed * 3;
+    const hem_sway = crouched ? 0 : -hem_flow * 5 + Math.sin(time_seconds * 3) * 0.6;
     const coat = context.createLinearGradient(0, -torso, 0, hem_y);
     coat.addColorStop(0, human_shades.coat_light);
     coat.addColorStop(1, human_shades.coat_dark);
@@ -429,8 +475,8 @@ function draw_human(context, human, time_seconds) {
     context.beginPath();
     context.moveTo(-8, -torso + 1);
     context.quadraticCurveTo(0, -torso - 2, 9, -torso + 1);
-    context.quadraticCurveTo(12, -torso * 0.4, 13 + hem_sway * 0.3, hem_y);
-    context.lineTo(-12 + hem_sway, hem_y + 1);
+    context.quadraticCurveTo(12, -torso * 0.4, 13 + hem_sway * 0.4, hem_y - hem_sway * 0.2);
+    context.lineTo(-12 + hem_sway, hem_y + 1 + Math.abs(hem_sway) * 0.2);
     context.quadraticCurveTo(-11, -torso * 0.4, -8, -torso + 1);
     context.closePath();
     context.fill();
@@ -440,7 +486,7 @@ function draw_human(context, human, time_seconds) {
     context.strokeStyle = 'rgba(0,0,0,0.25)';
     context.beginPath();
     context.moveTo(3, -torso + 4);
-    context.lineTo(4, hem_y - 2);
+    context.lineTo(4 + hem_sway * 0.3, hem_y - 2);
     context.moveTo(-4, -torso * 0.35);
     context.lineTo(8, -torso * 0.35);
     context.stroke();
@@ -448,7 +494,7 @@ function draw_human(context, human, time_seconds) {
     context.lineWidth = 1.5;
     context.beginPath();
     context.moveTo(9, -torso + 2);
-    context.quadraticCurveTo(12, -torso * 0.4, 12.5, hem_y - 2);
+    context.quadraticCurveTo(12, -torso * 0.4, 12.5 + hem_sway * 0.4, hem_y - 2);
     context.stroke();
     context.restore();
 
@@ -456,26 +502,48 @@ function draw_human(context, human, time_seconds) {
     context.strokeStyle = '#4b3a27';
     context.lineWidth = 1.8;
     context.beginPath();
-    context.moveTo(joints.shoulder[0] + 6, joints.shoulder[1] + 1);
-    context.lineTo(joints.hip[0] - 8, joints.hip[1] - 9);
+    context.moveTo(shape.shoulder[0] + 6, shape.shoulder[1] + 1);
+    context.lineTo(shape.hip[0] - 8, shape.hip[1] - 9);
     context.stroke();
 
-    // Scarf: wrapped at the neck, the tail lifting in the wind and trailing when she moves.
-    const scarf_lift = wind * 3 + speed * 4;
+    // Scarf: wrapped at the neck, the tail streaming back on a spring.
+    const scarf_lift = scarf_flow * 6;
+    const neck = shape.shoulder;
     context.fillStyle = human_shades.scarf;
     context.beginPath();
-    context.ellipse(joints.shoulder[0] + 1.5, joints.shoulder[1] - 2.5, 7.5, 3.8, 0, 0, Math.PI * 2);
+    context.ellipse(neck[0] + 1.5, neck[1] - 2.5, 7.5, 3.8, torso_angle, 0, Math.PI * 2);
     context.fill();
     context.fillStyle = human_shades.scarf_dark;
     context.beginPath();
-    context.moveTo(joints.shoulder[0] - 4, joints.shoulder[1] - 1);
-    context.quadraticCurveTo(joints.shoulder[0] - 12, joints.shoulder[1] + 4 - scarf_lift, joints.shoulder[0] - 18 - speed * 4, joints.shoulder[1] + 9 - scarf_lift * 1.6);
-    context.lineTo(joints.shoulder[0] - 13 - speed * 4, joints.shoulder[1] + 12 - scarf_lift * 1.4);
-    context.quadraticCurveTo(joints.shoulder[0] - 7, joints.shoulder[1] + 5, joints.shoulder[0] + 1, joints.shoulder[1] + 1);
+    context.moveTo(neck[0] - 4, neck[1] - 1);
+    context.quadraticCurveTo(neck[0] - 11 - scarf_lift * 0.5, neck[1] + 5 - scarf_lift, neck[0] - 15 - scarf_lift * 1.6, neck[1] + 11 - scarf_lift * 1.5);
+    context.lineTo(neck[0] - 10 - scarf_lift * 1.5, neck[1] + 13 - scarf_lift * 1.2);
+    context.quadraticCurveTo(neck[0] - 6, neck[1] + 6, neck[0] + 1, neck[1] + 1);
     context.fill();
 
-    // Head: face in profile, ear, blue eye, and blonde hair with a ponytail that lags behind.
-    const head = joints.head;
+    // Head, tilted down a little when she looks at the dog close by.
+    const head = shape.head;
+    context.save();
+    context.translate(head[0], head[1]);
+    context.rotate((human.head_tilt ? human.head_tilt.value : 0) + torso_angle * 0.4);
+    context.translate(-head[0], -head[1]);
+    draw_human_head(context, human, head, hair_angle, pose);
+    context.restore();
+
+    // Front arm last, so it sits over the coat; a bare hand at the end.
+    draw_limb(context, shape.shoulder, elbow_front, shape.hand_front, human_shades.coat, 6, 5.2);
+    context.fillStyle = human_shades.skin;
+    context.beginPath();
+    context.arc(shape.hand_front[0], shape.hand_front[1], 2.7, 0, Math.PI * 2);
+    context.fill();
+    if (human.holding) {
+        draw_carried_item(context, human.holding, shape.hand_front[0] + 3, shape.hand_front[1] - 2);
+    }
+    context.restore();
+}
+
+// Her face in profile, ear, blue eye and blonde hair with a ponytail that swings on a spring.
+function draw_human_head(context, human, head, hair_angle, pose) {
     context.fillStyle = human_shades.skin;
     context.beginPath();
     context.ellipse(head[0], head[1], 7.6, 8.6, 0, 0, Math.PI * 2);
@@ -488,17 +556,16 @@ function draw_human(context, human, time_seconds) {
     context.beginPath();
     context.arc(head[0] + 3.5, head[1] + 3, 2.2, 0, Math.PI * 2);
     context.fill();
-    const ponytail_swing = (human.ponytail_angle || 0);
     context.save();
     context.translate(head[0] - 6, head[1] - 4);
-    context.rotate(0.35 + ponytail_swing);
+    context.rotate(0.35 + hair_angle);
     const pony = context.createLinearGradient(0, 0, 0, 16);
     pony.addColorStop(0, human_shades.hair);
     pony.addColorStop(1, human_shades.hair_dark);
     context.fillStyle = pony;
     context.beginPath();
     context.moveTo(-2, 0);
-    context.quadraticCurveTo(-7, 6, -4, 16);
+    context.quadraticCurveTo(-7 + hair_angle * 4, 6, -4 + hair_angle * 6, 16);
     context.quadraticCurveTo(-1, 12, 3, 1);
     context.closePath();
     context.fill();
@@ -529,7 +596,9 @@ function draw_human(context, human, time_seconds) {
     context.beginPath();
     context.ellipse(head[0] - 1, head[1] + 0.5, 1.8, 2.4, 0, 0, Math.PI * 2);
     context.fill();
-    if (human.eyes_closed || pose === 'embrace') {
+    // Blinks every few seconds: a tiny thing that makes a figure feel alive.
+    const blinking = ((human.x || 0) * 0.37 + performance.now() / 1000) % 4.3 < 0.12;
+    if (human.eyes_closed || pose === 'embrace' || blinking) {
         context.strokeStyle = '#5a4136';
         context.lineWidth = 1.1;
         context.beginPath();
@@ -551,17 +620,6 @@ function draw_human(context, human, time_seconds) {
         context.lineTo(head[0] + 6.3, head[1] - 3.1);
         context.stroke();
     }
-
-    // Front arm last, so it sits over the coat; a bare hand at the end.
-    draw_limb(context, joints.shoulder, joints.elbow_front, joints.hand_front, human_shades.coat, 6, 5.2);
-    context.fillStyle = human_shades.skin;
-    context.beginPath();
-    context.arc(joints.hand_front[0], joints.hand_front[1], 2.7, 0, Math.PI * 2);
-    context.fill();
-    if (human.holding) {
-        draw_carried_item(context, human.holding, joints.hand_front[0] + 3, joints.hand_front[1] - 2);
-    }
-    context.restore();
 }
 
 // ---------- Background scenery ----------
@@ -828,8 +886,40 @@ function draw_smoke_column(context, x, ground_y, time_seconds) {
 
 // ---------- The world's solid parts ----------
 
-// Draws one solid piece of the world: floors, walls, gates, fences, planks, crates.
+// Draws one solid piece of the world, moving it physically when it opens, closes or arrives:
+// gates slide up into the ceiling, fire doors drop and bounce, gangplanks swing down from
+// upright, crates fall and land. (The collision changes at once; this is only the picture.)
 function draw_solid(context, solid, palette, time_seconds) {
+    const motion = solid.motion;
+    if (!motion) {
+        draw_solid_shape(context, solid, palette, time_seconds);
+        return;
+    }
+    context.save();
+    if (motion.type === 'slide_open' || motion.type === 'drop_shut') {
+        const progress = motion.type === 'slide_open' ? ease_in_out(motion.seconds / 0.9) : 1 - ease_out_bounce(motion.seconds / 0.45);
+        if (progress >= 1) {
+            context.restore();
+            return;
+        }
+        context.beginPath();
+        context.rect(solid.x - 6, solid.y, solid.w + 12, solid.h);
+        context.clip();
+        context.translate(0, -solid.h * progress);
+    } else if (motion.type === 'fall') {
+        context.translate(0, -170 * (1 - ease_out_bounce(motion.seconds / 0.45)));
+    } else if (motion.type === 'swing_down') {
+        const angle = -Math.PI / 2 * (1 - ease_out_bounce(motion.seconds / 0.8));
+        context.translate(solid.x, solid.y + solid.h / 2);
+        context.rotate(angle);
+        context.translate(-solid.x, -(solid.y + solid.h / 2));
+    }
+    draw_solid_shape(context, solid, palette, time_seconds);
+    context.restore();
+}
+
+// Draws the shape of one solid piece: floors, walls, gates, fences, planks, crates.
+function draw_solid_shape(context, solid, palette, time_seconds) {
     if (solid.kind === 'invisible' || solid.fade <= 0.01) {
         return;
     }
@@ -1044,6 +1134,15 @@ function draw_prop(context, prop, palette, time_seconds) {
             break;
         }
         case 'lamp': {
+            if (prop.sway) {
+                context.save();
+                context.translate(x, y);
+                context.rotate(prop.sway.value);
+                context.translate(-x, -y);
+                draw_prop(context, Object.assign({}, prop, { sway: null }), palette, time_seconds);
+                context.restore();
+                break;
+            }
             context.strokeStyle = '#151a20';
             context.lineWidth = 2.5;
             context.beginPath();
@@ -1388,17 +1487,19 @@ function draw_interactable(context, item, time_seconds, in_reach, available) {
             context.lineWidth = 4;
             context.lineCap = 'round';
             context.beginPath();
+            const since_used = item.used_at !== undefined ? time_seconds - item.used_at : 0;
             if (item.sprite === 'wheel' || item.sprite === 'crank') {
-                const turn = item.done ? 1.2 : 0;
+                const turn = item.done ? Math.PI * 3 * ease_in_out(since_used / 1.4) : 0;
                 context.arc(x, y - 34, 13, 0, Math.PI * 2);
                 for (const spoke of [0, Math.PI / 2]) {
                     context.moveTo(x + Math.cos(spoke + turn) * 13, y - 34 + Math.sin(spoke + turn) * 13);
                     context.lineTo(x - Math.cos(spoke + turn) * 13, y - 34 - Math.sin(spoke + turn) * 13);
                 }
             } else {
-                const pulled = item.done;
+                const pull = item.done ? ease_out_bounce(since_used / 0.4) : 0;
+                const lever_angle = -1.1 + pull * 2.1;
                 context.moveTo(x, y - 30);
-                context.lineTo(x + (pulled ? 15 : -14), y - (pulled ? 21 : 57));
+                context.lineTo(x + Math.sin(lever_angle) * 29, y - 30 - Math.cos(lever_angle) * 29);
             }
             context.stroke();
             break;
@@ -1638,6 +1739,16 @@ function draw_particles(context, particles) {
             context.globalAlpha = life_left;
             draw_carried_item(context, 'photo', 0, 0);
             context.restore();
+        } else if (particle.kind === 'board') {
+            context.save();
+            context.translate(particle.x, particle.y);
+            context.rotate(particle.angle || 0);
+            context.globalAlpha = Math.min(1, life_left * 3);
+            context.fillStyle = '#4e3c2c';
+            context.fillRect(-particle.width / 2, -particle.height / 2, particle.width, particle.height);
+            context.fillStyle = '#6a523c';
+            context.fillRect(-particle.width / 2, -particle.height / 2, particle.width, 3);
+            context.restore();
         } else if (particle.kind === 'puff') {
             context.fillStyle = 'rgba(190,190,185,' + (0.35 * life_left).toFixed(3) + ')';
             context.beginPath();
@@ -1652,7 +1763,15 @@ function draw_particles(context, particles) {
         } else {
             context.globalAlpha = particle.color ? life_left : 1;
             context.fillStyle = particle.color || 'rgba(200,220,235,' + (0.7 * life_left).toFixed(2) + ')';
-            context.fillRect(particle.x, particle.y, particle.size, particle.size);
+            if (particle.angle !== undefined) {
+                context.save();
+                context.translate(particle.x, particle.y);
+                context.rotate(particle.angle);
+                context.fillRect(-particle.size, -particle.size / 3, particle.size * 2, particle.size * 0.7);
+                context.restore();
+            } else {
+                context.fillRect(particle.x, particle.y, particle.size, particle.size);
+            }
             context.globalAlpha = 1;
         }
     }
@@ -1677,6 +1796,14 @@ function draw_light_effects(context, props, time_seconds, wet, left_edge, right_
         const bulb_y = prop.hanging ? prop.y + 42 : prop.y + 2;
         const floor_y = prop.floor_y || bulb_y + 200;
         const tint = prop.light_tint || '255,206,140';
+        // A swinging lamp swings its light: rotate the cone and halo around the hook,
+        // and slide the pool of light along the floor.
+        const sway = prop.sway ? prop.sway.value : 0;
+        const pool_x = prop.x + Math.sin(sway) * (floor_y - prop.y);
+        context.save();
+        context.translate(prop.x, prop.y);
+        context.rotate(sway);
+        context.translate(-prop.x, -prop.y);
         // The cone: brightest at the bulb, spreading and fading toward the floor.
         const cone = context.createLinearGradient(0, bulb_y, 0, floor_y);
         cone.addColorStop(0, 'rgba(' + tint + ',' + (0.22 * strength).toFixed(3) + ')');
@@ -1696,8 +1823,9 @@ function draw_light_effects(context, props, time_seconds, wet, left_edge, right_
         halo.addColorStop(1, 'rgba(' + tint + ',0)');
         context.fillStyle = halo;
         context.fillRect(prop.x - 46, bulb_y - 46, 92, 92);
+        context.restore();
         // The pool of light on the floor, and its reflection streaking down a wet surface.
-        const pool = context.createRadialGradient(prop.x, floor_y, 0, prop.x, floor_y, spread);
+        const pool = context.createRadialGradient(pool_x, floor_y, 0, pool_x, floor_y, spread);
         pool.addColorStop(0, 'rgba(' + tint + ',' + (0.18 * strength).toFixed(3) + ')');
         pool.addColorStop(1, 'rgba(' + tint + ',0)');
         context.fillStyle = pool;
@@ -1705,7 +1833,7 @@ function draw_light_effects(context, props, time_seconds, wet, left_edge, right_
         context.translate(0, floor_y);
         context.scale(1, 0.25);
         context.beginPath();
-        context.arc(prop.x, 0, spread, 0, Math.PI * 2);
+        context.arc(pool_x, 0, spread, 0, Math.PI * 2);
         context.fill();
         context.restore();
         if (wet) {
@@ -1714,9 +1842,9 @@ function draw_light_effects(context, props, time_seconds, wet, left_edge, right_
             reflection.addColorStop(1, 'rgba(' + tint + ',0)');
             context.fillStyle = reflection;
             const shimmer = Math.sin(time_seconds * 3 + prop.x) * 1.5;
-            context.fillRect(prop.x - 4 + shimmer, floor_y, 8, 34);
-            context.fillRect(prop.x - 12 - shimmer, floor_y + 2, 3, 20);
-            context.fillRect(prop.x + 9 + shimmer, floor_y + 1, 3, 24);
+            context.fillRect(pool_x - 4 + shimmer, floor_y, 8, 34);
+            context.fillRect(pool_x - 12 - shimmer, floor_y + 2, 3, 20);
+            context.fillRect(pool_x + 9 + shimmer, floor_y + 1, 3, 24);
         }
     }
     context.restore();

@@ -27,7 +27,9 @@ Open `index.html` in Chrome or Safari: double-click it on the Mac, or drag it in
 | `js/game.js` | The engine: movement, the companion who follows you, calls, the reunion, camera, screens |
 | `js/art.js` | Every picture, drawn in code: characters, places, light, rain, the quiet scenes |
 | `js/audio.js` | Every sound, made in code: rain, whistle, bark, music |
+| `js/motion.js` | How bodies respond to movement: springs, turning, leaning, bending joints, blending poses |
 | `tests/playtest.js` | A robot that plays every chapter to the end and measures frame time |
+| `tests/filmstrip.js` | Films walking, turning, jumping and the dog running into contact sheets; fails if motion goes stiff |
 
 ## How a chapter works
 
@@ -41,7 +43,13 @@ From the repository root, in a cloud session (Playwright and Chromium are instal
 ```
 node prototype/web/tests/playtest.js
 ```
-Expected: `PLAYTEST PASSED: every chapter finished`, plus the frame time for each chapter. Screenshots go to `prototype/web/tests/screenshots/`. Git ignores that folder, because the screenshots are regenerated on every run.
+Expected: `PLAYTEST PASSED: every chapter finished`, plus the frame time for each chapter.
+
+To check how the motion looks:
+```
+node prototype/web/tests/filmstrip.js
+```
+Expected: `MOTION CHECK PASSED`, plus two contact sheets (images of every frame) to look at. Screenshots go to `prototype/web/tests/screenshots/`. Git ignores that folder, because the screenshots are regenerated on every run.
 
 ## Security notes
 
