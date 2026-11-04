@@ -68,8 +68,9 @@ jobs:
     name: macOS (Apple clang), normal build
     # Run on a fresh virtual machine with the latest macOS that GitHub provides.
     runs-on: macos-latest
-    # Stop the job if it runs longer than 15 minutes.
-    timeout-minutes: 15
+    # Stop the job after 45 minutes. GitHub's Mac machines are scarce and the wait for one
+    # counted against a 15-minute limit on the first run, cancelling the job before it began.
+    timeout-minutes: 45
     # The steps for this job, run one after another.
     steps:
       # Step 1: the label for downloading the repository's code onto the machine.
