@@ -32,6 +32,14 @@ To see the chapter play out as a log:
 
 Each output line is one event, as JSON. The last line on screen shows the final story beat and the dog's feelings.
 
+To play the chapter yourself, as text:
+
+```
+./core/build/text_chapter
+```
+
+Type `help` at any time. A finished run ends with `chapter finished`. The whole plan, from here to the App Store, is in `docs/build_plan.md`.
+
 ## Reading order for the code
 
 1. `core/include/bodhi/chapter_beat.hpp`: the story beats
