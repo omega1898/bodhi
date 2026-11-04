@@ -390,7 +390,7 @@ const her_jump_keys = [
 
 // Her kneeling pose, breathing (0 = out, 1 = in).
 function her_kneeling(breath) {
-    return her_values({ hip_y: -23 - breath * 0.3, hip_x: -1, lean: 0.24 - breath * 0.01, near_foot: [13, 0], far_foot: [-19, 0], far_foot_angle: -1.3, near_hand: [9, 23], far_hand: [5, 24], hair: 0.1 - breath * 0.03, hem: 0.06 });
+    return her_values({ hip_y: -23 - breath * 0.3, hip_x: -1, lean: 0.24 - breath * 0.01, near_foot: [13, 0], far_foot: [-19, 0], far_foot_angle: -1.3, near_hand: [11, 19.5 - breath * 0.3], far_hand: [15, 15.5 - breath * 0.3], hair: 0.1 - breath * 0.03, hem: 0.06 });
 }
 
 // Every animation as a list of poses. Loops get two drawings per key; one-off moves get
@@ -402,24 +402,36 @@ const her_animations = {
     walk: in_between(her_cycle_keys(her_walk_keys, 0.04, 25), 2, true).map(her_pose),
     run: in_between(her_cycle_keys(her_run_keys, 0.14, 17), 2, true).map(her_pose),
     jump: in_between(her_jump_keys, 2, false).map(her_pose),
+    // Landing starts from touch-down (the end of the jump, feet now on the floor), sinks into
+    // the impact, then rises back to standing, so the jump hands over without a snap.
     land: in_between([
+        Object.assign({}, her_jump_keys[4], { hip_y: -43, near_foot: [4.5, 0], far_foot: [-4.5, 0], near_foot_angle: 0, far_foot_angle: 0 }),
         her_values({ hip_y: -33, lean: 0.16, near_foot: [4.5, 0], far_foot: [-4.5, 0], near_hand: [9, 18], far_hand: [-3, 20], hair: -0.1, hem: 0.06 }),
         her_values({ hip_y: -40, lean: 0.06, near_foot: [4.5, 0], far_foot: [-4.5, 0], near_hand: [3, 24], far_hand: [-1, 24], hair: 0.06, hem: 0.02 }),
         her_standing,
     ], 2, false).map(her_pose),
     turn: in_between([
-        her_values({ hip_y: -42, lean: -0.1, near_foot: [5.5, -1], far_foot: [-4, 0], near_hand: [-5, 24], far_hand: [6, 23], hair: 0.25, scarf: 0.6, hem: -0.06 }),
+        her_values({ hip_y: -41.5, lean: 0.1, near_foot: [4.5, 0], far_foot: [-6, -1.2], far_foot_angle: -0.4, near_hand: [5, 22], far_hand: [-3, 22], hair: 0.3, scarf: 0.6, hem: 0.05 }),
         her_values({ hip_y: -43, lean: 0.05, near_foot: [4.5, 0], far_foot: [-4.5, 0], near_hand: [2, 25], far_hand: [0, 25], hair: 0.12, scarf: 0.45, hem: 0.03 }),
         her_standing,
     ], 2, false).map(her_pose),
     // Stopping from a run: the front foot brakes, the back foot steps up, the coat and hair
     // carry on forward a moment, then everything settles.
     stop: in_between([
-        her_values({ hip_y: -41, lean: -0.08, near_foot: [5, 0], far_foot: [-8, -1.5], far_foot_angle: -0.5, near_hand: [6, 22], far_hand: [-4, 23], hair: 0.3, scarf: 0.65, hem: -0.08 }),
-        her_values({ hip_y: -42.8, lean: 0.03, near_foot: [5, 0], far_foot: [-3, -1.2], far_foot_angle: -0.2, near_hand: [3, 24.5], far_hand: [-1, 25], hair: 0.12, scarf: 0.4, hem: 0.03 }),
+        her_values({ hip_y: -41, lean: -0.08, near_foot: [5, 0], far_foot: [-8, -1.5], far_foot_angle: -0.5, near_hand: [6, 22], far_hand: [-4, 23], hair: -0.15, scarf: 0.1, hem: -0.08 }),
+        her_values({ hip_y: -42.8, lean: 0.03, near_foot: [5, 0], far_foot: [-3, -1.2], far_foot_angle: -0.2, near_hand: [3, 24.5], far_hand: [-1, 25], hair: 0.05, scarf: 0.35, hem: 0.03 }),
         her_standing,
     ], 2, false).map(her_pose),
+    // A skid: she reversed at speed and is still sliding the old way. Drawn facing the slide,
+    // the front heel dug in, body braced back, hair and scarf thrown forward. The game picks the
+    // drawing by speed: the first while sliding fast, the last just before she pivots.
+    skid: in_between([
+        her_values({ hip_y: -39.5, lean: -0.16, near_foot: [10, 0], near_foot_angle: 0.35, far_foot: [-5, -1.5], far_foot_angle: -0.3, near_hand: [9, 16], far_hand: [12, 12], hair: -0.25, scarf: 0.0, hem: -0.1 }),
+        her_values({ hip_y: -40.5, lean: -0.1, near_foot: [9, 0], near_foot_angle: 0.25, far_foot: [-3, -1], far_foot_angle: -0.2, near_hand: [7, 18], far_hand: [10, 15], hair: -0.18, scarf: 0.1, hem: -0.08 }),
+        her_values({ hip_y: -41.8, lean: -0.04, near_foot: [7, 0], near_foot_angle: 0.1, far_foot: [-2, -0.5], near_hand: [4, 22], far_hand: [5, 21], hair: -0.08, scarf: 0.2, hem: -0.04 }),
+    ], 2, false).map(her_pose),
     // Getting down (five drawings, played once), then breathing while kneeling (four, looped).
+    // Played backwards, the first five are also her getting up.
     kneel: in_between([
         her_standing,
         her_values({ hip_y: -35, lean: 0.12, near_foot: [10, -2], far_foot: [-10, -2], far_foot_angle: -0.5, near_hand: [8, 22], far_hand: [3, 23], hair: 0.05, hem: 0.04 }),
@@ -450,6 +462,13 @@ function draw_dog(pose) {
     const spine_middle = middle(pelvis, withers);
     const arch = pose.arch || 0;
     const head = pose.head;
+    // The fur is drawn in the body's own coordinates (origin mid-spine, turned with the spine),
+    // so its curl texture and fluffy edge move with the body. Drawn in the frame's coordinates
+    // the texture stayed put while the body moved, and the fur seemed to swim.
+    const body_angle = Math.atan2(axis[1], axis[0]);
+    const to_body = function to_body(point) {
+        return to_pixels(rotate_point(subtract(point, spine_middle), -body_angle));
+    };
     // The silhouette, from the rump, along the back and neck, round the chest and belly.
     const outline = [
         body_point(pelvis, axis, -11, 0),
@@ -466,7 +485,7 @@ function draw_dog(pose) {
         body_point(pelvis, axis, 4, -9.5),
         body_point(pelvis, axis, -6, -9.5),
         body_point(pelvis, axis, -10.5, -5),
-    ].map(to_pixels);
+    ].map(to_body);
 
     // A leg: one furry tube from inside the body, through the joint, to the paw.
     const leg = function draw_leg(top, paw, widths, color) {
@@ -474,10 +493,11 @@ function draw_dog(pose) {
         // Standing, the joints bend back as a dog's do; lying down (`folded`), they fold up into
         // the body instead of poking down through the floor.
         const joint = solve_joint(top, paw_point, 10.5, 10.5, pose.folded ? -1 : 1);
-        const points = [top, joint, paw_point].map(to_pixels);
-        const paw_pixels = to_pixels(add(paw_point, [0.8, 0]));
+        const points = [top, joint, paw_point].map(to_body);
+        const paw_pixels = to_body(add(paw_point, [0.8, 0]));
+        // The paw stays level with the floor, whatever angle the body is at.
         return '<path d="' + tube_path(points, widths) + '" fill="' + color + '"/>' +
-            '<ellipse cx="' + number_text(paw_pixels[0]) + '" cy="' + number_text(paw_pixels[1]) + '" rx="54" ry="31" fill="' + color + '"/>';
+            '<ellipse cx="' + number_text(paw_pixels[0]) + '" cy="' + number_text(paw_pixels[1]) + '" rx="54" ry="31" fill="' + color + '" transform="rotate(' + number_text(-degrees(body_angle)) + ' ' + number_text(paw_pixels[0]) + ' ' + number_text(paw_pixels[1]) + ')"/>';
     };
     const front_top_near = body_point(withers, axis, 2, -3);
     const front_top_far = body_point(withers, axis, 0, -3);
@@ -489,7 +509,7 @@ function draw_dog(pose) {
     const tail_direction = rotate_point([-1, 0], -(pose.tail || 0));
     const tail_tip = add(tail_root, scale(tail_direction, 14));
     const tail_middle = add(middle(tail_root, tail_tip), [0, -(pose.tail_curl || 2)]);
-    const tail_points = [tail_root, tail_middle, tail_tip].map(to_pixels);
+    const tail_points = [tail_root, tail_middle, tail_tip].map(to_body);
 
     const fur = [
         '<g filter="url(#far_side)">',
@@ -521,7 +541,8 @@ function draw_dog(pose) {
     }
     const ear_root = add(head, rotate_point([-4.2, -3.6], pose.head_angle || 0));
     const ear_markup = place_part(dog_parts.ear, ear_root, (pose.head_angle || 0) + (pose.ear || 0.2), ' scale(0.92)');
-    return '<g filter="url(#fluffy)">' + fur.join('') + '</g>' +
+    const body_place = to_pixels(spine_middle);
+    return '<g transform="translate(' + number_text(body_place[0]) + ',' + number_text(body_place[1]) + ') rotate(' + number_text(degrees(body_angle)) + ')"><g filter="url(#fluffy)">' + fur.join('') + '</g></g>' +
         '<path d="M ' + back_line.map(function point_text(point) { return point.map(number_text).join(','); }).join(' L ') + '" fill="none" stroke="#fff3d8" stroke-width="7" stroke-linecap="round" opacity="0.45"/>' +
         head_markup + ear_markup;
 }
@@ -582,9 +603,17 @@ function dog_sitting(breath, turn) {
         legs: { near_front: [12, 0], far_front: [10, 0], near_back: [1, 0], far_back: [-2, 0] } });
 }
 
+// The dog up on its back legs, front paws over her shoulders, eyes closed, tail going.
+function dog_hugging(breath, turn) {
+    return dog_pose({ pelvis: [-5, -14], withers: [2, -36 - breath * 0.4], arch: 0, tuck: 0, head: [8, -50 - breath * 0.4], head_angle: 0.35, ear: 0.25, tail: 0.3 + 0.2 * Math.sin(2 * Math.PI * turn),
+        eyes: 'closed', reaching: true, legs: { near_front: [19, -47], far_front: [16, -45], near_back: [-4, 0], far_back: [-7, 0] } });
+}
+
 const dog_animations = {
+    // The wag swings either side of the standing tail angle, so idle starts exactly where every
+    // landing, turn and stop ends.
     idle: breathing(8, function idle_pose(breath, turn) {
-        return dog_pose({ pelvis: [-11, -27 - breath * 0.3], withers: [11, -28 - breath * 0.3], head: [19, -39 - breath * 0.15], tail: 0.55 + 0.23 * Math.sin(2 * Math.PI * turn), ear: 0.22 + breath * 0.03 });
+        return dog_pose({ pelvis: [-11, -27 - breath * 0.3], withers: [11, -28 - breath * 0.3], head: [19, -39 - breath * 0.15], tail: 0.45 + 0.25 * Math.sin(2 * Math.PI * turn), ear: 0.22 + breath * 0.03 });
     }),
     trot: in_between(dog_trot_keys, 2, true),
     gallop: in_between(dog_gallop_keys, 2, true),
@@ -601,7 +630,10 @@ const dog_animations = {
         dog_pose({ pelvis: [-11, -29], withers: [11, -26], arch: 0, head: [21, -37], head_angle: 0.08, ear: 0.65, tail: 0.3,
             legs: { near_front: [16, -1], far_front: [14, -2], near_back: [-12, -4], far_back: [-10, -5] } }),
     ], 2, false),
+    // Landing starts from touch-down (front paws first), sinks into the impact, then stands.
     land: in_between([
+        dog_pose({ pelvis: [-11, -28], withers: [11, -25.5], head: [21, -37], head_angle: 0.08, ear: 0.6, tail: 0.3,
+            legs: { near_front: [15.5, 0], far_front: [13.5, -0.8], near_back: [-11.5, -3], far_back: [-10, -3.5] } }),
         dog_pose({ pelvis: [-10.5, -22], withers: [10.5, -21], arch: -0.5, head: [19, -32], head_angle: 0.12, ear: 0.75, tail: 0.3 }),
         dog_pose({ pelvis: [-11, -25.5], withers: [11, -26.5], head: [19, -37], head_angle: 0.04, ear: 0.45, tail: 0.4 }),
         dog_standing,
@@ -612,6 +644,15 @@ const dog_animations = {
         dog_pose({ pelvis: [-10, -27], withers: [10, -28], arch: 0.5, head: [18, -39], head_angle: -0.04, ear: 0.32, tail: 0.6 }),
         dog_standing,
     ], 2, false),
+    // A skid, as hers: drawn facing the slide, front paws braced, hips sunk, ears flung forward.
+    skid: in_between([
+        dog_pose({ pelvis: [-12.5, -23.5], withers: [9, -25.5], arch: -1.5, head: [17, -35], head_angle: 0.12, ear: -0.25, tail: 0.25,
+            legs: { near_front: [21, 0], far_front: [19, 0], near_back: [-5, 0], far_back: [-7, 0] } }),
+        dog_pose({ pelvis: [-12, -25], withers: [9.5, -26.5], arch: -1, head: [17.5, -36.5], head_angle: 0.08, ear: -0.1, tail: 0.3,
+            legs: { near_front: [19, 0], far_front: [17, 0], near_back: [-6, 0], far_back: [-8, 0] } }),
+        dog_pose({ pelvis: [-11.5, -26.3], withers: [10.5, -27.5], head: [18.5, -38], head_angle: 0.03, ear: 0.05, tail: 0.38,
+            legs: { near_front: [16, 0], far_front: [14, 0], near_back: [-7, 0], far_back: [-9.5, 0] } }),
+    ], 2, false),
     // Stopping from a run: front paws brace, the hips sink back, the ears swing forward.
     stop: in_between([
         dog_pose({ pelvis: [-12, -25], withers: [10, -26.5], arch: -1, head: [20, -36], head_angle: 0.08, ear: 0.7, tail: 0.3,
@@ -620,6 +661,7 @@ const dog_animations = {
         dog_standing,
     ], 2, false),
     // Sitting down (five drawings, played once), then sitting and breathing (four, looped).
+    // Played backwards, the first five are also the dog getting up.
     sit: in_between([
         dog_standing,
         dog_pose({ pelvis: [-9, -18], withers: [10, -28], head: [18, -41], ear: 0.25, tail: 0.1, legs: { near_back: [-3, -1.5], far_back: [-6, -1.5] } }),
@@ -641,10 +683,14 @@ const dog_animations = {
     lean: breathing(6, function nuzzle(breath, turn) {
         return dog_pose({ pelvis: [-11, -27], withers: [11, -27.5], head: [21, -35 + breath * 0.4], head_angle: -0.2, ear: 0.3, tail: 0.55 + 0.2 * Math.sin(2 * Math.PI * turn), eyes: 'closed' });
     }),
-    embrace: breathing(6, function hug(breath, turn) {
-        return dog_pose({ pelvis: [-5, -14], withers: [2, -36 - breath * 0.4], arch: 0, tuck: 0, head: [8, -50 - breath * 0.4], head_angle: 0.35, ear: 0.25, tail: 0.3 + 0.2 * Math.sin(2 * Math.PI * turn),
-            eyes: 'closed', reaching: true, legs: { near_front: [19, -47], far_front: [16, -45], near_back: [-4, 0], far_back: [-7, 0] } });
-    }),
+    // Rising onto the back legs into the hug (five drawings, played once), then holding on and
+    // breathing (six, looped). Played backwards, the first five bring the dog back down.
+    embrace: in_between([
+        dog_standing,
+        dog_pose({ pelvis: [-8, -20], withers: [5, -33], arch: 0.5, tuck: 1, head: [12, -46], head_angle: 0.22, ear: 0.3, tail: 0.5, reaching: true,
+            legs: { near_front: [16, -24], far_front: [14, -22], near_back: [-5, 0], far_back: [-8, 0] } }),
+        dog_hugging(0, 0),
+    ], 2, false).concat(breathing(6, dog_hugging)),
 };
 
 // ---------- Writing the files ----------
@@ -664,15 +710,73 @@ const cycle_lengths = {
 
 // Points the game draws things at, per frame: what she holds goes in her near hand; what the dog
 // carries goes in its mouth; its blink goes over its eye (with the head's angle).
+// Also where the feet are, so the game can start a stride from the drawing whose feet are
+// closest to the ones just shown.
 function frame_points(character, pose) {
     if (character === 'her') {
-        return { hand: [pose.near_hand[0], pose.near_hand[1]].map(round_tenth) };
+        return {
+            hand: [pose.near_hand[0], pose.near_hand[1]].map(round_tenth),
+            feet: [pose.near_foot.map(round_tenth), pose.far_foot.map(round_tenth)],
+        };
     }
     const angle = pose.head_angle || 0;
     return {
         mouth: add(pose.head, rotate_point([11.5, 6.5], angle)).map(round_tenth),
         eye: add(pose.head, rotate_point([4.4, -2.2], angle)).map(round_tenth).concat([round_tenth(angle)]),
+        feet: [pose.legs.near_front, pose.legs.far_front, pose.legs.near_back, pose.legs.far_back].map(function rounded(point) { return point.map(round_tenth); }),
     };
+}
+
+// The points compared when one move hands over to the next.
+function key_points(character, pose) {
+    if (character === 'her') {
+        return [pose.hip, pose.shoulder, pose.near_foot, pose.far_foot, pose.near_hand, pose.far_hand];
+    }
+    return [pose.pelvis, pose.withers, pose.head, pose.legs.near_front, pose.legs.far_front, pose.legs.near_back, pose.legs.far_back];
+}
+
+// How far the body jumps when the game goes from one drawing straight to another: the largest
+// distance any key point moves, in game units. Under about 2.5 reads as continuous motion.
+function hand_over_gap(character, from_pose, to_pose) {
+    const from_points = key_points(character, from_pose);
+    const to_points = key_points(character, to_pose);
+    let largest = 0;
+    for (let index = 0; index < from_points.length; index++) {
+        largest = Math.max(largest, length_of(subtract(from_points[index], to_points[index])));
+    }
+    return largest;
+}
+
+// The hand-overs the game makes from one animation straight into another: [from animation,
+// from drawing, to animation, to drawing]. A drawing of -1 means the last one.
+const hand_overs = {
+    her: [
+        ['land', -1, 'idle', 0], ['turn', -1, 'idle', 0], ['stop', -1, 'idle', 0], ['jump', -1, 'land', 0],
+        ['idle', 0, 'kneel', 0], ['kneel', 4, 'kneel', 5], ['kneel', 5, 'embrace', 0], ['embrace', 0, 'kneel', 5], ['kneel', 0, 'idle', 0],
+    ],
+    bodhi: [
+        ['land', -1, 'idle', 0], ['turn', -1, 'idle', 0], ['stop', -1, 'idle', 0], ['jump', -1, 'land', 0],
+        ['idle', 0, 'sit', 0], ['sit', 4, 'sit', 5], ['sit', 0, 'idle', 0],
+        ['idle', 0, 'embrace', 0], ['embrace', 4, 'embrace', 5], ['embrace', 0, 'idle', 0],
+    ],
+};
+
+// Prints every hand-over's gap, marking any big enough to see as a jump.
+function report_hand_overs() {
+    const animations = { her: her_animations, bodhi: dog_animations };
+    const lines = [];
+    let worst = 0;
+    for (const [character, pairs] of Object.entries(hand_overs)) {
+        for (const [from_name, from_index, to_name, to_index] of pairs) {
+            const from_frames = animations[character][from_name];
+            const from_pose = from_frames[from_index < 0 ? from_frames.length + from_index : from_index];
+            const gap = hand_over_gap(character, from_pose, animations[character][to_name][to_index]);
+            worst = Math.max(worst, gap);
+            lines.push('  ' + (gap > largest_smooth_gap ? 'JUMP ' : 'ok   ') + character + ' ' + from_name + ' ' + from_index + ' -> ' + to_name + ' ' + to_index + ': ' + gap.toFixed(1) + ' units');
+        }
+    }
+    console.log('hand-overs (largest move of any key point between two drawings):\n' + lines.join('\n'));
+    return worst;
 }
 
 // Rounds to one decimal place, keeping the atlas file short.
@@ -713,7 +817,16 @@ function write_animation(character, name, frames, definitions, draw) {
     return entry;
 }
 
+// The largest hand-over gap allowed, in game units. Bigger shows on screen as a jump.
+const largest_smooth_gap = 2.5;
+
 function main() {
+    // Like build_atlas.js refusing parts that overlap: frames whose hand-overs would visibly
+    // jump are not written, so a pose change can't quietly bring the jumping back.
+    if (report_hand_overs() > largest_smooth_gap) {
+        console.log('REFUSED: a hand-over above is bigger than ' + largest_smooth_gap + ' units. Change the poses so the two drawings meet, then run again.');
+        process.exit(1);
+    }
     fs.mkdirSync(output_folder, { recursive: true });
     // A lighter grain for whole frames (the painted parts already carry their own).
     const her_definitions = extract_definitions(her_sheet) + '<linearGradient id="sleeve_lit" x1="1" y1="0" x2="0" y2="0"><stop offset="0" stop-color="#5aa59f"/><stop offset="1" stop-color="#2c625f"/></linearGradient>' + '<filter id="grain_soft" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="1" seed="9" result="noise"/><feColorMatrix in="noise" type="saturate" values="0" result="mono"/><feComponentTransfer in="mono" result="faint"><feFuncA type="table" tableValues="0 0.06"/></feComponentTransfer><feComposite in="faint" in2="SourceGraphic" operator="in" result="grain"/><feBlend in="grain" in2="SourceGraphic" mode="multiply"/></filter>';

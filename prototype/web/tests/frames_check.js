@@ -1,7 +1,8 @@
 // Purpose: checks the hand-drawn animation frames (art/animations/, frames_atlas.js) in a real
 // browser. It fails if a sheet is missing or the wrong size; if any drawing is cut off at the
 // edge of its frame, sinks below the floor or is empty; if the game shows the wrong animation
-// for what a character is doing; if running changes drawing too rarely to look fluid; or if odd
+// for what a character is doing; if running changes drawing too rarely to look fluid; if a
+// turn at speed doesn't skid or getting up from kneeling pops; or if odd
 // input (an unknown pose, missing numbers) makes the drawing code crash.
 //
 // Run from the repository root:  node prototype/web/tests/frames_check.js
@@ -165,6 +166,55 @@ async function check_fluidity(page) {
     return problems;
 }
 
+// Records every drawing shown (and the way it faces), frame by frame, for `seconds` after
+// running `action` inside the page. Short moves like a skid last only a few frames.
+async function record_shown(page, kind, seconds, action) {
+    return page.evaluate(({ who, duration, action_text }) => new Promise((resolve) => {
+        const seen = [];
+        const debug = window.until_we_find_home_debug;
+        (new Function('debug', action_text))(debug);
+        const start = performance.now();
+        function look(now) {
+            const state = debug.character_state(who);
+            seen.push(state.shown + ' facing ' + state.shown_facing);
+            if (now - start < duration * 1000) {
+                requestAnimationFrame(look);
+            } else {
+                resolve(seen);
+            }
+        }
+        requestAnimationFrame(look);
+    }), { who: kind, duration: seconds, action_text: action });
+}
+
+// Turning round at a run must skid (drawn facing the old way, the way it's still sliding), and
+// moving off from kneeling must show her getting up rather than popping upright.
+async function check_transitions(page) {
+    const problems = [];
+    await page.evaluate(() => { const debug = window.until_we_find_home_debug; debug.start_level(5); debug.skip_card(); debug.take_control('human'); });
+    await page.waitForTimeout(1200);
+    await page.evaluate(() => window.until_we_find_home_debug.hold('right', true));
+    await page.waitForTimeout(1200);
+    const reversing = await record_shown(page, 'human', 0.5, "debug.hold('right', false); debug.hold('left', true);");
+    await page.evaluate(() => window.until_we_find_home_debug.hold('left', false));
+    const skid_facing_right = reversing.some((entry) => entry.startsWith('skid') && entry.endsWith('facing 1'));
+    console.log((skid_facing_right ? '  ok   ' : '  FAIL ') + 'reversing at a run skids, facing the slide (' + reversing.filter((entry) => entry.startsWith('skid')).length + ' skid frames)');
+    if (!skid_facing_right) {
+        problems.push('no skid facing the slide when reversing at a run: ' + Array.from(new Set(reversing)).slice(0, 8).join(', '));
+    }
+    await page.waitForTimeout(800);
+    await page.evaluate(() => window.until_we_find_home_debug.press('low'));
+    await page.waitForTimeout(1500);
+    const rising = await record_shown(page, 'human', 0.5, "debug.hold('right', true);");
+    await page.evaluate(() => window.until_we_find_home_debug.hold('right', false));
+    const got_up = rising.some((entry) => /^kneel [0-3] /.test(entry));
+    console.log((got_up ? '  ok   ' : '  FAIL ') + 'moving off from kneeling shows her getting up (' + Array.from(new Set(rising.map((entry) => entry.split(' facing')[0]))).slice(0, 6).join(', ') + ')');
+    if (!got_up) {
+        problems.push('moving off from kneeling pops upright with no getting-up drawings');
+    }
+    return problems;
+}
+
 // Break it: hands the drawing code characters with an unknown pose, missing or nonsense
 // numbers. None of it may throw; an unknown pose must fall back to standing.
 async function check_odd_input(page) {
@@ -209,11 +259,12 @@ async function main() {
     console.log('sheets: ' + (sheet_problems.length === 0 ? 'every frame present, sized right and inside its frame' : sheet_problems.length + ' problems'));
     const choice_problems = await check_choices(page);
     const fluidity_problems = await check_fluidity(page);
+    const transition_problems = await check_transitions(page);
     const odd_problems = await check_odd_input(page);
     console.log('odd input: ' + (odd_problems.length === 0 ? 'nothing crashed; an unknown pose falls back to idle' : odd_problems.length + ' problems'));
     await browser.close();
 
-    const problems = sheet_problems.concat(choice_problems, fluidity_problems, odd_problems, page_errors);
+    const problems = sheet_problems.concat(choice_problems, fluidity_problems, transition_problems, odd_problems, page_errors);
     if (problems.length > 0) {
         console.log('PROBLEMS:\n  ' + problems.join('\n  '));
     }

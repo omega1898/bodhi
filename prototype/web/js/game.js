@@ -621,6 +621,13 @@ function move_character(character, direction, wants_jump, delta_seconds, speed_s
     if (character.on_ground && Math.abs(character.velocity_x) > top_speed + 1 && direction !== 0) {
         rate = spec.braking * 0.5;  // Slowing from a jog to a walk is gradual.
     }
+    // A hard turn at speed kicks dust up from the feet, once per turn, flying the way of the slide.
+    if (turning && character.on_ground && Math.abs(character.velocity_x) > 150 && !character.skidding && game.world) {
+        for (let index = 0; index < 4; index++) {
+            game.world.particles.push({ kind: 'puff', x: center_x(character) - direction * (4 + index * 4), y: character.y + character.height - 3, velocity_x: -direction * (40 + index * 25), velocity_y: -14 - index * 6, gravity: 0, life: 0.4, max_life: 0.4, size: 4 });
+        }
+    }
+    character.skidding = turning && character.on_ground;
     character.velocity_x = move_toward(character.velocity_x, target_velocity, rate * delta_seconds);
     if (direction !== 0) {
         character.facing = direction;
@@ -2276,7 +2283,7 @@ window.until_we_find_home_debug = {
     drawn_x: function debug_drawn_x() { return game.last_drawn_player_x === undefined ? null : game.last_drawn_player_x; },
     character_state: function debug_character_state(kind) {
         const character = game.world.characters[kind];
-        return { x: character.x, y: character.y, velocity_x: character.velocity_x, velocity_y: character.velocity_y, facing: character.facing, facing_blend: character.facing_blend, lean: character.lean ? character.lean.value : 0, on_ground: character.on_ground, pose: character.pose, shown: character.flipbook_state ? character.flipbook_state.shown : null };
+        return { x: character.x, y: character.y, velocity_x: character.velocity_x, velocity_y: character.velocity_y, facing: character.facing, facing_blend: character.facing_blend, lean: character.lean ? character.lean.value : 0, on_ground: character.on_ground, pose: character.pose, shown: character.flipbook_state ? character.flipbook_state.shown : null, shown_facing: character.flipbook_state ? character.flipbook_state.shown_facing : null };
     },
     flipbook_ready: function debug_flipbook_ready() { return flipbook.ready; },
     camera: function debug_camera() { return { center_x: game.camera.center_x, center_y: game.camera.center_y, zoom: game.camera.zoom }; },

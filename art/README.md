@@ -27,7 +27,14 @@ The game animates frame by frame, the way hand-drawn 2D games do: every frame is
 
 - **Where the poses come from:** `tools/draw_frames.js` keys the poses as numbers, like an animator's key poses. A walk has contact, down, passing and up. The dog has a real trot and a rotary gallop.
 - **In-betweens:** like an animator, the tool keys a few poses and then makes the drawings in between. It follows smooth curves through the keys rather than straight lines, so movement flows through each key instead of turning sharply at it. A planted foot or paw moves in a straight line at an even speed, so it never slides or dips through the floor. Walks and runs have 16 drawings per cycle, the gallop 12, and idle breathing 12.
-- **Moves that hand over:** landings, turns and stops all settle into the same home stance that idle breathes from, so one move flows into the next. The jump is one arc of 9 drawings, and the game picks the drawing from how fast the character is rising or falling.
+- **Moves that hand over:**
+  - Landings, turns and stops all settle into the same home stance that idle breathes from, so one move flows into the next.
+  - The jump is one arc of 9 drawings, and the game picks the drawing from how fast the character is rising or falling. Landings start from a touch-down drawing that matches the end of the jump.
+  - Setting off, landing into a run and coming out of a skid start the stride at the drawing whose feet are closest to the feet just shown.
+  - Getting up is the getting-down drawings (kneel, sit, the dog's rise into the hug) played backwards.
+- **Skids:** reversing at speed shows a skid, drawn facing the way the character is still sliding, with dust from the feet.
+- **The hand-over gate:** `draw_frames.js` measures how far the body moves between the last drawing of one move and the first of the next. If anything jumps more than 2.5 game units, it refuses to write the frames and names the hand-over to fix.
+- **The dog's fur** is drawn in the body's own coordinates, so its curls and fluffy edge move with the body instead of swimming across it.
 - **How a frame is drawn:** limbs are drawn as one bending shape. The dog's back, chest and legs merge into one furry silhouette. Faces, the coat and the satchel come from the painted sheets in `characters/`, so the style matches.
 - **What it writes:** one SVG per animation into `animations/`, frames in rows of up to 8 (a very wide sheet is too wide for a phone to paint), and `prototype/web/js/frames_atlas.js`. The atlas says where each frame is, how far each walking cycle travels, and where her hand and the dog's mouth and eye are in each frame.
 - **No sliding feet:** walking and running frames advance with distance covered. The planted foot moves back by the same amount every frame, and the cycle length in the atlas is worked out from that.
@@ -38,10 +45,11 @@ After changing a pose or a painted part:
 node art/tools/draw_frames.js
 node prototype/web/tests/frames_check.js
 ```
-Expected: `drew 193 frames...`, then `FRAMES CHECK PASSED`. The check fails if:
+Expected: a hand-over list with every line `ok`, then `drew 212 frames...`, then `FRAMES CHECK PASSED`. The check fails if:
 - a drawing is cut off at its frame's edge, or sinks through the floor;
 - the game picks the wrong animation;
 - running changes drawing fewer than 24 times a second, which reads as steppy rather than fluid. The current figure is about 45.
+- reversing at a run doesn't skid, or getting up from kneeling pops straight upright.
 
 ## How the character parts work (painted sheets)
 
