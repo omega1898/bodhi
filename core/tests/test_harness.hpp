@@ -27,5 +27,6 @@ inline int check_count = 0;
 void run_chapter_beat_tests();
 void run_event_bus_tests();
 void run_bond_state_tests();
+void run_companion_behavior_tests();
 void run_telemetry_log_tests();
 void run_railway_chapter_tests();

@@ -15,6 +15,7 @@ add_library(bodhi_core
     src/chapter_beat.cpp
     src/event_bus.cpp
     src/bond_state.cpp
+    src/companion_behavior.cpp
     src/telemetry_log.cpp
     src/railway_chapter.cpp
 )
@@ -45,6 +46,7 @@ add_executable(core_tests
     tests/test_chapter_beat.cpp
     tests/test_event_bus.cpp
     tests/test_bond_state.cpp
+    tests/test_companion_behavior.cpp
     tests/test_telemetry_log.cpp
     tests/test_railway_chapter.cpp
 )
