@@ -54,3 +54,19 @@ add_test(NAME core_tests COMMAND core_tests)
 add_executable(chapter_demo tools/chapter_demo.cpp)
 target_link_libraries(chapter_demo PRIVATE bodhi_core)
 add_test(NAME chapter_demo_reaches_aftermath COMMAND chapter_demo)
+
+# A playable text version of chapter one. It stands in for Unreal Engine:
+#   ./core/build/text_chapter
+add_executable(text_chapter tools/text_chapter.cpp)
+target_link_libraries(text_chapter PRIVATE bodhi_core)
+
+# Replays scripts of typed commands. The full playthrough and the hostile script (garbage
+# mixed into a real playthrough) must both reach the ending, which gives exit code 0.
+set(playthrough_folder ${CMAKE_CURRENT_SOURCE_DIR}/tests/playthroughs)
+add_test(NAME text_chapter_full_playthrough COMMAND text_chapter ${playthrough_folder}/full_chapter.txt)
+add_test(NAME text_chapter_hostile_input COMMAND text_chapter ${playthrough_folder}/hostile_input.txt)
+# Break it: try every shortcut. The story must still be stuck right after the separation.
+add_test(NAME text_chapter_cheat_attempts COMMAND text_chapter ${playthrough_folder}/cheat_attempts.txt)
+set_tests_properties(text_chapter_cheat_attempts PROPERTIES
+    PASS_REGULAR_EXPRESSION "stopped at beat: human_section"
+    FAIL_REGULAR_EXPRESSION "AddressSanitizer|runtime error")

@@ -1,0 +1,27 @@
+look
+pet
+whistle
+go upper_walkway
+cross
+go signal_room
+whistle
+restore_power
+listen
+sniff
+go luggage_room
+sniff
+go flooded_passage
+sniff
+go railing_walk
+take_glove
+go waiting_room
+bark
+go fence
+touch
+pull_lever
+switch
+clear_debris
+approach
+kneel
+hold
+rest
