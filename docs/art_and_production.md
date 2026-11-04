@@ -27,6 +27,12 @@
 | Ears, tail, hair, scarf, coat hem, satchel are on springs | Each lags and settles at its own rate | Secondary motion is what makes small figures feel alive |
 | The world moves physically | Gates slide into the ceiling, planks break into tumbling boards or swing down, crates fall and bounce, lamps sway and swing their light | Fading things in and out reads as fake |
 
+**The camera frames the moment.**
+- **Close by default:** about 290 world units of height, so she's roughly a third of the screen.
+- **Pulls back to fit both of them** (as far as about 440 units) when they're on different floors near each other, meeting at a barrier, after an answered call, and as they approach the reunion.
+- **The ground she stands on sits about two thirds of the way down the screen.**
+- **Zoom glides** over about 0.7 s.
+
 In Unreal these become: character movement settings (acceleration, braking, gravity scale), animation blend spaces (walk to jog, trot to gallop), two-bone IK on feet, and physics or spring bones on ears, tail and hair.
 
 **The browser game (`prototype/web/`) is the art blueprint, not the final look.** It proves composition, colour, light and timing. The Unreal version keeps those decisions and adds real 3D, materials and fur.

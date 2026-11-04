@@ -1536,34 +1536,55 @@ function update_camera(delta_seconds) {
     const world = game.world;
     const camera = game.camera;
     const player = controlled_character();
-    let target_zoom = camera.base_zoom;
+    const companion = companion_character();
     // Look ahead in the direction of travel, eased so turning around doesn't jolt the view.
-    const wanted_look_ahead = player.facing * 60 * Math.min(1, 0.35 + player.speed_ratio);
+    const wanted_look_ahead = player.facing * 50 * Math.min(1, 0.35 + player.speed_ratio);
     camera.look_ahead += (wanted_look_ahead - camera.look_ahead) * Math.min(1, delta_seconds * 1.6);
     let focus_x = center_x(player) + camera.look_ahead;
     let focus_y = null;
+    let target_zoom = camera.close_zoom;
+
+    // Close on the character you control most of the time, so faces and bodies read clearly.
+    // Pull back to frame both of them only when both matter: different floors close together,
+    // meeting at a barrier, an answered call, the approach before a reunion.
+    const gap_x = Math.abs(center_x(companion) - center_x(player));
+    const gap_y = Math.abs((companion.y + companion.height) - (player.y + player.height));
+    const answer_heard = world.call_markers.some(function is_answer(marker) { return !marker.own; });
+    const both_matter = ['near_contact', 'final_obstacle'].includes(world.beat)
+        || (world.reunion && world.reunion.stage === 'approach')
+        || (gap_y > 60 && gap_x < 420)
+        || (answer_heard && gap_x < 700);
+    if (both_matter) {
+        const top = Math.min(player.y, companion.y);
+        const bottom = Math.max(player.y + player.height, companion.y + companion.height);
+        const zoom_to_fit = Math.min(view_height / (bottom - top + 170), view_width / (gap_x + 300));
+        target_zoom = Math.max(camera.wide_zoom, Math.min(camera.close_zoom, zoom_to_fit));
+        focus_x = (center_x(player) + center_x(companion)) / 2 + camera.look_ahead * 0.4;
+        focus_y = (top + bottom) / 2 + 20;
+    }
     if (world.reunion && world.reunion.stage === 'embrace') {
         focus_x = center_x(player);
         focus_y = player.y + player.height * 0.55;
-        target_zoom = camera.base_zoom * 1.5;
+        target_zoom = camera.close_zoom * 1.3;
     }
-    camera.zoom += (target_zoom - camera.zoom) * Math.min(1, delta_seconds * 1.1);
+    // Zoom glides rather than snaps.
+    camera.zoom = smooth_follow(camera.zoom, target_zoom, camera, 'zoom_velocity', 0.7, delta_seconds);
     const visible_width = view_width / camera.zoom;
     const visible_height = view_height / camera.zoom;
-    // Frame from the bottom of the level so both floors stay in view, but rise to keep the
-    // player's head clear of the top edge when climbing.
     const lowest_center_y = game.level.height - visible_height / 2;
-    let target_y = Math.min(lowest_center_y, player.y + player.height * 0.5 + 90, player.y - 70 + visible_height / 2);
+    // Put the ground she stands on about two thirds of the way down the screen (a common
+    // framing in film and games), with her head well clear of the top edge.
+    let target_y = Math.min(lowest_center_y, player.y + player.height - visible_height * 0.18, player.y - 40 + visible_height / 2);
     if (focus_y !== null) {
-        target_y = Math.min(lowest_center_y + 40, focus_y);
+        target_y = Math.min(lowest_center_y + 30, focus_y);
     }
     const target_x = game.level.width <= visible_width ? game.level.width / 2
         : Math.max(visible_width / 2, Math.min(game.level.width - visible_width / 2, focus_x));
     // Ignore small jumps vertically: only re-aim up or down when she lands, or leaves the frame.
-    if (camera.anchor_y === undefined || player.on_ground || Math.abs(target_y - camera.anchor_y) > 110 || focus_y !== null) {
+    if (camera.anchor_y === undefined || player.on_ground || Math.abs(target_y - camera.anchor_y) > visible_height * 0.25 || focus_y !== null) {
         camera.anchor_y = target_y;
     }
-    camera.center_x = smooth_follow(camera.center_x, target_x, camera, 'velocity_x', 0.32, delta_seconds);
+    camera.center_x = smooth_follow(camera.center_x, target_x, camera, 'velocity_x', 0.3, delta_seconds);
     camera.center_y = smooth_follow(camera.center_y, camera.anchor_y, camera, 'velocity_y', 0.45, delta_seconds);
 }
 
@@ -1897,6 +1918,10 @@ function draw_prompt(draw_context, prompt) {
     const key_name = shown.control === 'low' ? 'S' : 'E';
     const text = game.last_input === 'touch' ? shown.text : key_name + '   ' + shown.text;
     draw_context.save();
+    const text_scale = game.camera.wide_zoom / game.camera.zoom * 1.1;
+    draw_context.translate(shown.x, shown.y);
+    draw_context.scale(text_scale, text_scale);
+    draw_context.translate(-shown.x, -shown.y);
     draw_context.globalAlpha = ease_in_out(world.prompt_alpha);
     draw_context.font = '700 13px "Atkinson Hyperlegible", Arial, sans-serif';
     const text_width = draw_context.measureText(text).width;
@@ -2044,9 +2069,12 @@ function resize_canvas() {
     game.pixel_scale = Math.min(canvas.height / 540, canvas.width / minimum_view_width);
     view_width = canvas.width / game.pixel_scale;
     view_height = canvas.height / game.pixel_scale;
-    // Show about 430 world units of height: close enough to read faces, wide enough for both floors.
-    game.camera.base_zoom = Math.max(1, Math.min(view_height / 430, view_width / 620));
-    game.camera.zoom = game.camera.base_zoom;
+    // Close framing shows about 290 world units of height: she's roughly 30% of the screen,
+    // the size characters are in phone games. Wide framing shows both floors at once.
+    game.camera.close_zoom = Math.max(1, Math.min(view_height / 290, view_width / 520));
+    game.camera.wide_zoom = Math.max(1, Math.min(view_height / 440, view_width / 640));
+    game.camera.base_zoom = game.camera.close_zoom;
+    game.camera.zoom = game.camera.close_zoom;
     // Darkness and light are soft, so a third of the resolution looks the same and costs a ninth.
     light_canvas.width = Math.ceil(view_width / 3);
     light_canvas.height = Math.ceil(view_height / 3);
