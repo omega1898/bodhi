@@ -106,6 +106,7 @@ const levels = [
         mood: 'calm',
         scenery: {
             sky_top: '#0e1520', sky_bottom: '#24303f', far: 'city', mid: 'station_roof',
+            art: { far: 'art/scenery/station_far.svg', mid: 'art/scenery/station_mid.svg', near: 'art/scenery/station_near.svg' },
             far_color: '#18202b', mid_color: '#1d2632', ground_top: '#4a4f57', ground_body: '#22262c', wall: '#2f3238', room_wall: '#232830',
             near: 'near_columns', near_color: '#121a25', horizon_glow: 'rgba(120,145,180,0.55)', darkness: 0.64, darkness_color: 'rgb(4,7,13)', rain: 1, wind: 0.4, foreground: 'pillars', mist: 'rgba(140,165,190,0.07)',
         },

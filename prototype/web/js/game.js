@@ -269,6 +269,7 @@ function start_level(level_index) {
     game.level_index = level_index;
     game.level = levels[level_index];
     game.world = build_world(game.level);
+    load_scenery_art(game.level);
     game.backdrop_layers = render_backdrop(game.level, game.pixel_scale, view_width, view_height);
     game.rain_drops = [];
     game.near_rain_drops = [];
@@ -2083,6 +2084,7 @@ function resize_canvas() {
     if (game.level) {
         game.backdrop_layers = render_backdrop(game.level, game.pixel_scale, view_width, view_height);
     }
+    cut_puppet_parts(false);
 }
 
 // Watches how long frames take. If the device keeps falling behind (fewer than about
@@ -2284,6 +2286,7 @@ window.until_we_find_home_debug = {
 };
 
 resize_canvas();
+load_puppet_sheets();
 window.addEventListener('resize', resize_canvas);
 connect_controls();
 show_title();

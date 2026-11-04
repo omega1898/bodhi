@@ -101,6 +101,10 @@ function draw_contact_shadow(context, character) {
 // Draws the goldendoodle with its feet at the bottom of its collision box.
 // `dog` carries pose, facing, walk_phase, wag, fear, ear_lift, which the game updates.
 function draw_dog(context, dog, time_seconds) {
+    if (puppets.ready) {
+        draw_dog_puppet(context, dog, time_seconds);  // The painted dog, once its art has loaded.
+        return;
+    }
     const pose = dog.pose || 'stand';
     const fear = dog.fear || 0;
     context.save();
@@ -248,13 +252,13 @@ function dog_shape(pose, dog, time_seconds) {
     const bob = -walking * (Math.abs(Math.sin(phase)) * 1.6 * (1 - galloping) + (0.5 + 0.5 * Math.sin(phase)) * 4 * galloping);
     const spine = galloping * 2.5 * Math.cos(phase);
     const shape = {
-        body: [0, -23 + bob + breath * 0.3], body_tilt: galloping * 0.1 * Math.sin(phase), hind_x: -11 - spine, chest_x: 13 + spine,
-        head: [20 + galloping * 2, -34 + bob * 0.45], head_angle: 0,
+        body: [0, -27 + bob + breath * 0.3], body_tilt: galloping * 0.1 * Math.sin(phase), hind_x: -11 - spine, chest_x: 13 + spine,
+        head: [19 + galloping * 2, -39 + bob * 0.45], head_angle: 0,
         legs: [
-            [13, -17].concat(paw(13, phase + offsets.far_front)),
-            [-12, -17].concat(paw(-12, phase + offsets.far_back)),
-            [16, -17].concat(paw(16, phase + offsets.near_front)),
-            [-9, -17].concat(paw(-9, phase + offsets.near_back)),
+            [11, -20].concat(paw(11, phase + offsets.far_front)),
+            [-11, -20].concat(paw(-11, phase + offsets.far_back)),
+            [14, -20].concat(paw(14, phase + offsets.near_front)),
+            [-8, -20].concat(paw(-8, phase + offsets.near_back)),
         ],
     };
     if (pose === 'sit') {
@@ -425,6 +429,10 @@ function draw_boot(context, foot) {
 
 // Draws the woman with her feet at the bottom of her collision box.
 function draw_human(context, human, time_seconds) {
+    if (puppets.ready) {
+        draw_human_puppet(context, human, time_seconds);  // The painted woman, once her art has loaded.
+        return;
+    }
     const pose = human.pose || 'stand';
     context.save();
     context.translate(human.x + human.width / 2, human.y + human.height);
@@ -621,15 +629,57 @@ function draw_human_head(context, human, head, hair_angle, pose) {
 
 // ---------- Background scenery ----------
 
+// Painted scenery images (SVG files in art/scenery/), loaded once and kept, by path.
+const scenery_images = {};
+
+// Loads a chapter's painted background layers, if it has any. When they arrive, the backdrop
+// is repainted with them; until then the code-drawn layers stand in.
+function load_scenery_art(level) {
+    const art = level.scenery.art;
+    if (!art) {
+        return;
+    }
+    for (const art_path of Object.values(art)) {
+        if (scenery_images[art_path]) {
+            continue;
+        }
+        const image = new Image();
+        const from_repository = window.location.pathname.indexOf('/prototype/web/') !== -1;
+        const candidates = from_repository ? ['../../' + art_path, art_path] : [art_path, '../../' + art_path];
+        let attempt = 0;
+        scenery_images[art_path] = { image: image, loaded: false };
+        image.onload = function scenery_loaded() {
+            scenery_images[art_path].loaded = true;
+            if (game.level === level) {
+                game.backdrop_layers = render_backdrop(level, game.pixel_scale, view_width, view_height);
+            }
+        };
+        image.onerror = function scenery_failed() {
+            attempt += 1;
+            if (attempt < candidates.length) {
+                image.src = candidates[attempt];
+            }
+        };
+        image.src = candidates[0];
+    }
+}
+
+// The loaded painted image for one background depth ('far', 'mid' or 'near'), or null.
+function painted_layer(level, depth_name) {
+    const art_path = level.scenery.art && level.scenery.art[depth_name];
+    const entry = art_path && scenery_images[art_path];
+    return entry && entry.loaded ? entry.image : null;
+}
+
 // Paints the far and middle background layers for a level once, onto hidden canvases.
 // Drawing them once and copying them each frame is much cheaper on a phone.
 function render_backdrop(level, device_scale, screen_width, screen_height) {
     const scenery = level.scenery;
     const layers = [];
     const layer_plans = [
-        { kind: scenery.far, factor: 0.16, seed: 11, depth: 0, sharpness: 1 },
-        { kind: scenery.mid, factor: 0.42, seed: 23, depth: 1, sharpness: 1 },
-        { kind: scenery.near, factor: 0.7, seed: 37, depth: 2, sharpness: 0.5 },
+        { kind: scenery.far, factor: 0.16, seed: 11, depth: 0, sharpness: 1, name: 'far' },
+        { kind: scenery.mid, factor: 0.42, seed: 23, depth: 1, sharpness: 1, name: 'mid' },
+        { kind: scenery.near, factor: 0.7, seed: 37, depth: 2, sharpness: 0.5, name: 'near' },
     ];
     layer_plans.forEach(function paint_layer(plan, index) {
         if (!plan.kind) {
@@ -641,10 +691,19 @@ function render_backdrop(level, device_scale, screen_width, screen_height) {
         const canvas = make_sprite_canvas(width_units * scale, height_units * scale);
         const context = canvas.getContext('2d');
         context.scale(scale, scale);
-        paint_backdrop_layer(context, plan.kind, width_units, height_units, scenery, make_seeded_random(plan.seed + level.width), plan.depth);
+        // A painted layer, if the chapter has one, is repeated across; otherwise code draws it.
+        const painting = painted_layer(level, plan.name);
+        if (painting) {
+            for (let tile_x = 0; tile_x < width_units; tile_x += 1600) {
+                context.drawImage(painting, tile_x, 0, 1600, 800);
+            }
+        } else {
+            paint_backdrop_layer(context, plan.kind, width_units, height_units, scenery, make_seeded_random(plan.seed + level.width), plan.depth);
+        }
         // Atmospheric perspective: the farther the layer, the more it fades toward the sky.
+        // Painted layers carry their own haze, so they get less.
         const haze = context.createLinearGradient(0, 0, 0, height_units);
-        const amount = [0.5, 0.24, 0.1][plan.depth];
+        const amount = [0.5, 0.24, 0.1][plan.depth] * (painting ? 0.45 : 1);
         haze.addColorStop(0, hex_with_alpha(scenery.sky_bottom, amount));
         haze.addColorStop(0.7, hex_with_alpha(scenery.sky_bottom, amount * 0.6));
         haze.addColorStop(1, hex_with_alpha(scenery.sky_top, 0.15));
@@ -2172,7 +2231,7 @@ function draw_vignette_scene(context, scene_name, time_seconds, width, height) {
         context.translate(x, feet_y);
         context.scale(figure_scale, figure_scale);
         const spec = kind === 'dog' ? { width: 46, height: 38 } : { width: 26, height: 86 };
-        const figure = Object.assign({ x: -spec.width / 2, y: -spec.height, width: spec.width, height: spec.height, facing: facing, pose: pose, walk_phase: time_seconds * 5, wag: 0.25, fear: 0, on_ground: true, kind: kind }, extra || {});
+        const figure = Object.assign({ x: -spec.width / 2, y: -spec.height, width: spec.width, height: spec.height, facing: facing, pose: pose, walk_phase: time_seconds * 5, wag: 0.25, fear: 0, on_ground: true, kind: kind, velocity_x: pose === 'walk' ? 140 : 0 }, extra || {});
         draw_contact_shadow(context, figure);
         if (kind === 'dog') {
             draw_dog(context, figure, time_seconds);

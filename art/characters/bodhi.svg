@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Purpose: the goldendoodle, painted as separate body parts for cut-out animation. Each part
+     is a group named part_*; the group's origin is the joint the part turns around. Legs hang
+     straight down from their joint. Scale: 10 drawing units = 1 game unit.
+     The curly coat comes from two filters: "fluffy" pushes every edge in and out with noise,
+     so outlines read as fur; "curls" lays a fine curl texture over the colour.
+     Colours: cream-apricot. Change the "coat" gradients to match the real dog. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="1300" height="760" viewBox="0 0 1300 760">
+  <defs>
+    <filter id="fluffy" x="-15%" y="-15%" width="130%" height="130%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.07" numOctaves="3" seed="11" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="18" xChannelSelector="R" yChannelSelector="G" result="displaced"/>
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="5" result="fine"/>
+      <feColorMatrix in="fine" type="saturate" values="0" result="mono"/>
+      <feComponentTransfer in="mono" result="faint"><feFuncA type="table" tableValues="0 0.2"/></feComponentTransfer>
+      <feComposite in="faint" in2="displaced" operator="in" result="grain"/>
+      <feBlend in="grain" in2="displaced" mode="multiply"/>
+    </filter>
+    <filter id="grain" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="4" result="noise"/>
+      <feColorMatrix in="noise" type="saturate" values="0" result="mono"/>
+      <feComponentTransfer in="mono" result="faint"><feFuncA type="table" tableValues="0 0.16"/></feComponentTransfer>
+      <feComposite in="faint" in2="SourceGraphic" operator="in" result="grain_on_shape"/>
+      <feBlend in="grain_on_shape" in2="SourceGraphic" mode="multiply"/>
+    </filter>
+    <!-- One tile of loose curls, repeated over the coat. -->
+    <pattern id="curls" width="34" height="30" patternUnits="userSpaceOnUse">
+      <path d="M 5,12 C 3,4 14,2 15,9 M 21,25 C 19,17 30,15 31,22 M 23,6 C 22,0 31,0 31,5" fill="none" stroke="#b07a4a" stroke-width="2" stroke-linecap="round" opacity="0.32"/>
+      <path d="M 7,9 C 7,5 12,4 13,8 M 23,22 C 23,18 28,17 29,21 M 25,4 C 25,2 29,2 29,4" fill="none" stroke="#fff4dc" stroke-width="1.8" stroke-linecap="round" opacity="0.5"/>
+    </pattern>
+    <linearGradient id="coat" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f8dcaa"/><stop offset="0.45" stop-color="#e4b57c"/><stop offset="1" stop-color="#b98858"/>
+    </linearGradient>
+    <linearGradient id="coat_dark" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d9a76e"/><stop offset="1" stop-color="#94643f"/>
+    </linearGradient>
+    <linearGradient id="coat_light" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fbe6c0"/><stop offset="1" stop-color="#e2b27a"/>
+    </linearGradient>
+    <linearGradient id="ear" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d6a066"/><stop offset="1" stop-color="#8e5f3b"/>
+    </linearGradient>
+    <radialGradient id="eye_shine" cx="0.35" cy="0.35" r="0.6">
+      <stop offset="0" stop-color="#5a3a26"/><stop offset="1" stop-color="#160d08"/>
+    </radialGradient>
+  </defs>
+
+  <!-- BODY: joint at the body's centre. Hindquarters to the left, chest to the right. -->
+  <g id="part_body" transform="translate(260,180)">
+    <g filter="url(#fluffy)">
+      <path d="M -215,-10 C -228,-80 -170,-125 -80,-116 C 0,-128 110,-126 168,-96 C 214,-70 222,10 196,62 C 170,104 100,108 30,98 C -40,108 -130,110 -180,74 C -212,50 -210,20 -215,-10 Z" fill="url(#coat)"/>
+      <path d="M -215,-10 C -228,-80 -170,-125 -80,-116 C 0,-128 110,-126 168,-96 C 214,-70 222,10 196,62 C 170,104 100,108 30,98 C -40,108 -130,110 -180,74 C -212,50 -210,20 -215,-10 Z" fill="url(#curls)"/>
+      <path d="M -150,60 C -80,96 60,100 170,62 C 150,100 80,108 20,100 C -60,108 -120,104 -150,60 Z" fill="#9c6c45" opacity="0.45"/>
+    </g>
+    <path d="M -190,-70 C -140,-118 -40,-124 40,-122 C 110,-122 160,-106 190,-80" fill="none" stroke="#fff3d8" stroke-width="7" stroke-linecap="round" opacity="0.5"/>
+  </g>
+
+  <!-- HEAD: joint at the centre of the head (it tilts and nods around here). Facing right. -->
+  <g id="part_head" transform="translate(700,190)">
+    <g filter="url(#fluffy)">
+      <ellipse cx="0" cy="0" rx="112" ry="104" fill="url(#coat_light)"/>
+      <ellipse cx="0" cy="0" rx="112" ry="104" fill="url(#curls)"/>
+      <ellipse cx="-14" cy="-84" rx="66" ry="40" fill="url(#coat_light)"/>
+      <ellipse cx="-14" cy="-84" rx="66" ry="40" fill="url(#curls)"/>
+      <ellipse cx="92" cy="34" rx="74" ry="56" fill="#f3d3a2"/>
+      <ellipse cx="96" cy="70" rx="46" ry="26" fill="#e7bf8a"/>
+    </g>
+    <path d="M 120,40 C 128,56 118,70 104,72" fill="none" stroke="#3a2418" stroke-width="4" stroke-linecap="round"/>
+    <ellipse cx="146" cy="14" rx="24" ry="19" fill="#22150f"/>
+    <ellipse cx="140" cy="8" rx="8" ry="5" fill="#ffffff" opacity="0.35"/>
+    <ellipse cx="44" cy="-22" rx="19" ry="21" fill="url(#eye_shine)"/>
+    <circle cx="50" cy="-30" r="6" fill="#ffffff" opacity="0.9"/>
+    <circle cx="38" cy="-14" r="2.5" fill="#ffffff" opacity="0.5"/>
+    <path d="M 18,-48 C 32,-62 58,-62 74,-48" fill="none" stroke="#b9875a" stroke-width="8" stroke-linecap="round" opacity="0.8"/>
+    <path d="M -96,-40 C -80,-90 -20,-120 40,-108" fill="none" stroke="#fff3d8" stroke-width="6" stroke-linecap="round" opacity="0.55"/>
+    <!-- Collar and tag, at the base of the neck. -->
+    <path d="M -86,64 C -60,104 -10,118 26,108" fill="none" stroke="#9a2f2a" stroke-width="16" stroke-linecap="round"/>
+    <path d="M -80,60 C -56,96 -10,110 22,100" fill="none" stroke="#c45a50" stroke-width="4" stroke-linecap="round" opacity="0.6"/>
+    <circle cx="-30" cy="122" r="11" fill="#e2bf68"/>
+    <circle cx="-33" cy="119" r="3.5" fill="#fff2c4" opacity="0.8"/>
+  </g>
+
+  <!-- EAR: joint at the root; the long floppy ear hangs down and swings on a spring. -->
+  <g id="part_ear" transform="translate(1000,70)">
+    <g filter="url(#fluffy)">
+      <path d="M -40,0 C -62,40 -64,120 -40,170 C -20,196 20,196 34,168 C 50,120 44,40 30,0 C 10,-14 -20,-14 -40,0 Z" fill="url(#ear)"/>
+      <path d="M -40,0 C -62,40 -64,120 -40,170 C -20,196 20,196 34,168 C 50,120 44,40 30,0 C 10,-14 -20,-14 -40,0 Z" fill="url(#curls)"/>
+    </g>
+  </g>
+
+  <!-- TAIL: joint at the root; the plume reaches back and up, and wags around this point. -->
+  <g id="part_tail" transform="translate(1250,520)">
+    <g filter="url(#fluffy)">
+      <path d="M 10,-12 C -50,-60 -150,-86 -210,-56 C -248,-36 -240,14 -196,20 C -130,32 -50,26 10,18 Z" fill="url(#coat_light)"/>
+      <path d="M 10,-12 C -50,-60 -150,-86 -210,-56 C -248,-36 -240,14 -196,20 C -130,32 -50,26 10,18 Z" fill="url(#curls)"/>
+    </g>
+  </g>
+
+  <!-- LEGS: an upper and a lower part for front and back. Upper joint at the top, lower joint
+       at the wrist or hock; each segment is 95 drawing units long. -->
+  <g id="part_front_upper" transform="translate(90,470)">
+    <g filter="url(#fluffy)">
+      <path d="M -40,-14 C -42,30 -34,70 -30,100 L 30,100 C 34,70 40,30 40,-14 Z" fill="url(#coat)"/>
+      <path d="M -40,-14 C -42,30 -34,70 -30,100 L 30,100 C 34,70 40,30 40,-14 Z" fill="url(#curls)"/>
+    </g>
+  </g>
+  <g id="part_front_lower" transform="translate(240,470)">
+    <g filter="url(#fluffy)">
+      <path d="M -30,-6 C -32,30 -30,70 -28,90 C -30,104 -20,116 6,116 C 34,116 44,104 40,92 C 32,86 30,60 30,-6 Z" fill="url(#coat)"/>
+      <path d="M -30,-6 C -32,30 -30,70 -28,90 C -30,104 -20,116 6,116 C 34,116 44,104 40,92 C 32,86 30,60 30,-6 Z" fill="url(#curls)"/>
+    </g>
+    <path d="M -4,112 L -2,104 M 12,113 L 13,105 M 26,111 L 25,104" stroke="#8f5f37" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+  </g>
+  <g id="part_back_upper" transform="translate(420,470)">
+    <g filter="url(#fluffy)">
+      <path d="M -54,-20 C -62,30 -46,80 -30,100 L 28,100 C 40,70 52,30 48,-20 Z" fill="url(#coat)"/>
+      <path d="M -54,-20 C -62,30 -46,80 -30,100 L 28,100 C 40,70 52,30 48,-20 Z" fill="url(#curls)"/>
+    </g>
+  </g>
+  <g id="part_back_lower" transform="translate(590,470)">
+    <g filter="url(#fluffy)">
+      <path d="M -28,-6 C -30,30 -28,70 -26,90 C -28,104 -18,116 6,116 C 32,116 42,104 38,92 C 30,86 28,60 28,-6 Z" fill="url(#coat_dark)"/>
+      <path d="M -28,-6 C -30,30 -28,70 -26,90 C -28,104 -18,116 6,116 C 32,116 42,104 38,92 C 30,86 28,60 28,-6 Z" fill="url(#curls)"/>
+    </g>
+    <path d="M -2,112 L 0,104 M 14,113 L 15,105 M 26,111 L 25,104" stroke="#8f5f37" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+  </g>
+</svg>
