@@ -1,0 +1,14 @@
+# Build output from the core library. It is regenerated from the source by building.
+core/build*/
+
+# Folders Unreal Engine regenerates. Committing them bloats the repo and causes conflicts.
+unreal/**/Binaries/
+unreal/**/Intermediate/
+unreal/**/Saved/
+unreal/**/DerivedDataCache/
+unreal/**/.vs/
+unreal/**/*.xcworkspace
+unreal/**/*.xcodeproj
+
+# macOS folder metadata.
+.DS_Store

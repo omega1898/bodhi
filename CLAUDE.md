@@ -1,0 +1,33 @@
+# Bodhi game — instructions for Claude Code sessions
+
+## What this is
+A narrative game about a human and their dog who are separated and reunite. First release: a short iOS chapter ("The Other Side", a flooded railway station) built in Unreal Engine. Later: a larger PC game. Design document: `docs/design.md`. Architecture and decisions: `docs/architecture.md`.
+
+## Who owns it
+The owner is learning programming from zero. Every change must be readable by a beginner:
+- Full-word snake_case names (`seconds_spent_in`, not `sSpent` or `t`).
+- Every file starts with a `// Purpose:` comment; every function has a comment saying why it exists.
+- Simple code over clever code. No templates, inheritance hierarchies or macros unless a comment justifies them.
+- In the pull request description, explain in plain language what changed, why, and any new C++ syntax used.
+
+## Layout
+- `core/`: engine-independent C++17 game logic. Builds and tests anywhere, including cloud sessions.
+- `unreal/`: the Unreal Engine project. Created and edited only on the owner's Mac. Cloud sessions cannot run Unreal.
+- `docs/`: design, architecture, cloud session guide.
+
+## Hard rules for `core/`
+1. C++17 standard library only. Never include Unreal, Apple or other engine headers.
+2. No exceptions (`throw`, `try`) and no RTTI (`dynamic_cast`, `typeid`): Unreal builds with both off. The build flags enforce this.
+3. Treat everything arriving from outside the core (event names, times, saved files) as hostile: validate it at the boundary, refuse and count bad input, never crash.
+4. Every behavior change comes with a test in `core/tests/`. Add at least one "break it" test that tries to misuse the new code.
+5. Before committing, all of these must pass:
+   ```
+   cmake -S core -B core/build -G Ninja && cmake --build core/build && ctest --test-dir core/build --output-on-failure
+   cmake -S core -B core/build-sanitize -G Ninja -DCMAKE_CXX_COMPILER=g++ -DBODHI_SANITIZE=ON && cmake --build core/build-sanitize && ctest --test-dir core/build-sanitize --output-on-failure
+   ```
+6. Never edit or create `.uasset` or `.umap` files. They are binary files only the Unreal Editor can safely write.
+
+## Working style
+- Work on a branch and open a pull request; never push to `main` directly.
+- Keep each pull request small enough to read in one sitting (roughly under 300 changed lines).
+- If a task needs Unreal, the Mac or art, stop and write down what the owner must do instead of guessing.
