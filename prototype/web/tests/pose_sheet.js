@@ -13,7 +13,7 @@ async function main() {
     const browser = await chromium.launch();
     const page = await browser.newPage({ viewport: { width: 1600, height: 900 } });
     await page.goto('file://' + path.resolve(__dirname, '..', 'index.html'));
-    await page.waitForFunction(() => window.puppets && window.puppets.ready, null, { timeout: 15000 }).catch(() => {});
+    await page.waitForFunction(() => typeof puppets !== 'undefined' && puppets.ready, null, { timeout: 15000 }).catch(() => {});
     await page.evaluate(() => {
         const sheet = document.createElement('canvas');
         sheet.width = 1600;

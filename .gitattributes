@@ -14,3 +14,7 @@
 # This test file holds a Windows line ending and an escape code on purpose.
 # -text stops git from "fixing" those bytes on any computer.
 core/tests/playthroughs/hostile_input.txt -text
+
+# The app icon is one small picture that cloud sessions must be able to commit, and this cloud
+# environment can't upload to Git LFS, so it is stored as a normal file.
+ios/UntilWeFindHome/Assets.xcassets/AppIcon.appiconset/*.png -filter -diff -merge -text

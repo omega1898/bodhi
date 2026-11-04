@@ -11,7 +11,9 @@ const path = require('path');
 const fs = require('fs');
 const { chromium } = require('playwright');
 
-const page_path = 'file://' + path.resolve(__dirname, '..', 'index.html');
+// PLAYTEST_PAGE lets the same robot play the copy bundled into the iOS app:
+//   PLAYTEST_PAGE=ios/UntilWeFindHome/Game/index.html PLAYTEST_OFFLINE=1 node prototype/web/tests/playtest.js
+const page_path = 'file://' + (process.env.PLAYTEST_PAGE ? path.resolve(process.env.PLAYTEST_PAGE) : path.resolve(__dirname, '..', 'index.html'));
 const screenshot_folder = path.resolve(process.argv[2] || path.join(__dirname, 'screenshots'));
 const test_speed = 3;              // The game runs three times faster during tests.
 const slowest_allowed_frame_ms = 16;  // Average work per frame must leave room for 60 frames a second.
@@ -102,6 +104,10 @@ async function main() {
     const browser = await chromium.launch();
     const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
     const page_errors = [];
+    if (process.env.PLAYTEST_OFFLINE) {
+        // Like the app on a phone in airplane mode: every request to the internet fails.
+        await page.route(/^https?:/, (route) => { page_errors.push('tried the internet: ' + route.request().url()); route.abort(); });
+    }
     page.on('pageerror', (error) => page_errors.push(error.message));
     page.on('console', (message) => {
         if (message.type() === 'error' && !message.text().includes('fonts.g')) {

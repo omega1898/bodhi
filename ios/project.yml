@@ -1,0 +1,58 @@
+# Purpose: describes the iOS app in plain text. On the Mac, the free tool XcodeGen reads this
+# file and creates the Xcode project from it (run `xcodegen` in this folder). Keeping the
+# project as this short file, instead of Xcode's huge generated file, keeps it readable.
+#
+# Before your first build, change "com.yourname" below to something unique to you, for
+# example com.yoursurname. It becomes the app's permanent ID on the App Store.
+name: UntilWeFindHome
+options:
+  bundleIdPrefix: com.yourname
+  deploymentTarget:
+    iOS: "16.0"
+settings:
+  base:
+    MARKETING_VERSION: "1.0"       # The version players see on the App Store.
+    CURRENT_PROJECT_VERSION: "1"   # Raise by 1 for every upload to App Store Connect.
+targets:
+  UntilWeFindHome:
+    type: application
+    platform: iOS
+    sources:
+      - path: UntilWeFindHome
+        excludes:
+          - Game
+      # The game's files, copied in by bundle_game.sh. A "folder reference" keeps the folder
+      # structure intact inside the app, so the page finds js/, art/ and fonts/.
+      - path: UntilWeFindHome/Game
+        type: folder
+        buildPhase: resources
+    preBuildScripts:
+      - name: Copy the latest game into the app
+        script: '"${PROJECT_DIR}/bundle_game.sh"'
+        basedOnDependencyAnalysis: false
+    info:
+      path: UntilWeFindHome/Info.plist
+      properties:
+        CFBundleDisplayName: Until We Find Home
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        LSApplicationCategoryType: public.app-category.adventure-games
+        UILaunchScreen:
+          UIColorName: LaunchBackground
+        UIRequiresFullScreen: true
+        UIStatusBarHidden: true
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        # The app uses no encryption of its own (it never touches the internet), which lets
+        # App Store Connect skip the export-compliance questions.
+        ITSAppUsesNonExemptEncryption: false
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.yourname.untilwefindhome
+        PRODUCT_NAME: UntilWeFindHome
+        TARGETED_DEVICE_FAMILY: "1"              # iPhone only for the first release.
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        SWIFT_VERSION: "5.0"
+        CODE_SIGN_STYLE: Automatic               # Xcode handles certificates once you pick your team.
+        ENABLE_USER_SCRIPT_SANDBOXING: NO        # Lets the copy script write the Game folder.

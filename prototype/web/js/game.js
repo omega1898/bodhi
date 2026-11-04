@@ -2153,6 +2153,19 @@ function connect_controls() {
     window.addEventListener('blur', function on_blur() {
         input.left = input.right = input.low_held = false;
     });
+    // When the phone hides the game (a call, the home screen, the lock button), pause it and
+    // silence the sound, so the player comes back to exactly where they were.
+    document.addEventListener('visibilitychange', function on_visibility_change() {
+        input.left = input.right = input.low_held = input.jump_held = false;
+        if (document.hidden) {
+            set_paused(true);
+            if (audio.context) {
+                audio.context.suspend();
+            }
+        } else if (audio.context) {
+            audio.context.resume();
+        }
+    });
     for (const button of document.querySelectorAll('.touch_button')) {
         const control = button.dataset.control;
         const release = function release_button() {
