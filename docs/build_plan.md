@@ -16,16 +16,16 @@ Most of the remaining work needs the Mac. Cloud sessions can't build "the whole 
 
 - **Done, on `main`:** the chapter's rules: story beats, links between the two routes, the dog's feelings, the playtest log.
 - **Open pull requests, waiting for your review:** CI (#1), how the dog follows (#2), a code walkthrough (#3), save files (#4).
-- **This pull request:** a playable text version of the chapter (`core/tools/text_chapter.cpp`).
+- **This pull request:** a playable text version of chapter one (`core/tools/text_chapter.cpp`), and the whole story as a browser game with drawn graphics, sound, keepsakes and a robot playtest (`prototype/web/`).
 
 ## Milestones for the iOS chapter
 
 | | Milestone | Who | Check that proves it |
 |---|---|---|---|
-| T | Text playtest | You + 3 people | Each plays `text_chapter` uncoached; you note their answers to the five questions below |
+| T | Browser playtest | You + 3 people | Each plays `prototype/web/` on their own phone, uncoached; you note their answers to the five questions below |
 | M0 | Mac set up | You | Unreal 5 project `BodhiGame` opens (steps in `unreal/README.md`); Xcode installed; `ctest` passes on the Mac |
 | M1 | Rules inside Unreal | Cloud writes the spec (prompt E in `docs/cloud_sessions.md`); you build it | In the editor, pulling a test lever changes the beat printed on screen |
-| M2 | Grey-box chapter | You | The whole chapter is playable on the Mac with boxes for rooms and capsules for the pair; layout follows the `places` and `paths` tables in `text_chapter.cpp` |
+| M2 | Grey-box chapter | You | The whole chapter is playable on the Mac with boxes for rooms and capsules for the pair; layout follows `prototype/web/js/levels.js` (floors, gates and areas, already proven playable) |
 | M3 | First iPhone build | You | The grey-box chapter runs on your iPhone with touch controls; you write down the frame time |
 | M4 | Grey-box playtest | You + 5 people | Uncoached play; telemetry log saved; five questions answered |
 | M5 | Hardest-scene test on iPhone | You (+ artist) | One scene with curly fur, her face, water and both characters holds frame rate through a 15-minute heat test (`docs/characters.md`) |

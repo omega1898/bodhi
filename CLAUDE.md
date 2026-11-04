@@ -13,7 +13,8 @@ The owner is learning programming from zero. Every change must be readable by a 
 ## Layout
 - `core/`: engine-independent C++17 game logic. Builds and tests anywhere, including cloud sessions.
 - `unreal/`: the Unreal Engine project. Created and edited only on the owner's Mac. Cloud sessions cannot run Unreal.
-- `docs/`: design, architecture, cloud session guide.
+- `prototype/web/`: the whole story as a playable browser game (canvas, no libraries). The art, story and pacing blueprint for the Unreal version. Test it with `node prototype/web/tests/playtest.js`.
+- `docs/`: design, story, art and production, architecture, cloud session guide.
 
 ## Hard rules for `core/`
 1. C++17 standard library only. Never include Unreal, Apple or other engine headers.

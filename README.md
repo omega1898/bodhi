@@ -2,7 +2,7 @@
 
 A narrative game about a human and their dog: separated by a disaster, each works toward the other, and the player earns the reunion.
 
-**Current stage:** the chapter's rules run without any game engine. Graphics, controls and the Unreal project come next, on a Mac.
+**Current stage:** the whole story (a prologue, four chapters and an epilogue) is playable as a browser game in `prototype/web/`. Open `prototype/web/index.html` to play. Chapter one's rules also run in engine-independent C++ in `core/`, ready for Unreal. The Unreal project comes next, on a Mac.
 
 ## Layout
 
@@ -10,7 +10,8 @@ A narrative game about a human and their dog: separated by a disaster, each work
 |---|---|---|
 | `core/` | Game rules in plain C++17: story beats, links between the two routes, the dog's feelings, the playtest log | Anywhere, including cloud sessions |
 | `unreal/` | The Unreal Engine project (not created yet) | Only on the Mac |
-| `docs/` | Design, architecture and decisions, cloud session guide | Anywhere |
+| `prototype/web/` | The playable browser game: story, art, sound, robot playtest | Anywhere |
+| `docs/` | Design, story, art and production, architecture, cloud session guide | Anywhere |
 
 ## Build and test the core
 
