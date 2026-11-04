@@ -56,7 +56,33 @@ In Unreal these become: character movement settings (acceleration, braking, grav
 3. Draw darkness and light at half resolution.
 4. Measure on the oldest iPhone you'll support, not the newest.
 
-**What the browser game measures today:** about 2 ms of work per frame in a desktop test browser, averaged over a full playthrough of every chapter (`prototype/web/tests/playtest.js`). That's a desktop number. A real iPhone will be slower, so test on the device.
+**What the browser game measures today** (`prototype/web/tests/frame_rate.js`, iPhone 13 landscape size, in a test browser that paints with the processor rather than a graphics chip):
+
+| | Frames per second |
+|---|---|
+| Before the speed work | 27 |
+| After | 55–59 |
+
+**Lesson learned:** the earlier "2 ms per frame" figure counted only the code's own work, not the painting of pixels, and that hid the stutter. Always measure real frame gaps at the real screen size.
+
+**What fixed it:**
+1. The background is painted once at screen resolution, and only the visible part is copied each frame.
+2. Light holes, glows, mist, edge darkening and blurred foreground shapes are small pre-painted pictures, stamped on screen instead of rebuilt.
+3. Gradients are kept instead of rebuilt.
+4. Darkness is drawn at a third of the resolution.
+5. If frames run late, the drawing resolution steps down automatically (adaptive resolution).
+
+**Rule for every future visual change:** run `frame_rate.js` before and after.
+
+**How depth is built:**
+- Three background layers (far, middle, near) move at different speeds. The near one is painted at half resolution, so it's softly out of focus.
+- Haze increases with distance, and a horizon glow sits behind night skylines.
+- Floors have a visible top surface.
+- Rain falls both behind and in front of the characters.
+- Light shafts fall through windows and broken roofs.
+- Out-of-focus foreground shapes pass close to the camera.
+
+The real step up in depth (real 3D, real shadows, soft volumetric light) comes with Unreal on the Mac.
 
 ## 3. The team, and how agents fit into it
 

@@ -38,7 +38,7 @@ const levels = [
             sky_top: '#5b6a7c', sky_bottom: '#b9b2a6', far: 'city', mid: null,
             far_color: '#6f7783', mid_color: '#5a616c', window_color: 'rgba(255,214,150,0.35)',
             ground_top: '#6b6660', ground_body: '#3b3835', wall: '#4b4640', room_wall: '#4a3f3a',
-            darkness: 0.22, darkness_color: 'rgb(30,30,40)', rain: 0.35, wind: 0.15, fog: 'rgba(200,200,205,0.05)', darkness_floor: '#1c1a19', wet: true,
+            near: 'near_street', near_color: '#3e4048', darkness: 0.22, darkness_color: 'rgb(30,30,40)', rain: 0.35, wind: 0.15, fog: 'rgba(200,200,205,0.05)', darkness_floor: '#1c1a19', wet: true,
         },
         start: { human: [520, 520], dog: [640, 520] },
         ball: [760, 510],
@@ -107,7 +107,7 @@ const levels = [
         scenery: {
             sky_top: '#0e1520', sky_bottom: '#24303f', far: 'city', mid: 'station_roof',
             far_color: '#18202b', mid_color: '#1d2632', ground_top: '#4a4f57', ground_body: '#22262c', wall: '#2f3238', room_wall: '#232830',
-            darkness: 0.74, darkness_color: 'rgb(4,7,13)', rain: 1, wind: 0.4, foreground: 'pillars', mist: 'rgba(140,165,190,0.07)',
+            near: 'near_columns', near_color: '#121a25', horizon_glow: 'rgba(120,145,180,0.55)', darkness: 0.64, darkness_color: 'rgb(4,7,13)', rain: 1, wind: 0.4, foreground: 'pillars', mist: 'rgba(140,165,190,0.07)',
         },
         start: { human: [560, 300], dog: [640, 300] },
         solids: [
@@ -133,6 +133,9 @@ const levels = [
             { kind: 'room_wall', x: 110, y: 60, w: 280, h: 122, color: '#2a2f2a' },
             { kind: 'sign', x: 160, y: 80, text: 'SIGNALS', color: '#3a2f22' },
             { kind: 'lamp', x: 250, y: 60, hanging: true, off: false, radius: 170, flicker: true },
+            { kind: 'window', skylight: true, glow: true, x: 1080, y: -20, w: 70, h: 6, shaft_reach: 540, radius: 1, color: 'rgba(150,175,210,0.04)' },
+            { kind: 'window', skylight: true, glow: true, x: 1900, y: -20, w: 90, h: 6, shaft_reach: 320, radius: 1, color: 'rgba(150,175,210,0.04)' },
+            { kind: 'window', skylight: true, glow: true, x: 2700, y: -20, w: 60, h: 6, shaft_reach: 320, radius: 1, color: 'rgba(150,175,210,0.04)' },
             { kind: 'sign', x: 560, y: 200, text: 'PLATFORM 2', color: '#1f3a4f' },
             { kind: 'lamp', x: 820, y: 150, radius: 200 },
             { kind: 'rail', x: 930, y: 300, w: 60, front: true },
@@ -223,7 +226,7 @@ const levels = [
             sky_top: '#0b1018', sky_bottom: '#1a2230', far: 'hospital_blocks', mid: 'corridor',
             far_color: '#141b24', mid_color: '#1b232c', window_color: 'rgba(170,220,210,0.25)',
             ground_top: '#7d8a86', ground_body: '#2b302f', wall: '#3a4442', room_wall: '#26302f',
-            darkness: 0.74, darkness_color: 'rgb(3,9,11)', rain: 0, rain_sound: 0.35, wind: 0.1, dust: true, foreground: 'beams',
+            near: 'near_doorways', near_color: '#131b1d', horizon_glow: 'rgba(110,150,150,0.4)', darkness: 0.68, darkness_color: 'rgb(3,9,11)', rain: 0, rain_sound: 0.35, wind: 0.1, dust: true, foreground: 'beams',
         },
         start: { human: [420, 300], dog: [500, 300] },
         solids: [
@@ -324,7 +327,7 @@ const levels = [
         scenery: {
             sky_top: '#7f8c99', sky_bottom: '#c9cdca', far: 'trees', mid: 'school_blocks',
             far_color: '#6d7a72', mid_color: '#7d7d76', ground_top: '#8a8273', ground_body: '#4c463d', wall: '#7a6a58', room_wall: '#6a5d50',
-            darkness: 0.14, darkness_color: 'rgb(40,40,50)', rain: 0.15, wind: 0.2, fog: 'rgba(220,225,225,0.06)', darkness_floor: '#2a251f', foreground: 'grass', foreground_color: 'rgba(52,58,44,0.85)', mist: 'rgba(235,238,240,0.06)',
+            near: 'near_trees', near_color: '#5d695e', darkness: 0.14, darkness_color: 'rgb(40,40,50)', rain: 0.15, wind: 0.2, fog: 'rgba(220,225,225,0.06)', darkness_floor: '#2a251f', foreground: 'grass', foreground_color: 'rgba(52,58,44,0.85)', mist: 'rgba(235,238,240,0.06)',
         },
         start: { human: [180, 520], dog: [260, 520] },
         ball: [320, 510],
@@ -429,7 +432,7 @@ const levels = [
         scenery: {
             sky_top: '#070a10', sky_bottom: '#1b2433', far: 'river_hills', mid: 'trees',
             far_color: '#121924', mid_color: '#17202a', ground_top: '#4c5048', ground_body: '#23251f', wall: '#3a3a33', room_wall: '#2b2a24',
-            darkness: 0.78, darkness_color: 'rgb(3,6,10)', rain: 1.3, wind: 0.9, wind_slant: -0.45, storm: true, foreground: 'reeds', mist: 'rgba(150,170,185,0.08)',
+            near: 'near_trees', near_color: '#0e141b', horizon_glow: 'rgba(110,130,160,0.5)', darkness: 0.7, darkness_color: 'rgb(3,6,10)', rain: 1.3, wind: 0.9, wind_slant: -0.45, storm: true, foreground: 'reeds', mist: 'rgba(150,170,185,0.08)',
         },
         start: { human: [380, 300], dog: [460, 300] },
         solids: [
@@ -540,7 +543,7 @@ const levels = [
         scenery: {
             sky_top: '#5c6b8a', sky_bottom: '#f0c08a', far: 'hills', mid: null, sun: true,
             far_color: '#7c7f86', mid_color: '#5d6a52', ground_top: '#6f7a4c', ground_body: '#4a4532', wall: '#6d6356',
-            darkness: 0, rain: 0, wind: 0.2, fireflies: true, smoke_x: 1300, darkness_floor: '#2b2a1c', foreground: 'grass', foreground_color: 'rgba(46,52,30,0.8)', mist: 'rgba(255,228,190,0.07)',
+            near: 'near_hedges', near_color: '#4d5638', darkness: 0, rain: 0, wind: 0.2, fireflies: true, smoke_x: 1300, darkness_floor: '#2b2a1c', foreground: 'grass', foreground_color: 'rgba(46,52,30,0.8)', mist: 'rgba(255,228,190,0.07)',
         },
         start: { human: [160, 520], dog: [240, 520] },
         solids: [

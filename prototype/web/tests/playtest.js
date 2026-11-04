@@ -21,6 +21,7 @@ const slowest_allowed_frame_ms = 16;  // Average work per frame must leave room 
 //   ['act'] ['low'] ['switch'] ['call']   press that button
 //   ['wait_for', 'event_name']   wait until that story event has happened
 //   ['wait', seconds]   wait (in game seconds)
+//   ['wait_prompt', 'text']   wait until the on-screen prompt contains this text
 //   ['shot', 'name']   save a screenshot
 const playthroughs = [
     [['shot', 'prologue_start'], ['walk', 760], ['act'], ['act'], ['wait', 4], ['walk', 330], ['act'], ['wait_for', 'photo_taken'],
@@ -31,22 +32,22 @@ const playthroughs = [
         ['walk', 2700], ['act'], ['wait_for', 'glove_found'], ['walk', 3010], ['act'], ['wait_for', 'dog_barked'],
         ['walk', 3240], ['wait_for', 'pair_met_at_fence'], ['walk', 3222], ['act'], ['wait_for', 'fence_touched'], ['shot', 'station_fence'],
         ['walk', 3460], ['act'], ['switch'], ['walk', 3130], ['act'], ['wait_for', 'debris_cleared'], ['wait', 1.5],
-        ['low'], ['act'], ['wait', 2.5], ['shot', 'station_reunion'], ['wait_for', 'reunion_complete'], ['walk', 3800]],
+        ['wait_prompt', 'Kneel'], ['low'], ['wait_prompt', 'Hold'], ['act'], ['wait', 2.5], ['shot', 'station_reunion'], ['wait_for', 'reunion_complete'], ['walk', 3800]],
     [['shot', 'hospital_start'], ['walk', 900], ['act'], ['walk', 1400], ['wait_for', 'doors_closed'], ['wait_for', 'separation_scene_finished'],
         ['walk', 1900], ['act'], ['wait_for', 'basement_unlocked'], ['walk', 1650], ['shot', 'hospital_vent'], ['walk', 2500], ['act'], ['wait_for', 'lift_called'],
         ['walk', 2840], ['wait_for', 'pair_met_at_lift'], ['walk', 2776], ['act'], ['wait_for', 'glass_touched'], ['shot', 'hospital_glass'],
         ['walk', 3010], ['act'], ['switch'], ['walk', 2650], ['act'], ['wait_for', 'cord_pulled'], ['wait', 1.5],
-        ['low'], ['act'], ['wait_for', 'reunion_complete'], ['walk', 3650]],
+        ['wait_prompt', 'Kneel'], ['low'], ['wait_prompt', 'Hold'], ['act'], ['wait_for', 'reunion_complete'], ['walk', 3650]],
     [['shot', 'school_start'], ['walk', 320], ['act'], ['act'], ['wait_for', 'ball_fetched'], ['wait_for', 'dog_bolted'], ['wait', 1], ['shot', 'school_bolt'],
         ['walk', 1450], ['wait_for', 'saw_dog_from_roof'], ['walk', 1520], ['act'], ['wait_for', 'crate_pushed'], ['shot', 'school_roof'],
         ['walk', 2300], ['act'], ['wait_for', 'rope_pulled'], ['walk', 2700], ['wait_for', 'pair_met_at_window'], ['walk', 2652], ['act'],
         ['wait_for', 'window_touched'], ['walk', 2860], ['act'], ['switch'], ['walk', 2560], ['act'], ['wait_for', 'desk_pushed'], ['wait', 1.5],
-        ['low'], ['act'], ['wait_for', 'reunion_complete']],
+        ['wait_prompt', 'Kneel'], ['low'], ['wait_prompt', 'Hold'], ['act'], ['wait_for', 'reunion_complete']],
     [['shot', 'river_start'], ['walk', 420], ['act'], ['walk', 1400], ['wait_for', 'footbridge_broke'], ['wait', 0.8], ['shot', 'river_flood'],
         ['wait_for', 'dog_surfaced'], ['walk', 300], ['act'], ['wait_for', 'floodgate_turned'], ['wait', 2], ['walk', 2620], ['act'], ['wait_for', 'pin_pulled'],
         ['walk', 3050], ['wait_for', 'pair_met_at_fence'], ['walk', 3016], ['act'], ['wait_for', 'fence_touched'], ['walk', 3150], ['act'],
         ['shot', 'river_fence'], ['walk', 3320], ['act'], ['switch'], ['walk', 2945], ['act'], ['wait_for', 'post_dug'], ['wait', 1.5],
-        ['low'], ['act'], ['wait', 2.5], ['shot', 'river_reunion'], ['wait_for', 'reunion_complete']],
+        ['wait_prompt', 'Kneel'], ['low'], ['wait_prompt', 'Hold'], ['act'], ['wait', 2.5], ['shot', 'river_reunion'], ['wait_for', 'reunion_complete']],
     [['shot', 'home_start'], ['walk', 1460], ['wait_for', 'saw_house'], ['walk', 2030], ['act'], ['walk', 2148], ['act'], ['wait', 2], ['shot', 'home_step'],
         ['wait_for', 'dog_waits'], ['walk', 3300], ['wait_for', 'followed'], ['shot', 'home_end']],
 ];
@@ -79,6 +80,9 @@ async function play_chapter(page, chapter_index, steps) {
             await page.waitForTimeout(120);
         } else if (kind === 'wait_for') {
             await wait_until(page, (state) => state.happened.includes(value), 40, 'event ' + value);
+        } else if (kind === 'wait_prompt') {
+            // Wait until the on-screen prompt offers this action, the way a player would.
+            await wait_until(page, (state) => (state.prompt || '').includes(value), 40, 'the prompt "' + value + '"');
         } else if (kind === 'wait') {
             await page.waitForTimeout((value * 1000) / test_speed);
         } else if (kind === 'shot') {
