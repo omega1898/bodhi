@@ -1,7 +1,7 @@
 # Bodhi game — instructions for Claude Code sessions
 
 ## What this is
-A narrative game about a human and their dog who are separated and reunite. First release: a short iOS chapter ("The Other Side", a flooded railway station) built in Unreal Engine. Later: a larger PC game. Design document: `docs/design.md`. Architecture and decisions: `docs/architecture.md`.
+A narrative game about a human and their dog who are separated and reunite. First release: a short iOS chapter ("The Other Side", a flooded railway station) built in Unreal Engine. Later: a larger PC game. Design document: `docs/design.md`. Architecture and decisions: `docs/architecture.md`. The two main characters are based on real people and a real dog: read `docs/characters.md`, and never add photos of them to the repository.
 
 ## Who owns it
 The owner is learning programming from zero. Every change must be readable by a beginner:

@@ -10,5 +10,8 @@ unreal/**/.vs/
 unreal/**/*.xcworkspace
 unreal/**/*.xcodeproj
 
+# Personal reference photos and videos of real people and pets. Never commit these.
+references/
+
 # macOS folder metadata.
 .DS_Store

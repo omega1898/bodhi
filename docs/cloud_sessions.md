@@ -8,7 +8,7 @@
 
 ## One-time setup
 
-1. GitHub: install the Claude GitHub App on this repository: github.com/apps/claude, then **Configure**, then select `bodhi-game`.
+1. GitHub: install the Claude GitHub App on this repository: github.com/apps/claude, then **Configure**, then select `bodhi`. Private repositories need this step, or cloud sessions can't read or push to them.
 2. Go to claude.ai/code, choose this repository, and use the **Default** environment.
 3. Edit the environment and add this environment variable:
    `GIT_LFS_SKIP_SMUDGE=1`
