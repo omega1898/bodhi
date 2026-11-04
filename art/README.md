@@ -16,11 +16,29 @@ The game reads these files directly. For an engine that needs plain picture file
 
 | Folder | What's in it |
 |---|---|
-| `characters/` | `her.svg` and `bodhi.svg`: each character painted as separate body parts for cut-out animation |
+| `characters/` | `her.svg` and `bodhi.svg`: each character painted as separate body parts (faces, coat, satchel, ears) |
+| `animations/` | The animation frames the game draws: one file per animation, frames side by side. Generated, but each frame can be redrawn by hand |
 | `scenery/` | Background paintings, one file per depth layer, in 1600 × 800 tiles that repeat sideways |
-| `tools/` | `build_atlas.js`: measures the character parts and writes the map the game uses |
+| `tools/` | `draw_frames.js` draws every animation frame; `build_atlas.js` maps the painted parts (used before the frames load) |
 
-## How the character parts work
+## How the animation frames work
+
+The game animates frame by frame, the way hand-drawn 2D games do: every frame is a whole new drawing of the body, not parts turning on pins.
+
+- **Where the poses come from:** `tools/draw_frames.js` keys the poses as numbers, like an animator's key poses. A walk has contact, down, passing and up. The dog has a real trot and a rotary gallop.
+- **How a frame is drawn:** limbs are drawn as one bending shape. The dog's back, chest and legs merge into one furry silhouette. Faces, the coat and the satchel come from the painted sheets in `characters/`, so the style matches.
+- **What it writes:** one SVG per animation into `animations/`, and `prototype/web/js/frames_atlas.js`. The atlas says where each frame is, how far each walking cycle travels, and where her hand and the dog's mouth and eye are in each frame.
+- **No sliding feet:** walking and running frames advance with distance covered. The planted foot moves back by the same amount every frame, and the cycle length in the atlas is worked out from that.
+- **Frames:** her frames are 64 × 106 game units with the feet at (30, 99). The dog's are 90 × 84 with the feet at (42, 76).
+
+After changing a pose or a painted part:
+```
+node art/tools/draw_frames.js
+node prototype/web/tests/frames_check.js
+```
+Expected: `drew 78 frames...`, then `FRAMES CHECK PASSED`. The check fails if a drawing is cut off at its frame's edge, sinks through the floor, or the game picks the wrong animation.
+
+## How the character parts work (painted sheets)
 
 - **Part names:** each part is a group named `part_something`, for example `part_thigh` or `part_ear`.
 - **Joints:** the group's origin (where its `translate(x, y)` puts it) is the joint the part turns around. Limbs hang straight down from their joint.

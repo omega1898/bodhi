@@ -15,7 +15,7 @@ The owner is learning programming from zero. Every change must be readable by a 
 - `unreal/`: the Unreal Engine project. Created and edited only on the owner's Mac. Cloud sessions cannot run Unreal.
 - `prototype/web/`: the whole story as a playable browser game (canvas, no libraries). The art, story and pacing blueprint for the Unreal version. Test it with `node prototype/web/tests/playtest.js`.
 - `ios/`: the iOS app. `project.yml` (turned into an Xcode project on the Mac by XcodeGen), two Swift files, the app icon, and `bundle_game.sh`, which copies the game in. Cloud sessions can't build it; the Mac does.
-- `art/`: the game's art as editable SVG files (characters as cut-out parts, scenery layers) and the pipeline tool. See `art/README.md`.
+- `art/`: the game's art as editable SVG files: painted character parts, frame-by-frame animations (`art/animations/`, drawn by `art/tools/draw_frames.js`), scenery layers. See `art/README.md`. Check frames with `node prototype/web/tests/frames_check.js`.
 - `docs/`: design, story, art and production, architecture, cloud session guide.
 
 ## Hard rules for `core/`

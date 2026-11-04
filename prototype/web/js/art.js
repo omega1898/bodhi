@@ -101,6 +101,10 @@ function draw_contact_shadow(context, character) {
 // Draws the goldendoodle with its feet at the bottom of its collision box.
 // `dog` carries pose, facing, walk_phase, wag, fear, ear_lift, which the game updates.
 function draw_dog(context, dog, time_seconds) {
+    if (typeof flipbook !== 'undefined' && flipbook.ready) {
+        draw_flipbook_character(context, dog, 'bodhi', time_seconds);  // The hand-drawn frames, once loaded.
+        return;
+    }
     if (puppets.ready) {
         draw_dog_puppet(context, dog, time_seconds);  // The painted dog, once its art has loaded.
         return;
@@ -429,6 +433,10 @@ function draw_boot(context, foot) {
 
 // Draws the woman with her feet at the bottom of her collision box.
 function draw_human(context, human, time_seconds) {
+    if (typeof flipbook !== 'undefined' && flipbook.ready) {
+        draw_flipbook_character(context, human, 'her', time_seconds);  // The hand-drawn frames, once loaded.
+        return;
+    }
     if (puppets.ready) {
         draw_human_puppet(context, human, time_seconds);  // The painted woman, once her art has loaded.
         return;

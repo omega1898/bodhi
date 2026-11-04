@@ -1655,6 +1655,7 @@ function continue_from_aftermath() {
 function render(delta_seconds) {
     context.setTransform(game.pixel_scale, 0, 0, game.pixel_scale, 0, 0);
     const time_seconds = game.clock_seconds;
+    update_flipbook();
     if (!game.world || !game.level) {
         draw_title_backdrop(delta_seconds);
         return;
@@ -2275,8 +2276,9 @@ window.until_we_find_home_debug = {
     drawn_x: function debug_drawn_x() { return game.last_drawn_player_x === undefined ? null : game.last_drawn_player_x; },
     character_state: function debug_character_state(kind) {
         const character = game.world.characters[kind];
-        return { x: character.x, y: character.y, velocity_x: character.velocity_x, velocity_y: character.velocity_y, facing: character.facing, facing_blend: character.facing_blend, lean: character.lean ? character.lean.value : 0, on_ground: character.on_ground, pose: character.pose };
+        return { x: character.x, y: character.y, velocity_x: character.velocity_x, velocity_y: character.velocity_y, facing: character.facing, facing_blend: character.facing_blend, lean: character.lean ? character.lean.value : 0, on_ground: character.on_ground, pose: character.pose, shown: character.flipbook_state ? character.flipbook_state.shown : null };
     },
+    flipbook_ready: function debug_flipbook_ready() { return flipbook.ready; },
     camera: function debug_camera() { return { center_x: game.camera.center_x, center_y: game.camera.center_y, zoom: game.camera.zoom }; },
     state: function debug_state() {
         const world = game.world;
@@ -2300,6 +2302,7 @@ window.until_we_find_home_debug = {
 
 resize_canvas();
 load_puppet_sheets();
+load_flipbook_sheets();
 window.addEventListener('resize', resize_canvas);
 connect_controls();
 show_title();

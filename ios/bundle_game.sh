@@ -13,11 +13,12 @@ game_folder="$ios_folder/UntilWeFindHome/Game"
 
 # Start clean, so files deleted from the game don't linger in the app.
 rm -rf "$game_folder"
-mkdir -p "$game_folder/js" "$game_folder/art/characters" "$game_folder/art/scenery" "$game_folder/fonts"
+mkdir -p "$game_folder/js" "$game_folder/art/characters" "$game_folder/art/scenery" "$game_folder/art/animations" "$game_folder/fonts"
 
 cp "$repository"/prototype/web/js/*.js "$game_folder/js/"
 cp "$repository"/art/characters/*.svg "$game_folder/art/characters/"
 cp "$repository"/art/scenery/*.svg "$game_folder/art/scenery/"
+cp "$repository"/art/animations/*.svg "$game_folder/art/animations/"
 cp "$repository"/art/fonts/*.woff2 "$repository"/art/fonts/fonts.css "$repository"/art/fonts/OFL_*.txt "$game_folder/fonts/"
 
 # The page: a proper document header, the local fonts, and every line that would reach out to
