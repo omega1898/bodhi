@@ -2,7 +2,7 @@
 
 **The plan:** a real iOS app, written in Swift and built in Xcode, that carries the finished game inside it and runs fully offline. The game, its painted art and its fonts are copied into the app by `ios/bundle_game.sh`. The app itself is two short Swift files in `ios/UntilWeFindHome/`.
 
-**Why this route:** see decision 7 in `docs/architecture.md`.
+**Why this route:** see decision 8 in `docs/architecture.md`.
 
 **What you need:**
 - A Mac with **Xcode 26 or later**. Apple requires it for every upload since April 28, 2026; see [Upcoming Requirements](https://developer.apple.com/news/upcoming-requirements/).
@@ -25,7 +25,7 @@
    git clone https://github.com/omega1898/bodhi.git
    cd bodhi
    ```
-   Until pull request #5 is merged, also run:
+   Until the pull request with the iOS app is merged into `main`, also run:
    ```
    git checkout claude/eloquent-hopper-el57ed
    ```

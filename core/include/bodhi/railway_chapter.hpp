@@ -19,6 +19,25 @@ enum class character { human, dog };
 // Returns "human" or "dog" for logs.
 const char* character_name(character who);
 
+// Why a save file was refused. `none` means it loaded.
+enum class save_load_error {
+    none,
+    file_too_large,          // Over 4096 bytes.
+    bad_character,           // Anything except a-z, 0-9, underscore, space and newline.
+    bad_line,                // A line that is not exactly "name value", or no final newline.
+    missing_header,          // The first line does not start with "bodhi_railway_save".
+    unknown_version,         // A format version this game cannot read.
+    unknown_field,
+    duplicate_field,
+    missing_field,
+    unknown_beat,
+    bad_value,               // A number out of range, or a word that is not allowed there.
+    impossible_combination,  // Each value is fine alone, but the story cannot reach them together.
+};
+
+// Returns a fixed lowercase name for logs, for example "duplicate_field".
+const char* save_load_error_name(save_load_error error);
+
 // True when an event name is safe to accept from outside the core:
 // 1 to 64 characters, only lowercase letters, digits and underscores.
 bool is_valid_event_name(const std::string& event_name);
@@ -54,6 +73,17 @@ public:
     // Total seconds spent in `which_beat` up to `now_seconds`, for playtest measures
     // such as "how long did players linger at the fence".
     double seconds_spent_in(chapter_beat which_beat, double now_seconds) const;
+
+    // Writes the chapter's progress as a small text file (format version 1).
+    // Times are rounded down to the millisecond and feelings to the millionth.
+    // The playtest log and the refused-input count are not saved.
+    std::string save_progress() const;
+
+    // Replaces the chapter's progress with the progress in `save_text`.
+    // The text is treated as hostile: on any problem this returns the reason and
+    // changes nothing at all, so a broken file cannot leave the chapter half-loaded.
+    // The caller decides what to do with a refusal (for example, count it and start fresh).
+    save_load_error load_progress(const std::string& save_text);
 
     // How many inputs were refused because of a bad name, bad time or wrong moment.
     int refused_input_count() const;

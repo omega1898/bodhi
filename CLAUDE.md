@@ -1,7 +1,7 @@
 # Bodhi game — instructions for Claude Code sessions
 
 ## What this is
-A narrative game about a human and their dog who are separated and reunite. First release: an iOS app on the App Store: a native Swift app carrying the finished game (`prototype/web/`) inside it (decision 7 in `docs/architecture.md`, steps in `docs/app_store.md`). Later: a larger PC game, possibly in Unreal on top of `core/`. Design document: `docs/design.md`. Architecture and decisions: `docs/architecture.md`. The two main characters are based on real people and a real dog: read `docs/characters.md`, and never add photos of them to the repository.
+A narrative game about a human and their dog who are separated and reunite. First release: an iOS app on the App Store: a native Swift app carrying the finished game (`prototype/web/`) inside it (decision 8 in `docs/architecture.md`, steps in `docs/app_store.md`). Later: a larger PC game, possibly in Unreal on top of `core/`. Design document: `docs/design.md`. Architecture and decisions: `docs/architecture.md`. The two main characters are based on real people and a real dog: read `docs/characters.md`, and never add photos of them to the repository.
 
 ## Who owns it
 The owner is learning programming from zero. Every change must be readable by a beginner:
