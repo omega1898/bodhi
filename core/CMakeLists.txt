@@ -17,6 +17,7 @@ add_library(bodhi_core
     src/bond_state.cpp
     src/telemetry_log.cpp
     src/railway_chapter.cpp
+    src/railway_save.cpp
 )
 target_include_directories(bodhi_core PUBLIC include)
 
@@ -47,6 +48,7 @@ add_executable(core_tests
     tests/test_bond_state.cpp
     tests/test_telemetry_log.cpp
     tests/test_railway_chapter.cpp
+    tests/test_railway_save.cpp
 )
 target_link_libraries(core_tests PRIVATE bodhi_core)
 add_test(NAME core_tests COMMAND core_tests)

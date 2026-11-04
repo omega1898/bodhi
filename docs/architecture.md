@@ -54,12 +54,19 @@ The engine knows where things are and what the player pressed. The core knows wh
 - Strongest rejected alternative: GoogleTest or Catch2, which give better failure messages and more features.
 - What breaks otherwise: nothing yet. Revisit when the test count grows past a few hundred checks.
 
+**7. Save files are versioned "name value" text with whole numbers only.**
+- Constraint: the file lives on the player's device, so it can be edited, cut short by a crash, or left by another game version. Decimal parsing in C++ (`strtod`) depends on the phone's language settings, and the newer locale-free tool (`std::from_chars` for decimals) isn't available in every Apple compiler.
+- Strongest rejected alternative: JSON, which matches the playtest log and has tooling.
+- What breaks otherwise: a JSON parser is far more code to make hostile-input safe; decimals could load differently on a French-language phone. The cost: times are kept to the millisecond (rounded down) and feelings to the millionth.
+
 ## Secure against what, under which assumptions
 
 Malformed or out-of-order events and times from the engine boundary (bad names, oversized names, spoofed internal events, NaN or backwards times) can't crash the core, skip story beats or corrupt the log. This assumes:
 - callers use only the public functions in `railway_chapter.hpp`, and
 - the core runs inside the game process (a memory-level attacker is out of scope).
 
+Save files (`railway_chapter::load_progress`) can't crash the core or leave a chapter half-loaded: the loader refuses files over 4096 bytes, unknown versions, unknown fields and beats, duplicate or missing fields, out-of-range numbers and combinations the story can't reach, and changes nothing unless every check passes. A test feeds 10,000 randomly damaged files through it under the sanitizer build.
+
 **Not yet covered:**
-- Save files.
+- Save files are not signed, so a player can still hand-edit one to any *reachable* state (for example, the start of the final obstacle). That's acceptable for a single-player story.
 - Invalid UTF-8 inside logged text. It's passed through, so it can make one log line invalid JSON.

@@ -29,3 +29,4 @@ void run_event_bus_tests();
 void run_bond_state_tests();
 void run_telemetry_log_tests();
 void run_railway_chapter_tests();
+void run_railway_save_tests();
