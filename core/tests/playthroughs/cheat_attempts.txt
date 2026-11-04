@@ -1,0 +1,20 @@
+touch
+pull_lever
+hold
+rest
+switch
+shared_route_opened
+go fence
+go cabin_path
+go maintenance_cabin
+go signal_room
+go upper_walkway
+cross
+go fence
+go lower_platform
+switch
+bark
+clear_debris
+cross
+go upper_walkway
+quit

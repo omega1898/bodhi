@@ -1,0 +1,231 @@
+<title>Until We Find Home</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<!-- Purpose: the page that holds the game: the drawing surface, the menus, the story text
+     and the on-screen buttons for phones. All the game's behaviour lives in the js/ files. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+  /* Layout: one full-screen drawing surface, with story text and menus floating over it. */
+  :root {
+    --night: #0d1118;        /* The darkness between lamps. */
+    --night_raised: #161c26; /* Panels that sit on the night. */
+    --lamplight: #f0b65e;    /* The one warm accent: lamps, fire, the reunion. */
+    --paper: #efe6d4;        /* Story text, like an old letter. */
+    --paper_dim: #a9a293;    /* Secondary text. */
+    --rain: #7f93a8;         /* Cold, rainy blue-grey. */
+    --font_display: "Young Serif", "Iowan Old Style", Georgia, serif;
+    --font_story: "Newsreader", "Iowan Old Style", Georgia, serif;
+    --font_interface: "Atkinson Hyperlegible", "Helvetica Neue", Arial, sans-serif;
+    color-scheme: dark;
+  }
+  html, body { height: 100%; }
+  [hidden] { display: none !important; }
+  body {
+    background: var(--night);
+    color: var(--paper);
+    font-family: var(--font_interface);
+    overflow: hidden;
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  #game_frame { position: fixed; inset: 0; }
+  #world_canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+  /* Screens that cover the game: title, chapter card, aftermath, pause, ending. */
+  .screen {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 1.25rem; text-align: center;
+    padding-block: max(24px, env(safe-area-inset-top, 0px)) max(24px, env(safe-area-inset-bottom, 0px));
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    transition: opacity 1.2s ease;
+  }
+  .screen.faded { opacity: 0; pointer-events: none; }
+  #title_screen { background: radial-gradient(ellipse at 50% 70%, rgba(240,182,94,0.10), transparent 60%), rgba(13,17,24,0.55); }
+  .game_title {
+    font-family: var(--font_display); font-weight: 400;
+    font-size: clamp(2.2rem, 7vw, 4.6rem); line-height: 1.05; margin: 0;
+    letter-spacing: 0.01em; text-wrap: balance;
+  }
+  .game_title .home_word { color: var(--lamplight); }
+  .tagline { text-wrap: balance; font-family: var(--font_story); font-style: italic; font-size: clamp(1rem, 2.4vw, 1.25rem); color: var(--paper_dim); margin: 0; max-width: 34ch; }
+  .button_row { display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; }
+  button.menu_button {
+    font-family: var(--font_interface); font-size: 1.05rem; font-weight: 700; letter-spacing: 0.04em;
+    color: var(--night); background: var(--lamplight); border: 0; border-radius: 999px;
+    padding: 0.8rem 1.6rem; cursor: pointer; min-height: 48px;
+  }
+  button.menu_button.quiet { background: transparent; color: var(--paper); box-shadow: inset 0 0 0 1.5px rgba(239,230,212,0.4); }
+  button.menu_button:focus-visible, .chapter_choice:focus-visible { outline: 3px solid var(--paper); outline-offset: 3px; }
+  .small_note { font-size: 0.85rem; color: var(--paper_dim); margin: 0; letter-spacing: 0.02em; }
+
+  #chapter_list { display: grid; gap: 0.4rem; width: min(420px, 100%); }
+  .chapter_choice {
+    display: grid; grid-template-columns: 3.2rem 1fr; align-items: baseline; gap: 0.5rem;
+    text-align: left; background: var(--night_raised); color: var(--paper);
+    border: 0; border-radius: 10px; padding: 0.7rem 0.9rem; cursor: pointer;
+    font-family: var(--font_story); font-size: 1.05rem; min-height: 48px;
+  }
+  .chapter_choice .chapter_number { font-family: var(--font_interface); font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--lamplight); }
+  .chapter_choice[disabled] { opacity: 0.35; cursor: default; }
+  .chapter_choice { grid-template-columns: 5.6rem 1fr auto; }
+  .chapter_keepsakes { font-family: var(--font_interface); font-size: 0.8rem; color: var(--paper_dim); font-variant-numeric: tabular-nums; }
+
+  #toast {
+    position: absolute; top: max(14px, env(safe-area-inset-top, 0px)); left: 50%; transform: translate(-50%, -8px);
+    margin: 0; padding: 0.5rem 1rem; border-radius: 999px; background: rgba(13,17,24,0.78);
+    box-shadow: inset 0 0 0 1px rgba(240,182,94,0.5); color: var(--lamplight);
+    font-size: 0.85rem; letter-spacing: 0.04em; opacity: 0; transition: opacity 0.5s ease, transform 0.5s ease; pointer-events: none;
+  }
+  #toast.shown { opacity: 1; transform: translate(-50%, 0); }
+  #memory_box { background: rgba(13,17,24,0.94); justify-content: flex-start; overflow-y: auto; }
+  #memory_list { width: min(560px, 100%); text-align: left; display: grid; gap: 0.35rem; }
+  .memory_chapter { font-family: var(--font_display); font-weight: 400; font-size: 1.15rem; margin: 1rem 0 0.2rem; color: var(--lamplight); }
+  .memory_entry { font-family: var(--font_story); font-style: italic; margin: 0; line-height: 1.4; }
+  .memory_entry.missing { font-style: normal; font-family: var(--font_interface); font-size: 0.88rem; color: var(--paper_dim); }
+  #aftermath_tally { position: relative; opacity: 0; transition: opacity 1.5s ease; }
+  #aftermath_tally.shown { opacity: 1; }
+
+  #chapter_card { background: var(--night); }
+  .card_eyebrow { font-size: 0.8rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--lamplight); margin: 0; }
+  .card_title { font-family: var(--font_display); font-weight: 400; font-size: clamp(2rem, 6vw, 3.6rem); margin: 0; text-wrap: balance; }
+  .card_place { font-family: var(--font_story); font-style: italic; color: var(--paper_dim); margin: 0; font-size: 1.1rem; }
+
+  #aftermath_screen { background: var(--night); justify-content: flex-end; }
+  #aftermath_canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  #aftermath_text { position: relative; display: grid; gap: 0.7rem; max-width: 40ch; margin-bottom: 1rem; }
+  .aftermath_line { font-family: var(--font_story); font-style: italic; font-size: clamp(1.05rem, 2.6vw, 1.35rem); line-height: 1.45; margin: 0; opacity: 0; transition: opacity 2s ease; text-shadow: 0 2px 12px rgba(0,0,0,0.9); }
+  .aftermath_line.shown { opacity: 1; }
+  #aftermath_continue { position: relative; }
+
+  /* Story text spoken during play. */
+  #subtitle {
+    position: absolute; left: 50%; transform: translateX(-50%);
+    bottom: calc(max(18px, env(safe-area-inset-bottom, 0px)) + var(--subtitle_lift, 0px));
+    width: min(92%, 46rem); text-align: center; pointer-events: none;
+    font-family: var(--font_story); font-style: italic; font-size: clamp(1.02rem, 2.3vw, 1.32rem); line-height: 1.4;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.9), 0 0 18px rgba(0,0,0,0.85);
+    opacity: 0; transition: opacity 0.6s ease; margin: 0;
+  }
+  #subtitle.shown { opacity: 1; }
+  #subtitle.voice_dog { font-style: normal; font-variant: small-caps; letter-spacing: 0.08em; color: #f3dcb0; }
+  #subtitle.voice_note { font-style: normal; font-family: var(--font_interface); font-size: clamp(0.95rem, 2vw, 1.1rem); color: #dfe7ee; letter-spacing: 0.02em; }
+  /* On phones the thumbs own the bottom corners, so story text moves to the top centre. */
+  body.touch_mode #subtitle { top: calc(max(10px, env(safe-area-inset-top, 0px)) + 34px); bottom: auto; width: min(66%, 40rem); }
+
+  #objective {
+    position: absolute; top: max(14px, env(safe-area-inset-top, 0px)); left: max(16px, env(safe-area-inset-left, 0px));
+    max-width: min(60%, 26rem); margin: 0; font-size: 0.88rem; line-height: 1.35; color: var(--paper_dim);
+    text-shadow: 0 1px 3px rgba(0,0,0,0.9); pointer-events: none; transition: opacity 0.8s ease;
+  }
+  #pause_button {
+    position: absolute; top: max(10px, env(safe-area-inset-top, 0px)); right: max(12px, env(safe-area-inset-right, 0px));
+    width: 44px; height: 44px; border-radius: 50%; border: 0; cursor: pointer;
+    background: rgba(13,17,24,0.45); color: var(--paper); font-size: 1rem; font-family: var(--font_interface);
+  }
+  #pause_screen { background: rgba(13,17,24,0.82); }
+  body:not(.playing) #pause_button, body:not(.playing) #objective { display: none; }
+  body:not(.playing) #touch_controls { display: none !important; }
+  body.touch_mode .keyboard_note { display: none; }
+  .touch_note { display: none; }
+  body.touch_mode .touch_note { display: block; }
+  #title_screen { justify-content: flex-start; padding-block-start: max(9vh, env(safe-area-inset-top, 0px)); }
+
+  /* On-screen buttons for phones and tablets. */
+  #touch_controls { position: absolute; inset: auto 0 0 0; height: 0; display: none; }
+  body.touch_mode #touch_controls { display: block; }
+  .touch_cluster { position: absolute; bottom: max(16px, env(safe-area-inset-bottom, 0px)); display: flex; gap: 12px; align-items: flex-end; }
+  #touch_left_cluster { left: max(16px, env(safe-area-inset-left, 0px)); }
+  #touch_right_cluster { right: max(16px, env(safe-area-inset-right, 0px)); flex-wrap: wrap; justify-content: flex-end; width: 236px; }
+  .touch_button {
+    width: 68px; height: 68px; border-radius: 50%; border: 0;
+    background: rgba(239,230,212,0.14); color: var(--paper);
+    box-shadow: inset 0 0 0 1.5px rgba(239,230,212,0.28);
+    font-family: var(--font_interface); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.03em;
+    display: flex; align-items: center; justify-content: center; text-align: center; line-height: 1.1;
+    touch-action: none;
+  }
+  .touch_button.pressed { background: rgba(240,182,94,0.45); }
+  .touch_button.wide { width: 80px; height: 80px; font-size: 1.5rem; }
+  .touch_button.glow { box-shadow: inset 0 0 0 2px var(--lamplight), 0 0 18px rgba(240,182,94,0.55); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .screen, .aftermath_line, #subtitle { transition-duration: 0.01s; }
+  }
+</style>
+
+<div id="game_frame">
+  <canvas id="world_canvas" aria-label="The game world"></canvas>
+
+  <p id="objective" aria-live="polite"></p>
+  <p id="subtitle" aria-live="polite"></p>
+  <button id="pause_button" type="button" aria-label="Pause">II</button>
+  <p id="toast" aria-live="polite"></p>
+
+  <div id="touch_controls" aria-hidden="true">
+    <div class="touch_cluster" id="touch_left_cluster">
+      <button class="touch_button wide" type="button" data-control="left">&#9664;</button>
+      <button class="touch_button wide" type="button" data-control="right">&#9654;</button>
+    </div>
+    <div class="touch_cluster" id="touch_right_cluster">
+      <button class="touch_button" type="button" data-control="switch" id="touch_switch" hidden>Switch</button>
+      <button class="touch_button" type="button" data-control="call" id="touch_call">Whistle</button>
+      <button class="touch_button" type="button" data-control="low" id="touch_low">Kneel</button>
+      <button class="touch_button" type="button" data-control="act" id="touch_act">Use</button>
+      <button class="touch_button" type="button" data-control="jump">Jump</button>
+    </div>
+  </div>
+
+  <section class="screen" id="title_screen">
+    <h1 class="game_title">Until We Find <span class="home_word">Home</span></h1>
+    <p class="tagline">A woman, her dog, and the long way back to each other.</p>
+    <div class="button_row">
+      <button class="menu_button" type="button" id="begin_button">Begin</button>
+      <button class="menu_button quiet" type="button" id="chapters_button">Chapters</button>
+      <button class="menu_button quiet" type="button" id="memory_button">Memory box</button>
+    </div>
+    <div id="chapter_list" hidden></div>
+    <p class="small_note touch_note">Best with sound and headphones. Turn your phone sideways.</p>
+    <p class="small_note keyboard_note">Best with sound. Keyboard: arrows or A/D to walk, Space to jump, E to use, Q to call, S to kneel or sniff, Tab to switch.</p>
+  </section>
+
+  <section class="screen faded" id="chapter_card" aria-live="polite">
+    <p class="card_eyebrow" id="card_eyebrow"></p>
+    <h2 class="card_title" id="card_title"></h2>
+    <p class="card_place" id="card_place"></p>
+  </section>
+
+  <section class="screen faded" id="aftermath_screen">
+    <canvas id="aftermath_canvas" aria-hidden="true"></canvas>
+    <div id="aftermath_text"></div>
+    <p class="small_note" id="aftermath_tally"></p>
+    <button class="menu_button" type="button" id="aftermath_continue" hidden>Continue</button>
+  </section>
+
+  <section class="screen faded" id="memory_box">
+    <h2 class="card_title">Memory box</h2>
+    <p class="tagline">Small things found along the way. Some only a dog's nose can find.</p>
+    <div id="memory_list"></div>
+    <button class="menu_button" type="button" id="memory_close">Close</button>
+  </section>
+
+  <section class="screen faded" id="pause_screen">
+    <h2 class="card_title">Paused</h2>
+    <div class="button_row">
+      <button class="menu_button" type="button" id="resume_button">Resume</button>
+      <button class="menu_button quiet" type="button" id="restart_button">Restart chapter</button>
+      <button class="menu_button quiet" type="button" id="sound_button">Sound: on</button>
+      <button class="menu_button quiet" type="button" id="quit_button">Title screen</button>
+    </div>
+  </section>
+</div>
+
+<script src="js/audio.js"></script>
+<script src="js/motion.js"></script>
+<script src="js/art.js"></script>
+<script src="js/levels.js"></script>
+<script src="js/game.js"></script>
