@@ -10,6 +10,9 @@ unreal/**/.vs/
 unreal/**/*.xcworkspace
 unreal/**/*.xcodeproj
 
+# Screenshots the browser playtest writes on every run.
+prototype/web/tests/screenshots/
+
 # Personal reference photos and videos of real people and pets. Never commit these.
 references/
 
