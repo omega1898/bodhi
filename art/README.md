@@ -39,13 +39,14 @@ The game animates frame by frame, the way hand-drawn 2D games do: every frame is
 - **What it writes:** one SVG per animation into `animations/`, frames in rows of up to 8 (a very wide sheet is too wide for a phone to paint), and `prototype/web/js/frames_atlas.js`. The atlas says where each frame is, how far each walking cycle travels, and where her hand and the dog's mouth and eye are in each frame.
 - **No sliding feet:** walking and running frames advance with distance covered. The planted foot moves back by the same amount every frame, and the cycle length in the atlas is worked out from that.
 - **Frames:** her frames are 64 × 106 game units with the feet at (30, 99). The dog's are 90 × 84 with the feet at (42, 76).
+- **Two dog sets:** `bodhi_*` is the grown goldendoodle; `bodhi_puppy_*` is the same moves with a puppy's build (`puppy_build` in `tools/draw_frames.js`: a bigger head and paws, shorter legs, a short tail) in a deeper apricot. The game uses the puppy set until about six months and draws either set smaller while she grows. A third set, `biscuit_*`, is the old dog next door: the grown dog's moves in an older build, recoloured grey and white with a blue collar and a smoother coat (`biscuit_changes` in `tools/draw_frames.js`). Only the sets in use are painted, to save memory on a phone.
 
 After changing a pose or a painted part:
 ```
 node art/tools/draw_frames.js
 node prototype/web/tests/frames_check.js
 ```
-Expected: a hand-over list with every line `ok`, then `drew 212 frames...`, then `FRAMES CHECK PASSED`. The check fails if:
+Expected: a hand-over list with every line `ok`, then `drew 436 frames...`, then `FRAMES CHECK PASSED`. The check fails if:
 - a drawing is cut off at its frame's edge, or sinks through the floor;
 - the game picks the wrong animation;
 - running changes drawing fewer than 24 times a second, which reads as steppy rather than fluid. The current figure is about 45.

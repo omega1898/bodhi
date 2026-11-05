@@ -16,7 +16,8 @@ Open `index.html` in Chrome or Safari: double-click it on the Mac, or drag it in
 | Call (her whistle, the dog's bark) | Q | Whistle / Bark |
 | Kneel, or sniff as the dog | S | Kneel / Sniff |
 | Switch character (only at the final obstacle) | Tab | Switch |
-| Pause | Esc / P | II |
+| Pause (it also saves) | Esc / P | II |
+| Skip a film scene | Enter / E | Skip |
 
 ## Files
 
@@ -24,7 +25,9 @@ Open `index.html` in Chrome or Safari: double-click it on the Mac, or drag it in
 |---|---|
 | `index.html` | The page: drawing surface, menus, story text, phone buttons, styles |
 | `js/levels.js` | **The story as data:** every chapter's floors, gates, items, areas and story rules. Start reading here. |
-| `js/game.js` | The engine: movement, the companion who follows you, calls, the reunion, camera, screens |
+| `js/game.js` | The engine: movement, the companion who follows you, calls, the reunion, film scenes, camera, screens |
+| `js/care.js` | Looking after Bodhi: hunger, dirt, feeding, towelling, baths, food to pick up |
+| `js/save_game.js` | Saving and continuing mid-chapter; checks every save as hostile before using it |
 | `js/art.js` | Every picture, drawn in code: characters, places, light, rain, the quiet scenes |
 | `js/audio.js` | Every sound, made in code: rain, whistle, bark, music |
 | `js/motion.js` | How bodies respond to movement: springs, turning, leaning, bending joints, blending poses |
@@ -34,7 +37,8 @@ Open `index.html` in Chrome or Safari: double-click it on the Mac, or drag it in
 | `tests/playtest.js` | A robot that plays every chapter to the end and measures frame time |
 | `tests/filmstrip.js` | Films walking, turning, jumping and the dog running into contact sheets; fails if motion goes stiff |
 | `tests/pose_sheet.js` | Draws both painted characters large in every pose, for checking the art |
-| `tests/frame_rate.js` | Measures frames per second at iPhone size; fails below 50 |
+| `tests/frame_rate.js` | Measures frames per second at iPhone size; fails below 50. `FRAME_RATE_CHAPTER=coming_home` measures another chapter |
+| `tests/systems_check.js` | Checks growing up, feeding and cleaning, saving and film scenes, including break-it checks (tampered saves, buttons pressed during films) |
 
 ## How a chapter works
 
@@ -61,8 +65,14 @@ node prototype/web/tests/filmstrip.js
 ```
 Expected: `MOTION CHECK PASSED`, plus two contact sheets (images of every frame) to look at. Screenshots go to `prototype/web/tests/screenshots/`. Git ignores that folder, because the screenshots are regenerated on every run.
 
+To check growing up, care, saving and films (expected: `SYSTEMS CHECK PASSED`):
+```
+node prototype/web/tests/systems_check.js
+```
+
 ## Security notes
 
 - **Saved progress** (unlocked chapters, found keepsakes) is in the browser's storage. On loading, it's treated as untrusted: anything other than a short list of short names is ignored.
+- **The mid-chapter save** is checked by `read_save` before use (decision 9 and "Secure against what" in `docs/architecture.md`). A save that fails a check is refused and counted, and the chapter starts from its beginning.
 - **The page loads no outside code.** Only fonts come from Google Fonts.
 - **Story text reaches the page as plain text** (`textContent`), never as HTML, so a line of dialogue can't inject markup.

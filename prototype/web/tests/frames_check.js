@@ -96,7 +96,8 @@ async function wait_for_shown(page, kind, check, seconds) {
 // Plays a little and checks the game picks the right animation: still, moving, stopping, in the air.
 async function check_choices(page) {
     const problems = [];
-    await page.evaluate(() => { const debug = window.until_we_find_home_debug; debug.start_level(0); debug.skip_card(); });
+    // Chapters are found by name, so adding a chapter never changes which one a check plays.
+    await page.evaluate(() => { const debug = window.until_we_find_home_debug; debug.start_level(levels.findIndex(function named(level) { return level.id === 'last_morning'; })); debug.skip_card(); });
     await page.waitForTimeout(1500);
     const expectations = [
         ['standing still shows idle', null, (shown) => shown.startsWith('idle')],
@@ -125,7 +126,7 @@ async function check_choices(page) {
 // Counts how many times a second the drawing on screen changes while a character runs flat out.
 // Fewer than about 24 reads as steppy rather than fluid.
 async function drawings_per_second_running(page, kind) {
-    await page.evaluate(() => { const debug = window.until_we_find_home_debug; debug.start_level(5); debug.skip_card(); });
+    await page.evaluate(() => { const debug = window.until_we_find_home_debug; debug.start_level(levels.findIndex(function named(level) { return level.id === 'home'; })); debug.skip_card(); });
     await page.waitForTimeout(1200);
     await page.evaluate((who) => window.until_we_find_home_debug.take_control(who), kind);
     await page.evaluate(() => window.until_we_find_home_debug.hold('right', true));
@@ -191,7 +192,7 @@ async function record_shown(page, kind, seconds, action) {
 // moving off from kneeling must show her getting up rather than popping upright.
 async function check_transitions(page) {
     const problems = [];
-    await page.evaluate(() => { const debug = window.until_we_find_home_debug; debug.start_level(5); debug.skip_card(); debug.take_control('human'); });
+    await page.evaluate(() => { const debug = window.until_we_find_home_debug; debug.start_level(levels.findIndex(function named(level) { return level.id === 'home'; })); debug.skip_card(); debug.take_control('human'); });
     await page.waitForTimeout(1200);
     await page.evaluate(() => window.until_we_find_home_debug.hold('right', true));
     await page.waitForTimeout(1200);

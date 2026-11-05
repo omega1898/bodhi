@@ -70,6 +70,12 @@ The engine knows where things are and what the player pressed. The core knows wh
   - `core/` stays the foundation for a later engine build (the PC game).
 - How it works: `ios/` holds a two-file Swift app. It loads the game from inside the app with no internet. `ios/bundle_game.sh` copies the game, art and fonts in before every build. Steps are in `docs/app_store.md`.
 
+**9. The game's saves list the story so far and replay it.**
+- Constraint: the player can leave mid-chapter at any moment (a phone call, the lock button), and a regular game puts them back exactly there. The live world holds dozens of moving parts (gates, water levels, timers, who is in control).
+- Strongest rejected alternative: copy the whole live world into the save. That is more direct, but every new feature would need its own save and load code, and a missed field would load a broken chapter.
+- How it works (`prototype/web/js/save_game.js`): a save holds the chapter's story events in order, where the two of them stand, Bodhi's needs and the bond. Loading builds the chapter fresh and replays the events silently through the same story rules.
+- What breaks otherwise: a save written by one version of the game wouldn't load correctly in the next.
+
 ## Secure against what, under which assumptions
 
 Malformed or out-of-order events and times from the engine boundary (bad names, oversized names, spoofed internal events, NaN or backwards times) can't crash the core, skip story beats or corrupt the log. This assumes:
@@ -77,6 +83,14 @@ Malformed or out-of-order events and times from the engine boundary (bad names, 
 - the core runs inside the game process (a memory-level attacker is out of scope).
 
 Save files (`railway_chapter::load_progress`) can't crash the core or leave a chapter half-loaded: the loader refuses files over 4096 bytes, unknown versions, unknown fields and beats, duplicate or missing fields, out-of-range numbers and combinations the story can't reach, and changes nothing unless every check passes. A test feeds 10,000 randomly damaged files through it under the sanitizer build.
+
+The browser game's saves (`read_save` in `prototype/web/js/save_game.js`) are treated the same way. A save is refused and counted, and the chapter starts from its beginning instead, if it:
+- is over 16 KB, or isn't readable;
+- comes from another version or names a chapter that doesn't exist;
+- names an event that can't happen in that chapter, repeats an event, or contains the event that ends a chapter;
+- puts a character outside the world or inside a wall, or names an unknown character.
+
+Numbers in it are cleaned, never trusted (`checked_care`). Like the core's saves, it isn't signed: a player can still edit one into a state the story could reach.
 
 **Not yet covered:**
 - Save files are not signed, so a player can still hand-edit one to any *reachable* state (for example, the start of the final obstacle). That's acceptable for a single-player story.

@@ -79,7 +79,8 @@ async function main() {
     const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
     await page.goto('file://' + path.resolve(__dirname, '..', 'index.html'));
     await page.waitForTimeout(500);
-    await page.evaluate(() => { window.until_we_find_home_debug.start_level(5); window.until_we_find_home_debug.skip_card(); });
+    // The flat road home, found by name so adding chapters never changes it.
+    await page.evaluate(() => { const debug = window.until_we_find_home_debug; debug.start_level(levels.findIndex(function named(level) { return level.id === 'home'; })); debug.skip_card(); });
     await page.waitForTimeout(1500);
 
     // Measure smoothness while she walks right, turns, walks left, jumps.

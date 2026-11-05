@@ -454,8 +454,60 @@ function body_point(base, axis, along, up) {
     return add(base, add(scale(axis, along), scale(normal, up)));
 }
 
+// How the dog is built at each drawn age. Goldendoodle puppies have a big head, big paws,
+// short legs, large ears for their size and a short plume of a tail; the adult drawings take
+// over from about six months, drawn smaller while she is still growing (see dog_growth in
+// prototype/web/js/levels.js).
+//   head, ear, tail: how big each is compared with the adult.
+//   leg_width: how thick the legs and paws are.  leg_bone: how long each leg bone is.
+//   lower_body: how far the body sinks toward the paws when standing (0 = adult height).
+const adult_build = { head: 1, ear: 1, tail: 1, leg_width: 1, leg_bone: 1, lower_body: 0 };
+const puppy_build = { head: 1.34, ear: 1.15, tail: 0.6, leg_width: 1.1, leg_bone: 0.8, lower_body: 0.27 };
+// Biscuit, the old dog next door: the grown build, carried a little lower, with a slightly
+// smaller head and a shorter, heavier tail. His colours and smoother coat are in biscuit_look.
+const old_dog_build = { head: 0.96, ear: 1.05, tail: 0.85, leg_width: 0.96, leg_bone: 1, lower_body: 0.05 };
+
+// A puppy's body sits lower over its paws. Standing, the whole body (hips, shoulders and head
+// together, so its angle doesn't change) comes down by `lower_body` of the hips' height. Sitting
+// or lying, the hips are already on the floor, so nothing moves. The drop grows smoothly with
+// the hips' height, so every hand-over between two drawings stays as smooth as the adult's.
+function body_drop(pose, build) {
+    const hip_height = -pose.pelvis[1];
+    const upright = Math.min(1, Math.max(0, (hip_height - 12) / 15));
+    return build.lower_body * upright * hip_height;
+}
+
+// How far the adult head (with its beard) reaches below its centre, in game units.
+const head_reach_below = 13.4;
+
+// Turns an adult pose into the same pose with this build's proportions. The head rides down
+// with the shoulders, and a puppy's bigger head sits a little further back on its neck.
+// Two limits keep the bigger head inside its frame, each a smooth function of the pose so
+// hand-overs stay smooth:
+//   - near the floor (sniffing, lying down) it rises until its chin stays above the floor;
+//   - reaching far forward (sniffing) it comes back toward the body.
+function built_dog_pose(pose, build) {
+    if (build.lower_body === 0) {
+        return pose;
+    }
+    const drop = body_drop(pose, build);
+    // A head tipped down to sniff swings its beard lower, so it needs more room the more it tips.
+    const reach_below = head_reach_below + 7 * Math.max(0, pose.head_angle || 0);
+    const lowest_head_y = 1 - reach_below * build.head;  // 1 unit spare for the fluffy edge.
+    const head_x = pose.head[0] - 1.5 - Math.max(0, pose.head[0] - 20) * 0.8;
+    const head_y = Math.min(pose.head[1] + drop + 1, lowest_head_y);
+    return Object.assign({}, pose, {
+        pelvis: [pose.pelvis[0], pose.pelvis[1] + drop],
+        withers: [pose.withers[0], pose.withers[1] + drop],
+        head: [head_x, head_y],
+    });
+}
+
 // Draws one frame of the dog as SVG, from a pose in game units (feet at 0, 0; facing right).
-function draw_dog(pose) {
+// `build` gives the proportions (adult_build or puppy_build).
+function draw_dog(adult_pose, build) {
+    build = build || adult_build;
+    const pose = built_dog_pose(adult_pose, build);
     const pelvis = pose.pelvis;
     const withers = pose.withers;
     const axis = normalized(subtract(withers, pelvis));
@@ -478,8 +530,8 @@ function draw_dog(pose) {
         body_point(withers, axis, 1, 11.5),
         add(head, [-7.5, -5]),
         add(head, [-1, 9]),
-        body_point(withers, axis, 10, -2),
-        body_point(withers, axis, 7, -9.5),
+        body_point(withers, axis, 10.5, -2),
+        body_point(withers, axis, 8, -10),      // A full, fluffy chest.
         body_point(withers, axis, 1, -12),
         body_point(spine_middle, axis, 0, -10.5 + (pose.tuck || 2) + arch * 0.4),
         body_point(pelvis, axis, 4, -9.5),
@@ -489,15 +541,23 @@ function draw_dog(pose) {
 
     // A leg: one furry tube from inside the body, through the joint, to the paw.
     const leg = function draw_leg(top, paw, widths, color) {
-        const paw_point = add(paw, [0, -1.2]);
+        // Bigger paws are lifted by as much as they grew, so they still stand on the floor.
+        const paw_point = add(paw, [0, -1.2 - 8 * (build.leg_width - 1)]);
         // Standing, the joints bend back as a dog's do; lying down (`folded`), they fold up into
         // the body instead of poking down through the floor.
-        const joint = solve_joint(top, paw_point, 10.5, 10.5, pose.folded ? -1 : 1);
+        const bone = 10.5 * build.leg_bone;
+        const joint = solve_joint(top, paw_point, bone, bone, pose.folded ? -1 : 1);
         const points = [top, joint, paw_point].map(to_body);
         const paw_pixels = to_body(add(paw_point, [0.8, 0]));
+        // Goldendoodle legs carry thick, shaggy fur ("furnishings") down to big round paws. Lying
+        // down, the fur on the folded legs is pressed flat, and the knees tuck under the body.
+        const flattened = pose.folded ? 0.88 : 1;
+        const fluffy_widths = widths.map(function thicker(width) { return width * build.leg_width * flattened; });
+        const paw_width = 58 * build.leg_width;
+        const paw_height = 32 * build.leg_width;
         // The paw stays level with the floor, whatever angle the body is at.
-        return '<path d="' + tube_path(points, widths) + '" fill="' + color + '"/>' +
-            '<ellipse cx="' + number_text(paw_pixels[0]) + '" cy="' + number_text(paw_pixels[1]) + '" rx="54" ry="31" fill="' + color + '" transform="rotate(' + number_text(-degrees(body_angle)) + ' ' + number_text(paw_pixels[0]) + ' ' + number_text(paw_pixels[1]) + ')"/>';
+        return '<path d="' + tube_path(points, fluffy_widths) + '" fill="' + color + '"/>' +
+            '<ellipse cx="' + number_text(paw_pixels[0]) + '" cy="' + number_text(paw_pixels[1]) + '" rx="' + number_text(paw_width) + '" ry="' + number_text(paw_height) + '" fill="' + color + '" transform="rotate(' + number_text(-degrees(body_angle)) + ' ' + number_text(paw_pixels[0]) + ' ' + number_text(paw_pixels[1]) + ')"/>';
     };
     const front_top_near = body_point(withers, axis, 2, -3);
     const front_top_far = body_point(withers, axis, 0, -3);
@@ -507,28 +567,31 @@ function draw_dog(pose) {
     // The tail: a fluffy plume from the rump, pointing back and up by `tail` radians.
     const tail_root = body_point(pelvis, axis, -8.5, 6);
     const tail_direction = rotate_point([-1, 0], -(pose.tail || 0));
-    const tail_tip = add(tail_root, scale(tail_direction, 14));
-    const tail_middle = add(middle(tail_root, tail_tip), [0, -(pose.tail_curl || 2)]);
+    const tail_tip = add(tail_root, scale(tail_direction, 15 * build.tail));
+    const tail_middle = add(middle(tail_root, tail_tip), [0, -(pose.tail_curl || 2) * build.tail]);
     const tail_points = [tail_root, tail_middle, tail_tip].map(to_body);
+    // A goldendoodle's tail is a feathered plume: wide in the middle, still full at the tip.
+    const tail_widths = [78, 104, 72].map(function plume(width) { return width * (0.7 + 0.3 * build.tail); });
 
     const fur = [
         '<g filter="url(#far_side)">',
-        leg(front_top_far, pose.legs.far_front, [96, 76, 66], 'url(#coat)'),
-        leg(back_top_far, pose.legs.far_back, [124, 82, 66], 'url(#coat_dark)'),
+        leg(front_top_far, pose.legs.far_front, [104, 88, 80], 'url(#coat)'),
+        leg(back_top_far, pose.legs.far_back, [130, 84, 68], 'url(#coat_dark)'),
         '</g>',
-        '<path d="' + tube_path(tail_points, [70, 76, 40]) + '" fill="url(#coat_light)"/>',
-        '<path d="' + tube_path(tail_points, [70, 76, 40]) + '" fill="url(#curls)"/>',
+        '<path d="' + tube_path(tail_points, tail_widths) + '" fill="url(#coat_light)"/>',
+        '<path d="' + tube_path(tail_points, tail_widths) + '" fill="url(#curls)"/>',
         // Near legs go behind the body: the coat hides where they join, as on a real dog. A front
         // leg reaching up (the hug) is drawn over the body instead, so it reads as an arm.
-        pose.reaching ? '' : leg(front_top_near, pose.legs.near_front, [100, 80, 68], 'url(#coat)'),
-        leg(back_top_near, pose.legs.near_back, [128, 86, 68], 'url(#coat)'),
+        pose.reaching ? '' : leg(front_top_near, pose.legs.near_front, [108, 92, 82], 'url(#coat)'),
+        leg(back_top_near, pose.legs.near_back, [134, 86, 70], 'url(#coat)'),  // Hock and foot stay slim: sitting, they lie on the floor.
         '<path d="' + smooth_closed_path(outline) + '" fill="url(#coat)"/>',
         '<path d="' + smooth_closed_path(outline) + '" fill="url(#curls)"/>',
         pose.reaching ? '<g transform="translate(0,8)" opacity="0.35">' + leg(front_top_near, pose.legs.near_front, [92, 74, 64], '#6b4320') + '</g>' + leg(front_top_near, pose.legs.near_front, [92, 74, 64], 'url(#coat_light)') : '',
     ];
-    // Fur detail: a lighter back where the light catches it.
+    // Fur detail: a soft lighter band along the back where the light catches it. A wavy
+    // goldendoodle coat isn't glossy, so this is wide and faint, not a shine.
     const back_line = [body_point(pelvis, axis, -5, 8), body_point(spine_middle, axis, 0, 9 + arch), body_point(withers, axis, 1, 9)].map(to_pixels);
-    let head_markup = place_part(dog_parts.head, head, pose.head_angle || 0);
+    let head_markup = place_part(dog_parts.head, head, pose.head_angle || 0, build.head === 1 ? '' : ' scale(' + build.head + ')');
     const overlays = [];
     if (pose.eyes === 'closed') {
         overlays.push('<ellipse cx="44" cy="-22" rx="22" ry="24" fill="#f0d0a0"/><path d="M 26,-20 C 36,-8 54,-8 64,-20" fill="none" stroke="#3a2418" stroke-width="5" stroke-linecap="round"/>');
@@ -539,11 +602,11 @@ function draw_dog(pose) {
     if (overlays.length) {
         head_markup = head_markup.replace(/<\/g>$/, overlays.join('') + '</g>');
     }
-    const ear_root = add(head, rotate_point([-4.2, -3.6], pose.head_angle || 0));
-    const ear_markup = place_part(dog_parts.ear, ear_root, (pose.head_angle || 0) + (pose.ear || 0.2), ' scale(0.92)');
+    const ear_root = add(head, rotate_point(scale([-4.2, -3.6], build.head), pose.head_angle || 0));
+    const ear_markup = place_part(dog_parts.ear, ear_root, (pose.head_angle || 0) + (pose.ear || 0.2), ' scale(' + Math.round(0.92 * build.ear * 1000) / 1000 + ')');
     const body_place = to_pixels(spine_middle);
     return '<g transform="translate(' + number_text(body_place[0]) + ',' + number_text(body_place[1]) + ') rotate(' + number_text(degrees(body_angle)) + ')"><g filter="url(#fluffy)">' + fur.join('') + '</g></g>' +
-        '<path d="M ' + back_line.map(function point_text(point) { return point.map(number_text).join(','); }).join(' L ') + '" fill="none" stroke="#fff3d8" stroke-width="7" stroke-linecap="round" opacity="0.45"/>' +
+        '<path d="M ' + back_line.map(function point_text(point) { return point.map(number_text).join(','); }).join(' L ') + '" fill="none" stroke="#fff3d8" stroke-width="12" stroke-linecap="round" opacity="0.18"/>' +
         head_markup + ear_markup;
 }
 
@@ -677,7 +740,9 @@ const dog_animations = {
         dog_pose({ pelvis: [-11, -27], withers: [11, -28.5], head: [20, -41], head_angle: -0.15, ear: 0.15, tail: 0.55 }),
     ], 2, false),
     sleep: breathing(6, function breathe(breath) {
-        return dog_pose({ pelvis: [-10, -10 - breath * 0.4], withers: [10, -11 - breath * 0.4], arch: -2, tuck: 0, head: [21, -10], head_angle: 0.15, ear: 0.6, tail: -0.15, tail_curl: -1,
+        // The long ear lies back along the floor, as a sleeping dog's does, and the bearded chin
+        // rests just above it.
+        return dog_pose({ pelvis: [-10, -10 - breath * 0.4], withers: [10, -11 - breath * 0.4], arch: -2, tuck: 0, head: [21, -12.5], head_angle: 0.15, ear: 0.95, tail: -0.15, tail_curl: -1,
             eyes: 'closed', folded: true, legs: { near_front: [22, -2], far_front: [20, -2], near_back: [-1, -1], far_back: [-4, -1] } });
     }),
     lean: breathing(6, function nuzzle(breath, turn) {
@@ -699,7 +764,12 @@ const dog_animations = {
 const cells = {
     her: { width: 64, height: 106, feet_x: 30, feet_y: 99 },
     bodhi: { width: 90, height: 84, feet_x: 42, feet_y: 76 },
+    bodhi_puppy: { width: 90, height: 84, feet_x: 42, feet_y: 76 },
+    biscuit: { width: 90, height: 84, feet_x: 42, feet_y: 76 },
 };
+
+// Which build each dog drawing set uses. Both sets share the same poses and timing.
+const dog_builds = { bodhi: adult_build, bodhi_puppy: puppy_build, biscuit: old_dog_build };
 
 // How far each walking cycle travels, in game units (see cycle_length_of). The gallop's planted
 // paws move back about 10 units per key over its 6 keys. In-betweens don't change the distance.
@@ -707,6 +777,8 @@ const cycle_lengths = {
     her: { walk: cycle_length_of(her_walk_keys), run: cycle_length_of(her_run_keys) },
     bodhi: { trot: (trot_paw_path[0][0] - trot_paw_path[1][0]) * trot_paw_path.length, gallop: 60 },
 };
+cycle_lengths.bodhi_puppy = cycle_lengths.bodhi;  // The puppy's paws travel the same paths.
+cycle_lengths.biscuit = cycle_lengths.bodhi;
 
 // Points the game draws things at, per frame: what she holds goes in her near hand; what the dog
 // carries goes in its mouth; its blink goes over its eye (with the head's angle).
@@ -719,11 +791,15 @@ function frame_points(character, pose) {
             feet: [pose.near_foot.map(round_tenth), pose.far_foot.map(round_tenth)],
         };
     }
-    const angle = pose.head_angle || 0;
+    // The puppy's bigger head moves its mouth and eye outward; the eye's size goes last, so its
+    // blink covers it.
+    const build = dog_builds[character];
+    const built = built_dog_pose(pose, build);
+    const angle = built.head_angle || 0;
     return {
-        mouth: add(pose.head, rotate_point([11.5, 6.5], angle)).map(round_tenth),
-        eye: add(pose.head, rotate_point([4.4, -2.2], angle)).map(round_tenth).concat([round_tenth(angle)]),
-        feet: [pose.legs.near_front, pose.legs.far_front, pose.legs.near_back, pose.legs.far_back].map(function rounded(point) { return point.map(round_tenth); }),
+        mouth: add(built.head, rotate_point(scale([11.5, 6.5], build.head), angle)).map(round_tenth),
+        eye: add(built.head, rotate_point(scale([4.4, -2.2], build.head), angle)).map(round_tenth).concat([round_tenth(angle), build.head]),
+        feet: [built.legs.near_front, built.legs.far_front, built.legs.near_back, built.legs.far_back].map(function rounded(point) { return point.map(round_tenth); }),
     };
 }
 
@@ -732,7 +808,8 @@ function key_points(character, pose) {
     if (character === 'her') {
         return [pose.hip, pose.shoulder, pose.near_foot, pose.far_foot, pose.near_hand, pose.far_hand];
     }
-    return [pose.pelvis, pose.withers, pose.head, pose.legs.near_front, pose.legs.far_front, pose.legs.near_back, pose.legs.far_back];
+    const built = built_dog_pose(pose, dog_builds[character]);
+    return [built.pelvis, built.withers, built.head, built.legs.near_front, built.legs.far_front, built.legs.near_back, built.legs.far_back];
 }
 
 // How far the body jumps when the game goes from one drawing straight to another: the largest
@@ -760,10 +837,12 @@ const hand_overs = {
         ['idle', 0, 'embrace', 0], ['embrace', 4, 'embrace', 5], ['embrace', 0, 'idle', 0],
     ],
 };
+hand_overs.bodhi_puppy = hand_overs.bodhi;  // Same moves, checked again with puppy proportions.
+hand_overs.biscuit = hand_overs.bodhi;
 
 // Prints every hand-over's gap, marking any big enough to see as a jump.
 function report_hand_overs() {
-    const animations = { her: her_animations, bodhi: dog_animations };
+    const animations = { her: her_animations, bodhi: dog_animations, bodhi_puppy: dog_animations, biscuit: dog_animations };
     const lines = [];
     let worst = 0;
     for (const [character, pairs] of Object.entries(hand_overs)) {
@@ -817,6 +896,61 @@ function write_animation(character, name, frames, definitions, draw) {
     return entry;
 }
 
+// The puppy's coat colours. Goldendoodles usually lighten as they grow, so the puppy is a
+// deeper apricot than the adult. Each adult colour in the painted sheet is swapped for its
+// puppy shade; a colour missing from the sheet stops the tool, so a repaint can't silently
+// leave the puppy the adult's colour.
+const puppy_coat_colors = {
+    '#f6d39c': '#f0c286', '#e0a867': '#d6924c', '#ad773f': '#9c612d',
+    '#cf9558': '#c28046', '#8a5a30': '#7a4823',
+    '#fae2b6': '#f6d29c', '#e3ae70': '#d99a58',
+    '#c88746': '#b46f36', '#7c4a24': '#6a391b',
+};
+function puppy_definitions(definitions) {
+    let result = definitions;
+    for (const [adult_color, puppy_color] of Object.entries(puppy_coat_colors)) {
+        if (result.indexOf(adult_color) === -1) {
+            throw new Error('puppy colours: ' + adult_color + ' is no longer in bodhi.svg; update puppy_coat_colors');
+        }
+        result = result.split(adult_color).join(puppy_color);
+    }
+    return result;
+}
+
+// Biscuit's look: grey and white, the muzzle gone white with age, a blue collar, and a
+// smoother coat (less fur noise at the edge, fainter curls), so he reads as a different and
+// older dog at a glance. Used on the sheet's definitions and on every drawn frame.
+const biscuit_changes = [
+    // Coat, light coat, shadowed coat and ears.
+    ['#f6d39c', '#e4e0d8'], ['#e0a867', '#c2bdb3'], ['#ad773f', '#8e887d'],
+    ['#cf9558', '#aaa499'], ['#8a5a30', '#6d675d'],
+    ['#fae2b6', '#f1efea'], ['#e3ae70', '#cfcac1'],
+    ['#c88746', '#857d70'], ['#7c4a24', '#4f4940'],
+    // Muzzle, beard, moustache, brow, curl shading, the closed-eye lid.
+    ['#f1cd96', '#ece9e2'], ['#dba86c', '#d3cfc7'], ['#cf9a5e', '#c4bfb6'], ['#f4d6a6', '#f2f0ea'], ['#b07a46', '#8a8478'], ['#9a6233', '#6f6a62'], ['#f0d0a0', '#e8e5de'],
+    // A blue collar instead of Bodhi's red.
+    ['#9a2f2a', '#2f4f8a'], ['#c45a50', '#5a78b8'],
+    // A smoother coat.
+    ['scale="22"', 'scale="9"'], ['opacity="0.42"', 'opacity="0.16"'],
+];
+function biscuit_look(markup) {
+    let result = markup;
+    for (const [from, to] of biscuit_changes) {
+        result = result.split(from).join(to);
+    }
+    return result;
+}
+// Every change must still find something to change, or a repaint of the art could leave him
+// half golden without anyone noticing. Checked once, against the sheet and one drawn frame.
+function check_biscuit_look(definitions) {
+    const sample = definitions + draw_dog(dog_animations.idle[0], old_dog_build) + draw_dog(dog_animations.sleep[0], old_dog_build);
+    for (const [from] of biscuit_changes) {
+        if (sample.indexOf(from) === -1) {
+            throw new Error('biscuit_look: "' + from + '" is no longer in the art; update biscuit_changes');
+        }
+    }
+}
+
 // The largest hand-over gap allowed, in game units. Bigger shows on screen as a jump.
 const largest_smooth_gap = 2.5;
 
@@ -831,12 +965,15 @@ function main() {
     // A lighter grain for whole frames (the painted parts already carry their own).
     const her_definitions = extract_definitions(her_sheet) + '<linearGradient id="sleeve_lit" x1="1" y1="0" x2="0" y2="0"><stop offset="0" stop-color="#5aa59f"/><stop offset="1" stop-color="#2c625f"/></linearGradient>' + '<filter id="grain_soft" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="1" seed="9" result="noise"/><feColorMatrix in="noise" type="saturate" values="0" result="mono"/><feComponentTransfer in="mono" result="faint"><feFuncA type="table" tableValues="0 0.06"/></feComponentTransfer><feComposite in="faint" in2="SourceGraphic" operator="in" result="grain"/><feBlend in="grain" in2="SourceGraphic" mode="multiply"/></filter>';
     const dog_definitions = extract_definitions(dog_sheet);
-    const atlas = { her: { cell: cells.her, animations: {} }, bodhi: { cell: cells.bodhi, animations: {} } };
+    check_biscuit_look(dog_definitions);
+    const atlas = { her: { cell: cells.her, animations: {} }, bodhi: { cell: cells.bodhi, animations: {} }, bodhi_puppy: { cell: cells.bodhi_puppy, animations: {} }, biscuit: { cell: cells.biscuit, animations: {} } };
     for (const [name, frames] of Object.entries(her_animations)) {
         atlas.her.animations[name] = write_animation('her', name, frames, her_definitions, draw_her);
     }
     for (const [name, frames] of Object.entries(dog_animations)) {
-        atlas.bodhi.animations[name] = write_animation('bodhi', name, frames, dog_definitions, draw_dog);
+        atlas.bodhi.animations[name] = write_animation('bodhi', name, frames, dog_definitions, function adult(pose) { return draw_dog(pose, adult_build); });
+        atlas.bodhi_puppy.animations[name] = write_animation('bodhi_puppy', name, frames, puppy_definitions(dog_definitions), function puppy(pose) { return draw_dog(pose, puppy_build); });
+        atlas.biscuit.animations[name] = write_animation('biscuit', name, frames, biscuit_look(dog_definitions), function old_dog(pose) { return biscuit_look(draw_dog(pose, old_dog_build)); });
     }
     const header = [
         '// Purpose: where each animation frame is: one sheet per animation, frames in rows.',

@@ -9,10 +9,14 @@ const flipbook = {
     sheets: {},           // Loaded sheet images: flipbook.sheets.her.walk
     frames: {},           // Sheets painted at screen resolution: flipbook.frames.her.walk
     sheets_expected: 0,   // How many sheets frames_atlas.js lists.
-    sheets_cut: 0,        // How many have been painted at least once.
     cut_queue: [],        // Sheets waiting to be painted; one per drawn frame, so the game never stalls.
     pixels_per_unit: 0,   // The resolution sheets are painted at.
-    ready: false,
+    // Only the drawings in use are painted: hers, and the dog's set for this chapter (the puppy's
+    // or the grown dog's). The other dog set is let go, which halves the dog's memory on a phone.
+    dog_set: 'bodhi',
+    guest_set: null,      // A visiting dog's drawings (Biscuit), in chapters that have one.
+    set_ready: {},        // Per set: true once every one of its sheets is painted.
+    ready: false,         // True once every set in use is painted.
 };
 
 // How each animation plays when it isn't driven by distance or by jumping speed.
@@ -48,6 +52,27 @@ const flipbook_playback = {
 // The jump drawings run from the first speed, through the top of the arc, to the second.
 const flipbook_jump_speeds = { her: { rise: 620, fall: 700 }, bodhi: { rise: 690, fall: 700 } };
 
+// The puppy drawings (bodhi_puppy) are the same moves with a puppy's build, so they play
+// exactly as the grown dog's do.
+flipbook_playback.bodhi_puppy = flipbook_playback.bodhi;
+flipbook_jump_speeds.bodhi_puppy = flipbook_jump_speeds.bodhi;
+// Biscuit, the old dog next door, moves the same way too.
+flipbook_playback.biscuit = flipbook_playback.bodhi;
+flipbook_jump_speeds.biscuit = flipbook_jump_speeds.bodhi;
+
+// The dog drawing sets, and the colour of each one's eyelid when it blinks.
+const dog_drawing_sets = { bodhi: '#ecc791', bodhi_puppy: '#e2b578', biscuit: '#dcd8d0' };
+
+// True for any of the dogs' drawing sets.
+function is_dog_drawing(character_name) {
+    return Object.prototype.hasOwnProperty.call(dog_drawing_sets, character_name);
+}
+
+// How sharply each set is painted, compared with the grown characters. The puppy is never
+// drawn at more than about two thirds of full size, so painting her at 0.7 looks the same and
+// uses half the memory, which matters on a phone.
+const flipbook_paint_scale = { bodhi_puppy: 0.7, biscuit: 0.9 };
+
 // Drawings a second when getting up: an intro played backwards, faster than getting down.
 const getting_up_rate = 30;
 
@@ -72,7 +97,9 @@ function load_flipbook_sheets() {
             let attempt = 0;
             image.onload = function sheet_loaded() {
                 flipbook.sheets[character_name][animation_name] = image;
-                flipbook.cut_queue.push([character_name, animation_name]);
+                if (flipbook_set_in_use(character_name)) {
+                    flipbook.cut_queue.push([character_name, animation_name]);
+                }
             };
             image.onerror = function sheet_failed() {
                 // If no path works, the flipbook never becomes ready and the puppets stay on.
@@ -86,8 +113,66 @@ function load_flipbook_sheets() {
     }
 }
 
-// Called once per drawn frame. Paints at most one waiting sheet, and queues every sheet again
-// if the screen's resolution has changed a lot (after a resize or the camera zooming in).
+// True for the drawing sets in use: hers, this chapter's dog set, and a visiting dog's.
+function flipbook_set_in_use(character_name) {
+    return character_name === 'her' || character_name === flipbook.dog_set || character_name === flipbook.guest_set;
+}
+
+// Notes which sets have every sheet painted. A set is drawn only once it is complete; until then
+// its character shows as the cut-out puppet.
+function update_flipbook_readiness() {
+    for (const [character_name, character] of Object.entries(frames_atlas)) {
+        flipbook.set_ready[character_name] = Object.keys(character.animations).every(function painted(animation_name) {
+            return Boolean(flipbook.frames[character_name] && flipbook.frames[character_name][animation_name]);
+        });
+    }
+    flipbook.ready = Boolean(flipbook.set_ready.her && flipbook.set_ready[flipbook.dog_set] && (!flipbook.guest_set || flipbook.set_ready[flipbook.guest_set]));
+}
+
+// Switches which dog drawings are in use (at the start of a chapter). The new set's sheets are
+// queued for painting, and the other set's paintings are let go to free memory.
+function use_dog_drawings(set_name) {
+    if (typeof frames_atlas === 'undefined' || !frames_atlas[set_name] || set_name === flipbook.dog_set) {
+        return;
+    }
+    flipbook.dog_set = set_name;
+    for (const character_name of Object.keys(frames_atlas)) {
+        if (!flipbook_set_in_use(character_name)) {
+            flipbook.frames[character_name] = {};
+        }
+    }
+    for (const animation_name of Object.keys(flipbook.sheets[set_name] || {})) {
+        flipbook.cut_queue.push([set_name, animation_name]);
+    }
+    update_flipbook_readiness();
+}
+
+// Switches the visiting dog's drawings on (a set's name) or off (null), at the start of a
+// chapter. Like use_dog_drawings, it paints what's needed and lets go of what isn't.
+function use_guest_drawings(set_name) {
+    const wanted = typeof frames_atlas !== 'undefined' && set_name && frames_atlas[set_name] ? set_name : null;
+    if (wanted === flipbook.guest_set) {
+        return;
+    }
+    flipbook.guest_set = wanted;
+    for (const character_name of Object.keys(frames_atlas)) {
+        if (!flipbook_set_in_use(character_name)) {
+            flipbook.frames[character_name] = {};
+        }
+    }
+    for (const animation_name of Object.keys((wanted && flipbook.sheets[wanted]) || {})) {
+        flipbook.cut_queue.push([wanted, animation_name]);
+    }
+    update_flipbook_readiness();
+}
+
+// True when a set's drawings can be shown.
+function flipbook_set_ready(character_name) {
+    return Boolean(flipbook.set_ready[character_name]);
+}
+
+// Called once per drawn frame. Paints at most one waiting sheet, and queues every sheet in use
+// again if the screen's resolution has changed a lot (after a resize or the camera zooming in).
 function update_flipbook() {
     if (flipbook.sheets_expected === 0) {
         return;
@@ -100,17 +185,22 @@ function update_flipbook() {
     if (flipbook.ready && flipbook.cut_queue.length === 0 && Math.abs(wanted - flipbook.pixels_per_unit) / wanted > 0.15) {
         flipbook.pixels_per_unit = wanted;
         for (const [character_name, sheets] of Object.entries(flipbook.sheets)) {
+            if (!flipbook_set_in_use(character_name)) {
+                continue;
+            }
             for (const animation_name of Object.keys(sheets)) {
                 flipbook.cut_queue.push([character_name, animation_name]);
             }
         }
     }
-    const next = flipbook.cut_queue.shift();
+    // Skip anything queued for a set that has since gone out of use.
+    let next = flipbook.cut_queue.shift();
+    while (next && !flipbook_set_in_use(next[0])) {
+        next = flipbook.cut_queue.shift();
+    }
     if (next) {
-        const first_time = !flipbook.frames[next[0]][next[1]];
         paint_flipbook_sheet(next[0], next[1]);
-        flipbook.sheets_cut += first_time ? 1 : 0;
-        flipbook.ready = flipbook.sheets_cut === flipbook.sheets_expected;
+        update_flipbook_readiness();
     }
 }
 
@@ -121,8 +211,9 @@ function paint_flipbook_sheet(character_name, animation_name) {
     const entry = frames_atlas[character_name].animations[animation_name];
     const columns = entry.columns || entry.frames;
     const rows = Math.ceil(entry.frames / columns);
-    const frame_width = Math.round(cell.width * flipbook.pixels_per_unit);
-    const frame_height = Math.round(cell.height * flipbook.pixels_per_unit);
+    const pixels_per_unit = flipbook.pixels_per_unit * (flipbook_paint_scale[character_name] || 1);
+    const frame_width = Math.round(cell.width * pixels_per_unit);
+    const frame_height = Math.round(cell.height * pixels_per_unit);
     const canvas = make_sprite_canvas(frame_width * columns, frame_height * rows);
     canvas.getContext('2d').drawImage(flipbook.sheets[character_name][animation_name], 0, 0, canvas.width, canvas.height);
     flipbook.frames[character_name][animation_name] = { canvas: canvas, frame_width: frame_width, frame_height: frame_height, columns: columns };
@@ -143,6 +234,8 @@ const flipbook_levels = {
         embrace: { level: 'hugging', up_from: 'embrace' },
     },
 };
+flipbook_levels.bodhi_puppy = flipbook_levels.bodhi;
+flipbook_levels.biscuit = flipbook_levels.bodhi;
 
 // The level of a pose: 'upright' unless the table above says otherwise.
 function level_of(character_name, pose) {
@@ -271,7 +364,9 @@ function choose_flipbook_frame(character, character_name, time_seconds) {
         const frame_count = animations.jump.frames;
         const speeds = flipbook_jump_speeds[character_name];
         const velocity_y = character.velocity_y || 0;
-        const through_arc = velocity_y < 0 ? 1 + velocity_y / speeds.rise : 1 + velocity_y / speeds.fall;
+        // A puppy takes off slower (she jumps lower), so her arc starts from her own speed.
+        const rise = speeds.rise * (character.jump_scale || 1);
+        const through_arc = velocity_y < 0 ? 1 + velocity_y / rise : 1 + velocity_y / speeds.fall;
         state.starting_stride = true;  // Landing into a run starts the stride from the feet.
         return ['jump', safe_frame(Math.round(clamp_between(through_arc, 0, 2) * (frame_count - 1) / 2), frame_count)];
     }
@@ -306,6 +401,8 @@ function choose_flipbook_frame(character, character_name, time_seconds) {
         // Walk or run (trot or gallop for the dog), by speed. Two thresholds, so a speed near
         // the line doesn't flicker between the two.
         const slow_gait = character_name === 'her' ? 'walk' : 'trot';
+        // A smaller dog's stride is shorter in the world, so her cycle covers less ground.
+        const size = character.size_scale || 1;
         const fast_gait = character_name === 'her' ? 'run' : 'gallop';
         const switch_speed = character_name === 'her' ? 125 : 150;
         if (state.gait !== fast_gait && speed > switch_speed + 10) {
@@ -321,7 +418,7 @@ function choose_flipbook_frame(character, character_name, time_seconds) {
             state.phase = state.last_feet ? closest_phase(entry, state.last_feet, state.facing) : walk_start_phase;
             state.starting_stride = false;
         } else {
-            state.phase = (state.phase + state.moved / entry.cycle_length) % 1;
+            state.phase = (state.phase + state.moved / (entry.cycle_length * size)) % 1;
         }
         return [gait, safe_frame(Math.floor(state.phase * entry.frames), entry.frames)];
     }
@@ -329,7 +426,7 @@ function choose_flipbook_frame(character, character_name, time_seconds) {
     // stance each time it begins, which is exactly where landings, turns and stops end.
     const animation_name = pose === 'stand' || !animations[pose] ? 'idle' : pose;
     const playback = Object.assign({}, playbacks[animation_name]);
-    if (character_name === 'bodhi' && animation_name === 'idle') {
+    if (is_dog_drawing(character_name) && animation_name === 'idle') {
         playback.rate = 6 + clamp_between(character.wag || 0, 0, 1) * 14;  // A happier dog wags faster.
     }
     let started = state.pose_started;
@@ -358,13 +455,16 @@ function draw_flipbook_character(context, character, character_name, time_second
     state.last_feet = points.feet.map(function on_screen(foot) { return [foot[0] * drawn_facing, foot[1]]; });
     context.save();
     context.translate(character.x + character.width / 2, character.y + character.height);
-    context.scale(drawn_facing * (character.squash_x || 1), character.squash_y || 1);
+    // Frames are drawn for a full-grown body; a growing dog is drawn smaller around her feet.
+    const size = character.size_scale || 1;
+    context.scale(drawn_facing * (character.squash_x || 1) * size, (character.squash_y || 1) * size);
     const column = frame_index % painted.columns;
     const row = Math.floor(frame_index / painted.columns);
     context.drawImage(painted.canvas, column * painted.frame_width, row * painted.frame_height, painted.frame_width, painted.frame_height,
         -cell.feet_x, -cell.feet_y, cell.width, cell.height);
-    if (character_name === 'bodhi') {
-        draw_dog_blink(context, character, animation_name, points.eye);
+    if (is_dog_drawing(character_name)) {
+        draw_mud(context, character.dirt, points.feet);
+        draw_dog_blink(context, character, animation_name, points.eye, dog_drawing_sets[character_name]);
         if (character.carrying) {
             draw_carried_item(context, character.carrying, points.mouth[0], points.mouth[1]);
         }
@@ -376,20 +476,22 @@ function draw_flipbook_character(context, character, character_name, time_second
 
 // Every few seconds the dog blinks: a soft lid over the painted eye for a tenth of a second.
 // Frames that already have closed eyes (sleeping, leaning in, the embrace) are left alone.
-function draw_dog_blink(context, dog, animation_name, eye) {
+function draw_dog_blink(context, dog, animation_name, eye, lid_color) {
     if (animation_name === 'sleep' || animation_name === 'lean' || animation_name === 'embrace') {
         return;
     }
     if (((dog.x || 0) * 0.29 + performance.now() / 1000) % 3.7 >= 0.11) {
         return;
     }
-    context.fillStyle = '#ecc791';
+    // The puppy's bigger head has a bigger eye: the atlas gives its size after its angle.
+    const eye_size = Number.isFinite(eye[3]) ? clamp_between(eye[3], 0.5, 2) : 1;
+    context.fillStyle = lid_color || '#ecc791';
     context.beginPath();
-    context.ellipse(eye[0], eye[1], 2.3, 2.4, eye[2], 0, Math.PI * 2);
+    context.ellipse(eye[0], eye[1], 2.3 * eye_size, 2.4 * eye_size, eye[2], 0, Math.PI * 2);
     context.fill();
     context.strokeStyle = '#3a2418';
     context.lineWidth = 0.5;
     context.beginPath();
-    context.arc(eye[0], eye[1] + 0.2, 1.7, 0.25, Math.PI - 0.25);
+    context.arc(eye[0], eye[1] + 0.2 * eye_size, 1.7 * eye_size, 0.25, Math.PI - 0.25);
     context.stroke();
 }

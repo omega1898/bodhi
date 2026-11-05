@@ -1,40 +1,44 @@
-# Build plan: from here to the whole game
+# Build plan: from here to the App Store
 
-This is the full path to the finished iOS chapter, then the PC game. Each milestone ends with a check you can run yourself, so "done" means evidence, not a feeling.
+This is the path to the iOS release, then the PC game. Each milestone ends with a check you can run yourself, so "done" means evidence, not a feeling.
+
+## The route
+
+The iOS release is a native Swift app that carries the browser game inside it and runs offline (decision 8 in `docs/architecture.md`; steps in `docs/app_store.md`). Unreal Engine and the C++ rules in `core/` are kept for the later PC game; they are not in the iPhone app.
 
 ## Who can do what
 
 | Who | Can do | Cannot do |
 |---|---|---|
-| Cloud sessions | Game rules in `core/`, tests, docs, specs, CI, the text version | Open Unreal, build for iPhone, make or judge art |
-| You, on the Mac | Unreal Editor, Xcode, iPhone builds, playtests | — |
-| An artist (later) | Dog and human models, fur, the station | — |
+| Cloud sessions | The game in `prototype/web/` (story, chapters, mechanics, art drawn in code), the robot tests, `core/`, docs | Build or run the iPhone app, judge how it feels on a phone, sign anything with Apple |
+| You, on the Mac | Xcode, the iPhone build, TestFlight, App Store Connect, playtests with people | — |
+| An artist (later) | Hand-painted scenery, a polished dog and human | — |
 
-Most of the remaining work needs the Mac. Cloud sessions can't build "the whole game"; they build the parts that don't need an engine and write precise steps for the parts that do.
+## Where things stand (5 November 2026)
 
-## Where things stand
+- **The story:** twelve chapters covering Bodhi's first year, from the puppy coming home to the two of them asleep in their bed. A mystery runs under it: the lost dog next door, Biscuit, and the chalk hearts his girl draws so he can follow her (`docs/story.md`).
+- **Systems:** Bodhi grows chapter by chapter (puppy drawings, then the grown build drawn smaller), feeding and cleaning, mid-chapter saving with Continue, a pause menu, film scenes with Skip, and a third character (Biscuit) who can follow Bodhi.
+- **Tests that pass in the cloud:**
+  - `playtest.js`: the robot plays all twelve chapters.
+  - `systems_check.js`: 47 checks, including break-it checks on saves, care, films and Biscuit.
+  - `frames_check.js`, `filmstrip.js`, `frame_rate.js`: about 57 to 60 frames a second at iPhone size, in every chapter measured.
+- **Not tested anywhere yet:** the Swift app itself, and the game on a real iPhone (memory, heat, touch feel).
+- **Play time:** the robot's shortest run is 10.8 minutes. A first-time player is estimated at 45 to 75 minutes, a guess until measured. The target is at least five hours; the plan is in `docs/story.md`.
 
-- **Done, on `main`:** the chapter's rules: story beats, links between the two routes, the dog's feelings, the playtest log.
-- **Open pull requests, waiting for your review:** CI (#1), how the dog follows (#2), a code walkthrough (#3), save files (#4).
-- **This pull request:** a playable text version of chapter one (`core/tools/text_chapter.cpp`), and the whole story as a browser game with drawn graphics, sound, keepsakes and a robot playtest (`prototype/web/`).
-
-## Milestones for the iOS chapter
+## Milestones
 
 | | Milestone | Who | Check that proves it |
 |---|---|---|---|
-| T | Browser playtest | You + 3 people | Each plays `prototype/web/` on their own phone, uncoached; you note their answers to the five questions below |
-| M0 | Mac set up | You | Unreal 5 project `BodhiGame` opens (steps in `unreal/README.md`); Xcode installed; `ctest` passes on the Mac |
-| M1 | Rules inside Unreal | Cloud writes the spec (prompt E in `docs/cloud_sessions.md`); you build it | In the editor, pulling a test lever changes the beat printed on screen |
-| M2 | Grey-box chapter | You | The whole chapter is playable on the Mac with boxes for rooms and capsules for the pair; layout follows `prototype/web/js/levels.js` (floors, gates and areas, already proven playable) |
-| M3 | First iPhone build | You | The grey-box chapter runs on your iPhone with touch controls; you write down the frame time |
-| M4 | Grey-box playtest | You + 5 people | Uncoached play; telemetry log saved; five questions answered |
-| M5 | Hardest-scene test on iPhone | You (+ artist) | One scene with curly fur, her face, water and both characters holds frame rate through a 15-minute heat test (`docs/characters.md`) |
-| M6 | Real art and sound | Artist + you | Dog and human models in; whistle, bark and rain sounds in; written likeness agreement signed |
-| M7 | App Store | You | TestFlight build played by testers; App Review passed |
+| M1 | First iPhone build | You | `docs/app_store.md` parts A and B: the game opens on your iPhone, fills the screen sideways, plays sound after a tap, and works with Wi-Fi off. Play Coming Home to the end. Write down anything that stutters or looks wrong |
+| T | First playtest | You + 3 people | Each plays on your phone, uncoached. Time how long they take, and ask the five questions below |
+| M2 | TestFlight | You | Apple Developer Program, `docs/app_store.md` parts C to F; five testers play the build |
+| M3 | Toward five hours | Cloud + you | One deepened or new chapter at a time (`docs/story.md`), each played by the robot and by at least one person, whose time you write down. Total measured time reaches five hours |
+| M4 | Art and sound polish | Artist + you | Painted scenery per chapter; whistle, bark and rain recorded or replaced |
+| M5 | App Store | You | App Review passed |
 
-**Why this order:** each milestone answers the riskiest open question as cheaply as possible.
-- T and M4 answer "does anyone care?" before art money is spent.
-- M3 and M5 answer "does it run on a phone?" before the level is finished.
+**Why this order:**
+- **M1 first:** the Swift app has never been compiled, so the first build is its real test. Everything built since PR #6 sits on it.
+- **T before M3:** five hours of a game people don't care about is the most expensive mistake available. Thirty minutes that people love can grow; five hours they quit after twenty minutes can't be fixed by adding more.
 
 **The five playtest questions** (from `docs/design.md`):
 1. When did you first care about the dog?
@@ -45,18 +49,9 @@ Most of the remaining work needs the Mac. Cloud sessions can't build "the whole 
 
 ## Details only you can supply
 
-These are listed in `docs/characters.md` and still blank: the dog's name, coat, size and three habits; her in-game name, hair and clothes; how she calls the dog. The text version says "your dog" until they're filled in.
+In `docs/characters.md`: Bodhi's real coat colour and three habits, her in-game name (if she should have one) and how she calls the dog. The game uses a golden-apricot coat from goldendoodle breed descriptions; tell a session if Bodhi's is cream, red or another shade.
 
-## Cloud-session work that can run in parallel
+## After the iOS release: the PC game
 
-- Merge or fix the open pull requests #1 to #4 first. Unreviewed code piles up.
-- Then, one session each:
-  - the Unreal adapter spec (prompt E),
-  - scent and whistle rules in `core/` (how far a whistle carries, where the scent is lost),
-  - the playtest-log analysis script for M4.
-
-## After the iOS chapter: the PC game
-
-- More chapters (the design document lists a hospital, a school and an evacuation shelter), richer lighting and fur.
-- Customization of the human and dog, which `docs/characters.md` deliberately left out of the iOS release.
-- The `core/` rules carry over unchanged. That's why they're kept engine-independent.
+- The design document's PC plans: more chapters, richer lighting and fur, customization of the human and dog.
+- `core/` (engine-independent C++) and the Unreal adapter spec are the foundation for that version.
