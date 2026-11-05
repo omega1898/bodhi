@@ -1,7 +1,8 @@
 // Purpose: films short moves (start walking, turn around, jump and land, the dog following)
 // and stitches the frames into one contact sheet, so a person can judge how natural the
 // motion looks, frame by frame. It also checks two smoothness numbers and fails if the
-// motion has gone stiff again: turning must take several frames, and the body must lean.
+// motion has gone stiff again: she must go through many different drawings, a turn must show
+// the turning frames, and a jump must show both rising and falling drawings.
 //
 // Run from the repository root:  node prototype/web/tests/filmstrip.js output_folder
 'use strict';
@@ -92,18 +93,18 @@ async function main() {
         ['right', true, 900], ['right', false, 120], ['left', true, 700], ['jump', true, 200], ['jump', false, 600], ['left', false, 400],
     ], 2900);
     clearInterval(sampler);
+    const frames_atlas_jump_count = await page.evaluate(() => frames_atlas.her.animations.jump.frames);
 
-    // Facing changes: how many frames does a turn take? (1 means an instant, cardboard flip.)
-    let turn_frames = 0;
-    for (const sample of samples) {
-        const blend = sample.facing_blend === undefined ? sample.facing : sample.facing_blend;
-        if (Math.abs(blend) < 0.95) {
-            turn_frames += 1;
-        }
-    }
-    const leans = samples.map((sample) => Math.abs(sample.lean || 0));
-    console.log('turn frames (more than 2 = a visible turn): ' + turn_frames);
-    console.log('largest body lean (radians): ' + Math.max(...leans).toFixed(3));
+    // What was actually drawn: each sample says which animation and frame was on screen.
+    const shown = samples.map((sample) => sample.shown || '');
+    const different_drawings = new Set(shown.filter((name) => name)).size;
+    const turn_drawn = shown.some((name) => name.startsWith('turn'));
+    // The jump is one arc of drawings with the top in the middle: lower numbers rise, higher fall.
+    const jump_drawings = frames_atlas_jump_count;
+    const rise_drawn = shown.some((name) => name.startsWith('jump ') && Number(name.split(' ')[1]) < (jump_drawings - 1) / 2);
+    const fall_drawn = shown.some((name) => name.startsWith('jump ') && Number(name.split(' ')[1]) > (jump_drawings - 1) / 2);
+    console.log('different drawings shown (at least 10 = alive): ' + different_drawings);
+    console.log('turn drawn: ' + turn_drawn + ' | jump rising drawn: ' + rise_drawn + ' | falling drawn: ' + fall_drawn);
     console.log('contact sheet: ' + sheet);
 
     // The dog, close up: a sprint, a turn, a jump, a stop.
@@ -113,8 +114,8 @@ async function main() {
     ], 2600, 'dog');
     console.log('dog contact sheet: ' + dog_sheet);
     await browser.close();
-    const smooth_enough = turn_frames >= 3 && Math.max(...leans) > 0.03;
-    console.log(smooth_enough ? 'MOTION CHECK PASSED' : 'MOTION CHECK FAILED: a turn must take at least 3 frames and the body must lean');
+    const smooth_enough = different_drawings >= 10 && turn_drawn && rise_drawn && fall_drawn;
+    console.log(smooth_enough ? 'MOTION CHECK PASSED' : 'MOTION CHECK FAILED: too few drawings, or the turn or jump frames never showed');
     process.exit(smooth_enough ? 0 : 1);
 }
 

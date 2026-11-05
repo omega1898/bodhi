@@ -1,7 +1,7 @@
 # Bodhi game — instructions for Claude Code sessions
 
 ## What this is
-A narrative game about a human and their dog who are separated and reunite. First release: a short iOS chapter ("The Other Side", a flooded railway station) built in Unreal Engine. Later: a larger PC game. Design document: `docs/design.md`. Architecture and decisions: `docs/architecture.md`. The two main characters are based on real people and a real dog: read `docs/characters.md`, and never add photos of them to the repository.
+A narrative game about a human and their dog who are separated and reunite. First release: an iOS app on the App Store: a native Swift app carrying the finished game (`prototype/web/`) inside it (decision 8 in `docs/architecture.md`, steps in `docs/app_store.md`). Later: a larger PC game, possibly in Unreal on top of `core/`. Design document: `docs/design.md`. Architecture and decisions: `docs/architecture.md`. The two main characters are based on real people and a real dog: read `docs/characters.md`, and never add photos of them to the repository.
 
 ## Who owns it
 The owner is learning programming from zero. Every change must be readable by a beginner:
@@ -14,6 +14,8 @@ The owner is learning programming from zero. Every change must be readable by a 
 - `core/`: engine-independent C++17 game logic. Builds and tests anywhere, including cloud sessions.
 - `unreal/`: the Unreal Engine project. Created and edited only on the owner's Mac. Cloud sessions cannot run Unreal.
 - `prototype/web/`: the whole story as a playable browser game (canvas, no libraries). The art, story and pacing blueprint for the Unreal version. Test it with `node prototype/web/tests/playtest.js`.
+- `ios/`: the iOS app. `project.yml` (turned into an Xcode project on the Mac by XcodeGen), two Swift files, the app icon, and `bundle_game.sh`, which copies the game in. Cloud sessions can't build it; the Mac does.
+- `art/`: the game's art as editable SVG files: painted character parts, frame-by-frame animations (`art/animations/`, drawn by `art/tools/draw_frames.js`), scenery layers. See `art/README.md`. Check frames with `node prototype/web/tests/frames_check.js`.
 - `docs/`: design, story, art and production, architecture, cloud session guide.
 
 ## Hard rules for `core/`

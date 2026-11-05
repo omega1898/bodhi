@@ -59,6 +59,17 @@ The engine knows where things are and what the player pressed. The core knows wh
 - Strongest rejected alternative: JSON, which matches the playtest log and has tooling.
 - What breaks otherwise: a JSON parser is far more code to make hostile-input safe; decimals could load differently on a French-language phone. The cost: times are kept to the millisecond (rounded down) and feelings to the millionth.
 
+**8. The iOS release is a native app that carries the finished browser game inside it.**
+- Constraint: the owner wants the game on the App Store soon. The whole story, the painted art, the motion system and the automated tests already exist as a browser game (`prototype/web/`), and one person is building it.
+- Strongest rejected alternatives:
+  - Rebuilding in Unreal (the original plan in decision 1): real 3D and the most room to grow, but it means rebuilding everything, learning a heavy engine, and a large app for a 2D game.
+  - Rebuilding in SpriteKit, Apple's 2D engine: the most native, but the engine code would be rewritten.
+- What breaks otherwise: months of rebuilding before anyone can play the game on an iPhone.
+- The cost, stated honestly:
+  - There are now two copies of the chapter rules, the C++ one in `core/` and the JavaScript one in the game, and they can drift apart. For the iOS release, the game's own rules are the ones that ship.
+  - `core/` stays the foundation for a later engine build (the PC game).
+- How it works: `ios/` holds a two-file Swift app. It loads the game from inside the app with no internet. `ios/bundle_game.sh` copies the game, art and fonts in before every build. Steps are in `docs/app_store.md`.
+
 ## Secure against what, under which assumptions
 
 Malformed or out-of-order events and times from the engine boundary (bad names, oversized names, spoofed internal events, NaN or backwards times) can't crash the core, skip story beats or corrupt the log. This assumes:

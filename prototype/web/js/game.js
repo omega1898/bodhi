@@ -16,8 +16,9 @@ const step_up_height = 14;
 const character_specs = {
     // Speeds are world units per second; accelerations are units per second, per second.
     // Starting, stopping and turning take a moment, the way a body with weight does.
-    human: { width: 26, height: 86, walk_speed: 175, jog_speed: 235, jump_speed: 620, acceleration: 1000, braking: 1500, turning: 2300, air_control: 1100 },
-    dog: { width: 46, height: 38, walk_speed: 235, jog_speed: 235, jump_speed: 690, acceleration: 1500, braking: 1800, turning: 3000, air_control: 1600 },
+    // Weight shows in the animation; the controls themselves answer within about a tenth of a second.
+    human: { width: 26, height: 86, walk_speed: 175, jog_speed: 235, jump_speed: 620, acceleration: 1800, braking: 2600, turning: 3600, air_control: 1500 },
+    dog: { width: 46, height: 38, walk_speed: 235, jog_speed: 235, jump_speed: 690, acceleration: 2400, braking: 3000, turning: 4400, air_control: 2000 },
 };
 const progress_storage_key = 'until_we_find_home_progress';
 const keepsake_storage_key = 'until_we_find_home_keepsakes';
@@ -268,8 +269,10 @@ function start_level(level_index) {
     game.level_index = level_index;
     game.level = levels[level_index];
     game.world = build_world(game.level);
-    game.backdrop_layers = render_backdrop(game.level);
+    load_scenery_art(game.level);
+    game.backdrop_layers = render_backdrop(game.level, game.pixel_scale, view_width, view_height);
     game.rain_drops = [];
+    game.near_rain_drops = [];
     prepare_level_lighting(game.level);
     const start_human = game.world.characters.human;
     const camera = game.camera;
@@ -618,6 +621,13 @@ function move_character(character, direction, wants_jump, delta_seconds, speed_s
     if (character.on_ground && Math.abs(character.velocity_x) > top_speed + 1 && direction !== 0) {
         rate = spec.braking * 0.5;  // Slowing from a jog to a walk is gradual.
     }
+    // A hard turn at speed kicks dust up from the feet, once per turn, flying the way of the slide.
+    if (turning && character.on_ground && Math.abs(character.velocity_x) > 150 && !character.skidding && game.world) {
+        for (let index = 0; index < 4; index++) {
+            game.world.particles.push({ kind: 'puff', x: center_x(character) - direction * (4 + index * 4), y: character.y + character.height - 3, velocity_x: -direction * (40 + index * 25), velocity_y: -14 - index * 6, gravity: 0, life: 0.4, max_life: 0.4, size: 4 });
+        }
+    }
+    character.skidding = turning && character.on_ground;
     character.velocity_x = move_toward(character.velocity_x, target_velocity, rate * delta_seconds);
     if (direction !== 0) {
         character.facing = direction;
@@ -1534,34 +1544,55 @@ function update_camera(delta_seconds) {
     const world = game.world;
     const camera = game.camera;
     const player = controlled_character();
-    let target_zoom = camera.base_zoom;
+    const companion = companion_character();
     // Look ahead in the direction of travel, eased so turning around doesn't jolt the view.
-    const wanted_look_ahead = player.facing * 60 * Math.min(1, 0.35 + player.speed_ratio);
+    const wanted_look_ahead = player.facing * 50 * Math.min(1, 0.35 + player.speed_ratio);
     camera.look_ahead += (wanted_look_ahead - camera.look_ahead) * Math.min(1, delta_seconds * 1.6);
     let focus_x = center_x(player) + camera.look_ahead;
     let focus_y = null;
+    let target_zoom = camera.close_zoom;
+
+    // Close on the character you control most of the time, so faces and bodies read clearly.
+    // Pull back to frame both of them only when both matter: different floors close together,
+    // meeting at a barrier, an answered call, the approach before a reunion.
+    const gap_x = Math.abs(center_x(companion) - center_x(player));
+    const gap_y = Math.abs((companion.y + companion.height) - (player.y + player.height));
+    const answer_heard = world.call_markers.some(function is_answer(marker) { return !marker.own; });
+    const both_matter = ['near_contact', 'final_obstacle'].includes(world.beat)
+        || (world.reunion && world.reunion.stage === 'approach')
+        || (gap_y > 60 && gap_x < 420)
+        || (answer_heard && gap_x < 700);
+    if (both_matter) {
+        const top = Math.min(player.y, companion.y);
+        const bottom = Math.max(player.y + player.height, companion.y + companion.height);
+        const zoom_to_fit = Math.min(view_height / (bottom - top + 170), view_width / (gap_x + 300));
+        target_zoom = Math.max(camera.wide_zoom, Math.min(camera.close_zoom, zoom_to_fit));
+        focus_x = (center_x(player) + center_x(companion)) / 2 + camera.look_ahead * 0.4;
+        focus_y = (top + bottom) / 2 + 20;
+    }
     if (world.reunion && world.reunion.stage === 'embrace') {
         focus_x = center_x(player);
         focus_y = player.y + player.height * 0.55;
-        target_zoom = camera.base_zoom * 1.5;
+        target_zoom = camera.close_zoom * 1.3;
     }
-    camera.zoom += (target_zoom - camera.zoom) * Math.min(1, delta_seconds * 1.1);
+    // Zoom glides rather than snaps.
+    camera.zoom = smooth_follow(camera.zoom, target_zoom, camera, 'zoom_velocity', 0.7, delta_seconds);
     const visible_width = view_width / camera.zoom;
     const visible_height = view_height / camera.zoom;
-    // Frame from the bottom of the level so both floors stay in view, but rise to keep the
-    // player's head clear of the top edge when climbing.
     const lowest_center_y = game.level.height - visible_height / 2;
-    let target_y = Math.min(lowest_center_y, player.y + player.height * 0.5 + 90, player.y - 70 + visible_height / 2);
+    // Put the ground she stands on about two thirds of the way down the screen (a common
+    // framing in film and games), with her head well clear of the top edge.
+    let target_y = Math.min(lowest_center_y, player.y + player.height - visible_height * 0.18, player.y - 40 + visible_height / 2);
     if (focus_y !== null) {
-        target_y = Math.min(lowest_center_y + 40, focus_y);
+        target_y = Math.min(lowest_center_y + 30, focus_y);
     }
     const target_x = game.level.width <= visible_width ? game.level.width / 2
         : Math.max(visible_width / 2, Math.min(game.level.width - visible_width / 2, focus_x));
     // Ignore small jumps vertically: only re-aim up or down when she lands, or leaves the frame.
-    if (camera.anchor_y === undefined || player.on_ground || Math.abs(target_y - camera.anchor_y) > 110 || focus_y !== null) {
+    if (camera.anchor_y === undefined || player.on_ground || Math.abs(target_y - camera.anchor_y) > visible_height * 0.25 || focus_y !== null) {
         camera.anchor_y = target_y;
     }
-    camera.center_x = smooth_follow(camera.center_x, target_x, camera, 'velocity_x', 0.32, delta_seconds);
+    camera.center_x = smooth_follow(camera.center_x, target_x, camera, 'velocity_x', 0.3, delta_seconds);
     camera.center_y = smooth_follow(camera.center_y, camera.anchor_y, camera, 'velocity_y', 0.45, delta_seconds);
 }
 
@@ -1631,6 +1662,7 @@ function continue_from_aftermath() {
 function render(delta_seconds) {
     context.setTransform(game.pixel_scale, 0, 0, game.pixel_scale, 0, 0);
     const time_seconds = game.clock_seconds;
+    update_flipbook();
     if (!game.world || !game.level) {
         draw_title_backdrop(delta_seconds);
         return;
@@ -1652,6 +1684,9 @@ function render(delta_seconds) {
     game.draw_camera = { center_x: draw_center_x, center_y: draw_center_y, zoom: camera.zoom };
 
     draw_backdrop(context, level, game.backdrop_layers, camera_left, camera_top, view_width, time_seconds, world.lightning_seconds);
+    if (scenery.rain) {
+        update_and_draw_rain(context, game.rain_drops, view_width, scenery.rain, scenery.wind_slant || -0.25, delta_seconds, is_sheltered_on_screen, false);
+    }
 
     const shake = camera.shake_seconds > 0 ? 6 * Math.min(1, camera.shake_seconds) : 0;
     context.save();
@@ -1691,6 +1726,9 @@ function render(delta_seconds) {
             character.y = character.previous_y + (true_y - character.previous_y) * blend;
         }
         character.shadow_y = character.on_ground ? character.y + character.height : find_floor_below(character);
+        if (character === player) {
+            game.last_drawn_player_x = character.x;  // Where she is drawn, for judder tests.
+        }
         draw_contact_shadow(context, character);
         if (character.kind === 'dog') {
             draw_dog(context, character, time_seconds);
@@ -1706,6 +1744,7 @@ function render(delta_seconds) {
     for (const water of world.water) {
         draw_water(context, water, time_seconds);
     }
+    draw_light_shafts(context, level.props, time_seconds, left_edge, right_edge);
     draw_light_effects(context, level.props, time_seconds, (scenery.rain || 0) > 0.3 || scenery.wet, left_edge, right_edge);
     for (const prop of level.props) {
         if (prop.front && prop.x < right_edge && prop.x + (prop.w || 450) > left_edge) {
@@ -1716,12 +1755,13 @@ function render(delta_seconds) {
     draw_call_markers(context, world.call_markers);
     context.restore();
 
-    draw_lighting(context, light_canvas, collect_lights(), scenery.darkness, scenery.darkness_color || 'rgb(6,9,16)', view_width);
+    const vignette_strength = world.reunion && world.reunion.stage === 'embrace' ? 0.8 : 0.55;
+    draw_lighting(context, light_canvas, collect_lights(), world.lightning_seconds > 0 ? 0 : scenery.darkness, scenery.darkness_color || 'rgb(6,9,16)', view_width, vignette_strength);
     if (scenery.mist) {
         draw_mist(context, view_width, camera_left, time_seconds, scenery.mist);
     }
     if (scenery.rain) {
-        update_and_draw_rain(context, game.rain_drops, view_width, scenery.rain, scenery.wind_slant || -0.25, delta_seconds, is_sheltered_on_screen);
+        update_and_draw_rain(context, game.near_rain_drops, view_width, scenery.rain, scenery.wind_slant || -0.25, delta_seconds, is_sheltered_on_screen, true);
     }
     draw_foreground(context, scenery.foreground, view_width, camera_left * camera.zoom, time_seconds, scenery.foreground_color, world_to_screen(center_x(player), 0)[0]);
     // The prompt is drawn last, above the darkness, so it's always readable.
@@ -1735,7 +1775,6 @@ function render(delta_seconds) {
         context.fillStyle = 'rgba(220,230,255,' + (world.lightning_seconds * 0.6).toFixed(2) + ')';
         context.fillRect(0, 0, view_width, view_height);
     }
-    draw_vignette(context, view_width, world.reunion && world.reunion.stage === 'embrace' ? 0.8 : 0.55);
     draw_offscreen_markers(context, world.call_markers);
     if (game.fade > 0.01) {
         context.fillStyle = 'rgba(13,17,24,' + game.fade.toFixed(3) + ')';
@@ -1788,8 +1827,8 @@ function collect_lights() {
         const is_player = character.kind === world.controlled;
         const position = world_to_screen(center_x(character), character.y + character.height * 0.5);
         lights.push({
-            x: position[0], y: position[1], radius: ((is_player ? 150 : 105) + embrace * 240) * zoom, strength: is_player ? 0.8 : 0.6,
-            color: embrace > 0 ? 'rgba(255,170,90,' + (0.22 * embrace).toFixed(3) + ')' : null,
+            x: position[0], y: position[1], radius: ((is_player ? 170 : 120) + embrace * 240) * zoom, strength: is_player ? 0.8 : 0.65,
+            glow_color: embrace > 0 ? '255,170,90' : null, glow_strength: 0.3 * embrace,
         });
     }
     for (const prop of game.level.props) {
@@ -1815,9 +1854,20 @@ function collect_lights() {
         if (position[0] < -radius * zoom || position[0] > view_width + radius * zoom) {
             continue;
         }
-        lights.push({ x: position[0], y: position[1], radius: radius * zoom, strength: 0.95, color: prop.color || 'rgba(255,186,105,0.14)' });
+        const glow = split_rgba(prop.color || 'rgba(255,186,105,0.14)');
+        lights.push({ x: position[0], y: position[1], radius: radius * zoom, strength: 0.95, glow_color: glow.rgb, glow_strength: glow.alpha * 1.6 });
     }
     return lights;
+}
+
+// Splits "rgba(r,g,b,a)" into "r,g,b" and the number a, remembering each answer.
+const split_rgba_cache = new Map();
+function split_rgba(color) {
+    if (!split_rgba_cache.has(color)) {
+        const parts = color.replace(/[^0-9.,]/g, '').split(',');
+        split_rgba_cache.set(color, { rgb: parts.slice(0, 3).join(','), alpha: parts.length > 3 ? Number(parts[3]) : 1 });
+    }
+    return split_rgba_cache.get(color);
 }
 
 // Draws expanding rings where a call was heard.
@@ -1877,6 +1927,10 @@ function draw_prompt(draw_context, prompt) {
     const key_name = shown.control === 'low' ? 'S' : 'E';
     const text = game.last_input === 'touch' ? shown.text : key_name + '   ' + shown.text;
     draw_context.save();
+    const text_scale = game.camera.wide_zoom / game.camera.zoom * 1.1;
+    draw_context.translate(shown.x, shown.y);
+    draw_context.scale(text_scale, text_scale);
+    draw_context.translate(-shown.x, -shown.y);
     draw_context.globalAlpha = ease_in_out(world.prompt_alpha);
     draw_context.font = '700 13px "Atkinson Hyperlegible", Arial, sans-serif';
     const text_width = draw_context.measureText(text).width;
@@ -1949,7 +2003,8 @@ function draw_title_backdrop(delta_seconds) {
         context.restore();
     }
     draw_mist(context, view_width, time_seconds * 4, time_seconds, 'rgba(150,170,195,0.06)');
-    update_and_draw_rain(context, game.rain_drops, view_width, 1, -0.25, delta_seconds, null);
+    update_and_draw_rain(context, game.rain_drops, view_width, 1, -0.25, delta_seconds, null, false);
+    update_and_draw_rain(context, game.near_rain_drops || (game.near_rain_drops = []), view_width, 1, -0.25, delta_seconds, null, true);
     draw_vignette(context, view_width, 0.6);
 }
 
@@ -2013,19 +2068,48 @@ function set_paused(paused) {
 // Fits the drawing surface to the window. Phones held upright show more sky above;
 // the world is always at least 640 units wide so both routes stay readable.
 function resize_canvas() {
-    const pixel_ratio = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width = Math.round(window.innerWidth * pixel_ratio);
-    canvas.height = Math.round(window.innerHeight * pixel_ratio);
+    const device_ratio = window.devicePixelRatio || 1;
+    if (game.render_scale === undefined) {
+        const is_phone = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+        game.render_scale = Math.min(device_ratio, is_phone ? 1.5 : 2);
+    }
+    canvas.width = Math.round(window.innerWidth * game.render_scale);
+    canvas.height = Math.round(window.innerHeight * game.render_scale);
     game.pixel_scale = Math.min(canvas.height / 540, canvas.width / minimum_view_width);
     view_width = canvas.width / game.pixel_scale;
     view_height = canvas.height / game.pixel_scale;
-    // Show about 430 world units of height: close enough to read faces, wide enough for both floors.
-    game.camera.base_zoom = Math.max(1, Math.min(view_height / 430, view_width / 620));
-    game.camera.zoom = game.camera.base_zoom;
-    light_canvas.width = Math.ceil(view_width * 0.5);
-    light_canvas.height = Math.ceil(view_height * 0.5);
+    // Close framing shows about 290 world units of height: she's roughly 30% of the screen,
+    // the size characters are in phone games. Wide framing shows both floors at once.
+    game.camera.close_zoom = Math.max(1, Math.min(view_height / 290, view_width / 520));
+    game.camera.wide_zoom = Math.max(1, Math.min(view_height / 440, view_width / 640));
+    game.camera.base_zoom = game.camera.close_zoom;
+    game.camera.zoom = game.camera.close_zoom;
+    // Darkness and light are soft, so a third of the resolution looks the same and costs a ninth.
+    light_canvas.width = Math.ceil(view_width / 3);
+    light_canvas.height = Math.ceil(view_height / 3);
     aftermath_canvas.width = canvas.width;
     aftermath_canvas.height = canvas.height;
+    if (game.level) {
+        game.backdrop_layers = render_backdrop(game.level, game.pixel_scale, view_width, view_height);
+    }
+    cut_puppet_parts(false);
+}
+
+// Watches how long frames take. If the device keeps falling behind (fewer than about
+// 50 frames a second for over a second), draw at a slightly lower resolution. Smoothness
+// matters more than sharpness for something in motion.
+function adapt_resolution(delta_seconds) {
+    if (game.screen !== 'play' || game.paused || delta_seconds <= 0 || delta_seconds > 0.25) {
+        return;
+    }
+    game.average_frame_seconds = (game.average_frame_seconds || 1 / 60) * 0.95 + delta_seconds * 0.05;
+    game.resolution_cooldown = Math.max(0, (game.resolution_cooldown || 2) - delta_seconds);
+    if (game.average_frame_seconds > 1 / 50 && game.resolution_cooldown <= 0 && game.render_scale > 0.75) {
+        game.render_scale = Math.max(0.75, game.render_scale - 0.25);
+        game.resolution_cooldown = 2.5;
+        game.average_frame_seconds = 1 / 60;
+        resize_canvas();
+    }
 }
 
 // ---------- Controls ----------
@@ -2076,6 +2160,19 @@ function connect_controls() {
     });
     window.addEventListener('blur', function on_blur() {
         input.left = input.right = input.low_held = false;
+    });
+    // When the phone hides the game (a call, the home screen, the lock button), pause it and
+    // silence the sound, so the player comes back to exactly where they were.
+    document.addEventListener('visibilitychange', function on_visibility_change() {
+        input.left = input.right = input.low_held = input.jump_held = false;
+        if (document.hidden) {
+            set_paused(true);
+            if (audio.context) {
+                audio.context.suspend();
+            }
+        } else if (audio.context) {
+            audio.context.resume();
+        }
     });
     for (const button of document.querySelectorAll('.touch_button')) {
         const control = button.dataset.control;
@@ -2155,6 +2252,7 @@ function frame(timestamp) {
         }
     }
     game.interpolation = Math.min(1, game.accumulator_seconds / fixed_step_seconds);
+    adapt_resolution(delta_seconds);
     game.fade += (game.fade_target - game.fade) * Math.min(1, delta_seconds * 1.5);
     if (game.screen === 'aftermath') {
         game.aftermath_seconds += delta_seconds;
@@ -2181,10 +2279,13 @@ window.until_we_find_home_debug = {
     press: function debug_press(control) { set_control(control, true); set_control(control, false); },
     hold: function debug_hold(control, pressed) { set_control(control, pressed); },
     take_control: function debug_take_control(kind) { take_control(kind); },
+    render_scale: function debug_render_scale() { return game.render_scale; },
+    drawn_x: function debug_drawn_x() { return game.last_drawn_player_x === undefined ? null : game.last_drawn_player_x; },
     character_state: function debug_character_state(kind) {
         const character = game.world.characters[kind];
-        return { x: character.x, y: character.y, velocity_x: character.velocity_x, velocity_y: character.velocity_y, facing: character.facing, facing_blend: character.facing_blend, lean: character.lean ? character.lean.value : 0, on_ground: character.on_ground, pose: character.pose };
+        return { x: character.x, y: character.y, velocity_x: character.velocity_x, velocity_y: character.velocity_y, facing: character.facing, facing_blend: character.facing_blend, lean: character.lean ? character.lean.value : 0, on_ground: character.on_ground, pose: character.pose, shown: character.flipbook_state ? character.flipbook_state.shown : null, shown_facing: character.flipbook_state ? character.flipbook_state.shown_facing : null };
     },
+    flipbook_ready: function debug_flipbook_ready() { return flipbook.ready; },
     camera: function debug_camera() { return { center_x: game.camera.center_x, center_y: game.camera.center_y, zoom: game.camera.zoom }; },
     state: function debug_state() {
         const world = game.world;
@@ -2207,6 +2308,8 @@ window.until_we_find_home_debug = {
 };
 
 resize_canvas();
+load_puppet_sheets();
+load_flipbook_sheets();
 window.addEventListener('resize', resize_canvas);
 connect_controls();
 show_title();

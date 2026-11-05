@@ -56,9 +56,12 @@ function fluffy_blob(context, center_x, center_y, radius_x, radius_y, bumps, see
         const ripple = index % 2 === 0 ? 1.08 + 0.04 * Math.sin(seed + index) : 0.94;
         points.push([center_x + Math.cos(angle) * radius_x * ripple, center_y + Math.sin(angle) * radius_y * ripple]);
     }
-    const gradient = context.createLinearGradient(0, center_y - radius_y, 0, center_y + radius_y);
-    gradient.addColorStop(0, top_color);
-    gradient.addColorStop(1, bottom_color);
+    const gradient = cached_gradient(context, shared_gradient_owner, 'blob|' + center_y + '|' + radius_y + '|' + top_color + '|' + bottom_color, function make_fur_gradient() {
+        const fur = context.createLinearGradient(0, center_y - radius_y, 0, center_y + radius_y);
+        fur.addColorStop(0, top_color);
+        fur.addColorStop(1, bottom_color);
+        return fur;
+    });
     context.fillStyle = gradient;
     trace_smooth_closed(context, points);
     context.fill();
@@ -86,16 +89,10 @@ function curl_marks(context, center_x, center_y, radius_x, radius_y, count, seed
 function draw_contact_shadow(context, character) {
     const lift = character.on_ground === false ? Math.min(1, Math.abs(character.velocity_y || 0) / 600) : 0;
     const width = character.width * (character.kind === 'dog' ? 0.95 : 1.15) * (1 - lift * 0.4);
-    const gradient = context.createRadialGradient(0, 0, 0, 0, 0, width);
-    gradient.addColorStop(0, 'rgba(0,0,0,' + (0.42 * (1 - lift * 0.6)).toFixed(3) + ')');
-    gradient.addColorStop(1, 'rgba(0,0,0,0)');
     context.save();
     context.translate(character.x + character.width / 2, (character.shadow_y || character.y + character.height) - 1);
     context.scale(1, 0.22);
-    context.fillStyle = gradient;
-    context.beginPath();
-    context.arc(0, 0, width, 0, Math.PI * 2);
-    context.fill();
+    stamp_glow(context, '0,0,0', 0, 0, width, 0.5 * (1 - lift * 0.6));
     context.restore();
 }
 
@@ -104,6 +101,14 @@ function draw_contact_shadow(context, character) {
 // Draws the goldendoodle with its feet at the bottom of its collision box.
 // `dog` carries pose, facing, walk_phase, wag, fear, ear_lift, which the game updates.
 function draw_dog(context, dog, time_seconds) {
+    if (typeof flipbook !== 'undefined' && flipbook.ready) {
+        draw_flipbook_character(context, dog, 'bodhi', time_seconds);  // The hand-drawn frames, once loaded.
+        return;
+    }
+    if (puppets.ready) {
+        draw_dog_puppet(context, dog, time_seconds);  // The painted dog, once its art has loaded.
+        return;
+    }
     const pose = dog.pose || 'stand';
     const fear = dog.fear || 0;
     context.save();
@@ -251,13 +256,13 @@ function dog_shape(pose, dog, time_seconds) {
     const bob = -walking * (Math.abs(Math.sin(phase)) * 1.6 * (1 - galloping) + (0.5 + 0.5 * Math.sin(phase)) * 4 * galloping);
     const spine = galloping * 2.5 * Math.cos(phase);
     const shape = {
-        body: [0, -23 + bob + breath * 0.3], body_tilt: galloping * 0.1 * Math.sin(phase), hind_x: -11 - spine, chest_x: 13 + spine,
-        head: [20 + galloping * 2, -34 + bob * 0.45], head_angle: 0,
+        body: [0, -27 + bob + breath * 0.3], body_tilt: galloping * 0.1 * Math.sin(phase), hind_x: -11 - spine, chest_x: 13 + spine,
+        head: [19 + galloping * 2, -39 + bob * 0.45], head_angle: 0,
         legs: [
-            [13, -17].concat(paw(13, phase + offsets.far_front)),
-            [-12, -17].concat(paw(-12, phase + offsets.far_back)),
-            [16, -17].concat(paw(16, phase + offsets.near_front)),
-            [-9, -17].concat(paw(-9, phase + offsets.near_back)),
+            [11, -20].concat(paw(11, phase + offsets.far_front)),
+            [-11, -20].concat(paw(-11, phase + offsets.far_back)),
+            [14, -20].concat(paw(14, phase + offsets.near_front)),
+            [-8, -20].concat(paw(-8, phase + offsets.near_back)),
         ],
     };
     if (pose === 'sit') {
@@ -428,6 +433,14 @@ function draw_boot(context, foot) {
 
 // Draws the woman with her feet at the bottom of her collision box.
 function draw_human(context, human, time_seconds) {
+    if (typeof flipbook !== 'undefined' && flipbook.ready) {
+        draw_flipbook_character(context, human, 'her', time_seconds);  // The hand-drawn frames, once loaded.
+        return;
+    }
+    if (puppets.ready) {
+        draw_human_puppet(context, human, time_seconds);  // The painted woman, once her art has loaded.
+        return;
+    }
     const pose = human.pose || 'stand';
     context.save();
     context.translate(human.x + human.width / 2, human.y + human.height);
@@ -624,32 +637,125 @@ function draw_human_head(context, human, head, hair_angle, pose) {
 
 // ---------- Background scenery ----------
 
-// Paints the far and middle background layers for a level once, onto hidden canvases.
-// Drawing them once and copying them each frame is much cheaper on a phone.
-function render_backdrop(level) {
-    const scenery = level.scenery;
-    const layers = [];
-    for (const layer of [{ kind: scenery.far, factor: 0.16, seed: 11, depth: 0 }, { kind: scenery.mid, factor: 0.42, seed: 23, depth: 1 }]) {
-        if (!layer.kind) {
+// Painted scenery images (SVG files in art/scenery/), loaded once and kept, by path.
+const scenery_images = {};
+
+// Loads a chapter's painted background layers, if it has any. When they arrive, the backdrop
+// is repainted with them; until then the code-drawn layers stand in.
+function load_scenery_art(level) {
+    const art = level.scenery.art;
+    if (!art) {
+        return;
+    }
+    for (const art_path of Object.values(art)) {
+        if (scenery_images[art_path]) {
             continue;
         }
-        const width = Math.ceil(2400 + level.width * layer.factor);
-        const height = 800;
-        const canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
+        const image = new Image();
+        const from_repository = window.location.pathname.indexOf('/prototype/web/') !== -1;
+        const candidates = from_repository ? ['../../' + art_path, art_path] : [art_path, '../../' + art_path];
+        let attempt = 0;
+        scenery_images[art_path] = { image: image, loaded: false };
+        image.onload = function scenery_loaded() {
+            scenery_images[art_path].loaded = true;
+            if (game.level === level) {
+                game.backdrop_layers = render_backdrop(level, game.pixel_scale, view_width, view_height);
+            }
+        };
+        image.onerror = function scenery_failed() {
+            attempt += 1;
+            if (attempt < candidates.length) {
+                image.src = candidates[attempt];
+            }
+        };
+        image.src = candidates[0];
+    }
+}
+
+// The loaded painted image for one background depth ('far', 'mid' or 'near'), or null.
+function painted_layer(level, depth_name) {
+    const art_path = level.scenery.art && level.scenery.art[depth_name];
+    const entry = art_path && scenery_images[art_path];
+    return entry && entry.loaded ? entry.image : null;
+}
+
+// Paints the far and middle background layers for a level once, onto hidden canvases.
+// Drawing them once and copying them each frame is much cheaper on a phone.
+function render_backdrop(level, device_scale, screen_width, screen_height) {
+    const scenery = level.scenery;
+    const layers = [];
+    const layer_plans = [
+        { kind: scenery.far, factor: 0.16, seed: 11, depth: 0, sharpness: 1, name: 'far' },
+        { kind: scenery.mid, factor: 0.42, seed: 23, depth: 1, sharpness: 1, name: 'mid' },
+        { kind: scenery.near, factor: 0.7, seed: 37, depth: 2, sharpness: 0.5, name: 'near' },
+    ];
+    layer_plans.forEach(function paint_layer(plan, index) {
+        if (!plan.kind) {
+            return;
+        }
+        const scale = device_scale * plan.sharpness;
+        const width_units = screen_width + (level.width + 400) * plan.factor;
+        const height_units = Math.max(800, screen_height + 260);
+        const canvas = make_sprite_canvas(width_units * scale, height_units * scale);
         const context = canvas.getContext('2d');
-        paint_backdrop_layer(context, layer.kind, width, height, scenery, make_seeded_random(layer.seed + level.width), layer.depth);
-        // Atmospheric perspective: distant layers fade toward the sky's colour.
-        const haze = context.createLinearGradient(0, 0, 0, height);
-        haze.addColorStop(0, hex_with_alpha(scenery.sky_bottom, layer.depth === 0 ? 0.55 : 0.25));
-        haze.addColorStop(0.7, hex_with_alpha(scenery.sky_bottom, layer.depth === 0 ? 0.35 : 0.12));
-        haze.addColorStop(1, hex_with_alpha(scenery.sky_top, 0.2));
+        context.scale(scale, scale);
+        // A painted layer, if the chapter has one, is repeated across; otherwise code draws it.
+        const painting = painted_layer(level, plan.name);
+        if (painting) {
+            for (let tile_x = 0; tile_x < width_units; tile_x += 1600) {
+                context.drawImage(painting, tile_x, 0, 1600, 800);
+            }
+        } else {
+            paint_backdrop_layer(context, plan.kind, width_units, height_units, scenery, make_seeded_random(plan.seed + level.width), plan.depth);
+        }
+        // Atmospheric perspective: the farther the layer, the more it fades toward the sky.
+        // Painted layers carry their own haze, so they get less.
+        const haze = context.createLinearGradient(0, 0, 0, height_units);
+        const amount = [0.5, 0.24, 0.1][plan.depth] * (painting ? 0.45 : 1);
+        haze.addColorStop(0, hex_with_alpha(scenery.sky_bottom, amount));
+        haze.addColorStop(0.7, hex_with_alpha(scenery.sky_bottom, amount * 0.6));
+        haze.addColorStop(1, hex_with_alpha(scenery.sky_top, 0.15));
         context.globalCompositeOperation = 'source-atop';
         context.fillStyle = haze;
-        context.fillRect(0, 0, width, height);
-        layers.push({ canvas: canvas, factor: layer.factor });
-    }
+        context.fillRect(0, 0, width_units, height_units);
+        if (scenery.fog && plan.depth < 2) {
+            context.fillStyle = scenery.fog;
+            context.fillRect(0, 0, width_units, height_units);
+        }
+        context.globalCompositeOperation = 'destination-over';
+        if (index === 0 && scenery.horizon_glow) {
+            const horizon = context.createRadialGradient(width_units / 2, 520, 0, width_units / 2, 520, width_units * 0.6);
+            horizon.addColorStop(0, scenery.horizon_glow);
+            horizon.addColorStop(1, 'rgba(0,0,0,0)');
+            context.save();
+            context.translate(0, 520);
+            context.scale(1, 0.35);
+            context.translate(0, -520);
+            context.fillStyle = horizon;
+            context.fillRect(0, 0, width_units, height_units * 3);
+            context.restore();
+        }
+        if (index === 0) {
+            // The sky lives behind the farthest layer, so it costs nothing extra each frame.
+            const sky = context.createLinearGradient(0, 90, 0, 90 + screen_height);
+            sky.addColorStop(0, scenery.sky_top);
+            sky.addColorStop(1, scenery.sky_bottom);
+            if (scenery.sun) {
+                const sun_x = width_units * 0.55;
+                const glow = context.createRadialGradient(sun_x, 90 + screen_height * 0.62, 6, sun_x, 90 + screen_height * 0.62, screen_height * 0.9);
+                glow.addColorStop(0, 'rgba(255,236,190,1)');
+                glow.addColorStop(0.06, 'rgba(255,214,150,0.85)');
+                glow.addColorStop(0.3, 'rgba(255,180,120,0.3)');
+                glow.addColorStop(1, 'rgba(255,170,110,0)');
+                context.fillStyle = glow;
+                context.fillRect(0, 0, width_units, height_units);
+            }
+            context.fillStyle = sky;
+            context.fillRect(0, 0, width_units, height_units);
+        }
+        context.globalCompositeOperation = 'source-over';
+        layers.push({ canvas: canvas, factor: plan.factor, scale: scale, first: index === 0 });
+    });
     return layers;
 }
 
@@ -789,6 +895,58 @@ function paint_backdrop_layer(context, kind, width, height, scenery, random, dep
         }
         context.fillStyle = tree_color;
         context.fillRect(0, horizon + 40, width, height);
+    } else if (kind.indexOf('near_') === 0) {
+        // Close background structures, painted dark and soft: they sit just behind the action.
+        const near_color = scenery.near_color || darken(scenery.sky_top, 0.35);
+        context.fillStyle = near_color;
+        if (kind === 'near_columns' || kind === 'near_doorways') {
+            for (let x = 60; x < width; x += 420 + random() * 220) {
+                if (kind === 'near_columns') {
+                    context.fillRect(x, 120, 34, height);
+                    context.fillRect(x - 12, 110, 58, 16);
+                    context.beginPath();
+                    context.moveTo(x + 34, 140);
+                    context.quadraticCurveTo(x + 160, 60, x + 300, 140);
+                    context.lineTo(x + 300, 152);
+                    context.quadraticCurveTo(x + 160, 74, x + 34, 152);
+                    context.fill();
+                } else {
+                    context.fillRect(x, 200, 16, height);
+                    context.fillRect(x + 110, 200, 16, height);
+                    context.fillRect(x, 190, 126, 18);
+                }
+            }
+        } else if (kind === 'near_trees' || kind === 'near_hedges') {
+            for (let x = 0; x < width; x += 140 + random() * 260) {
+                const size = kind === 'near_trees' ? 60 + random() * 50 : 30 + random() * 26;
+                const base = kind === 'near_trees' ? 560 : 610;
+                if (kind === 'near_trees') {
+                    context.fillRect(x - 5, base - size * 2.6, 10, size * 2.6 + 200);
+                }
+                for (let puff = 0; puff < 6; puff++) {
+                    context.beginPath();
+                    context.arc(x + (random() - 0.5) * size * 1.6, base - size * (kind === 'near_trees' ? 2.6 : 0.6) + (random() - 0.5) * size, size * (0.5 + random() * 0.4), 0, Math.PI * 2);
+                    context.fill();
+                }
+            }
+            context.fillRect(0, kind === 'near_trees' ? 600 : 625, width, height);
+        } else if (kind === 'near_street') {
+            for (let x = 40; x < width; x += 300 + random() * 260) {
+                context.fillRect(x, 330, 7, 400);
+                context.beginPath();
+                context.arc(x + 3, 330, 9, Math.PI, 0);
+                context.fill();
+                if (random() < 0.5) {
+                    context.beginPath();
+                    context.moveTo(x + 60, 640);
+                    context.quadraticCurveTo(x + 80, 585, x + 140, 585);
+                    context.lineTo(x + 200, 585);
+                    context.quadraticCurveTo(x + 240, 600, x + 250, 640);
+                    context.fill();
+                }
+            }
+            context.fillRect(0, 630, width, height);
+        }
     } else if (kind === 'hills' || kind === 'river_hills') {
         const bands = [[360, 70, far_color], [430, 46, mid_color]];
         for (const [base, amplitude, color] of bands) {
@@ -828,42 +986,35 @@ function paint_backdrop_layer(context, kind, width, height, scenery, random, dep
 // Draws the sky and the pre-painted background layers, shifted for depth (parallax).
 function draw_backdrop(context, level, layers, camera_left, camera_top, view_width, time_seconds, lightning) {
     const scenery = level.scenery;
-    const sky = context.createLinearGradient(0, 0, 0, view_height);
-    sky.addColorStop(0, scenery.sky_top);
-    sky.addColorStop(1, scenery.sky_bottom);
-    context.fillStyle = sky;
-    context.fillRect(0, 0, view_width, view_height);
-    if (scenery.sun) {
-        const sun_x = view_width * 0.72 - camera_left * 0.04;
-        const glow = context.createRadialGradient(sun_x, view_height * 0.62, 6, sun_x, view_height * 0.62, view_height * 0.9);
-        glow.addColorStop(0, 'rgba(255,236,190,1)');
-        glow.addColorStop(0.06, 'rgba(255,214,150,0.85)');
-        glow.addColorStop(0.3, 'rgba(255,180,120,0.3)');
-        glow.addColorStop(1, 'rgba(255,170,110,0)');
-        context.fillStyle = glow;
+    const screen_scale = context.getTransform().a;
+    if (!layers.length || !layers[0].first) {
+        context.fillStyle = scenery.sky_bottom;
         context.fillRect(0, 0, view_width, view_height);
     }
-    if (scenery.stars) {
-        const random = make_seeded_random(5);
-        for (let index = 0; index < 80; index++) {
-            const twinkle = 0.4 + 0.6 * Math.abs(Math.sin(time_seconds * 0.7 + index));
-            context.fillStyle = 'rgba(239,230,212,' + (0.5 * twinkle).toFixed(2) + ')';
-            context.fillRect(((random() * 2400 - camera_left * 0.03) % view_width + view_width) % view_width, random() * 260, 1.5, 1.5);
-        }
-    }
-    if (lightning > 0) {
-        context.fillStyle = 'rgba(200,215,255,' + (lightning * 0.8).toFixed(2) + ')';
-        context.fillRect(0, 0, view_width, view_height);
-    }
+    // Copy only the visible part of each pre-painted layer, pixel for pixel where possible.
+    context.save();
+    context.setTransform(1, 0, 0, 1, 0, 0);
+    const screen_width_pixels = Math.ceil(view_width * screen_scale);
+    const screen_height_pixels = Math.ceil(view_height * screen_scale);
     for (const layer of layers) {
-        context.drawImage(layer.canvas, -camera_left * layer.factor, -camera_top * layer.factor * 0.5 - 90);
+        const source_scale = layer.scale;
+        const source_x = Math.max(0, camera_left * layer.factor * source_scale);
+        const source_y = Math.max(0, (camera_top * layer.factor * 0.5 + 90) * source_scale);
+        const source_width = Math.min(layer.canvas.width - source_x, screen_width_pixels * source_scale / screen_scale);
+        const source_height = Math.min(layer.canvas.height - source_y, screen_height_pixels * source_scale / screen_scale);
+        if (source_width <= 0 || source_height <= 0) {
+            continue;
+        }
+        context.drawImage(layer.canvas, Math.round(source_x), Math.round(source_y), Math.floor(source_width), Math.floor(source_height),
+            0, 0, Math.floor(source_width) * screen_scale / source_scale, Math.floor(source_height) * screen_scale / source_scale);
+    }
+    context.restore();
+    if (lightning > 0) {
+        context.fillStyle = 'rgba(200,215,255,' + (lightning * 0.5).toFixed(2) + ')';
+        context.fillRect(0, 0, view_width, view_height);
     }
     if (scenery.smoke_x) {
         draw_smoke_column(context, scenery.smoke_x - camera_left * 0.16, 330 - camera_top * 0.08, time_seconds);
-    }
-    if (scenery.fog) {
-        context.fillStyle = scenery.fog;
-        context.fillRect(0, 0, view_width, view_height);
     }
 }
 
@@ -928,11 +1079,32 @@ function draw_solid_shape(context, solid, palette, time_seconds) {
     const { x, y, w, h } = solid;
     switch (solid.kind) {
         case 'floor': {
-            // Body fades into darkness below; the walking surface has a lip and a wet sheen.
-            const body = context.createLinearGradient(0, y, 0, y + Math.min(h, 140));
-            body.addColorStop(0, palette.ground_body);
-            body.addColorStop(1, palette.darkness_floor || 'rgb(8,10,14)');
-            context.fillStyle = body;
+            // The top surface, seen slightly from above: a band that recedes into the scene,
+            // so floors read as places you stand on, not lines you stand on.
+            const surface_depth = 12;
+            context.fillStyle = cached_gradient(context, solid, 'surface', function make_surface() {
+                const surface = context.createLinearGradient(0, y - surface_depth, 0, y);
+                surface.addColorStop(0, hex_with_alpha(palette.ground_top, 0));
+                surface.addColorStop(0.35, hex_with_alpha(palette.ground_top, 0.35));
+                surface.addColorStop(1, hex_with_alpha(palette.ground_top, 0.75));
+                return surface;
+            });
+            context.fillRect(x, y - surface_depth, w, surface_depth);
+            context.strokeStyle = 'rgba(0,0,0,0.12)';
+            context.lineWidth = 1;
+            context.beginPath();
+            for (let line_x = x + 48 - (((x % 48) + 48) % 48); line_x < x + w; line_x += 48) {
+                context.moveTo(line_x, y);
+                context.lineTo(line_x + 6, y - surface_depth);
+            }
+            context.stroke();
+            // Body fades into darkness below; the front edge has a lip and a wet sheen.
+            context.fillStyle = cached_gradient(context, solid, 'body', function make_body() {
+                const body = context.createLinearGradient(0, y, 0, y + Math.min(h, 140));
+                body.addColorStop(0, palette.ground_body);
+                body.addColorStop(1, palette.darkness_floor || 'rgb(8,10,14)');
+                return body;
+            });
             context.fillRect(x, y, w, h);
             context.fillStyle = palette.ground_top;
             context.fillRect(x, y, w, 4);
@@ -1083,11 +1255,14 @@ function draw_prop(context, prop, palette, time_seconds) {
     const { x, y } = prop;
     switch (prop.kind) {
         case 'room_wall': {
-            const wall = context.createLinearGradient(0, y, 0, y + prop.h);
-            wall.addColorStop(0, 'rgba(0,0,0,0.55)');
-            wall.addColorStop(0.25, prop.color || palette.room_wall || '#2a2f36');
-            wall.addColorStop(1, prop.color || palette.room_wall || '#2a2f36');
-            context.fillStyle = wall;
+            context.fillStyle = cached_gradient(context, prop, 'wall', function make_wall() {
+                const wall = context.createLinearGradient(0, y, 0, y + prop.h);
+                wall.addColorStop(0, 'rgba(0,0,0,0.6)');
+                wall.addColorStop(0.25, prop.color || palette.room_wall || '#2a2f36');
+                wall.addColorStop(0.85, prop.color || palette.room_wall || '#2a2f36');
+                wall.addColorStop(1, 'rgba(0,0,0,0.55)');
+                return wall;
+            });
             context.fillRect(x, y, prop.w, prop.h);
             context.fillStyle = 'rgba(255,255,255,0.025)';
             for (let panel_x = x + 30; panel_x < x + prop.w; panel_x += 90) {
@@ -1169,7 +1344,10 @@ function draw_prop(context, prop, palette, time_seconds) {
         case 'sign': {
             const text = personalize_if_available(prop.text);
             context.font = '700 12px "Atkinson Hyperlegible", Arial, sans-serif';
-            const sign_width = context.measureText(text).width + 22;
+            if (prop.measured_width === undefined) {
+                prop.measured_width = context.measureText(text).width;
+            }
+            const sign_width = prop.measured_width + 22;
             context.fillStyle = prop.color || '#1f3a4f';
             context.fillRect(x, y, sign_width, 26);
             context.strokeStyle = 'rgba(255,255,255,0.18)';
@@ -1796,6 +1974,7 @@ function draw_light_effects(context, props, time_seconds, wet, left_edge, right_
         const bulb_y = prop.hanging ? prop.y + 42 : prop.y + 2;
         const floor_y = prop.floor_y || bulb_y + 200;
         const tint = prop.light_tint || '255,206,140';
+        const spread = (floor_y - bulb_y) * 0.42;
         // A swinging lamp swings its light: rotate the cone and halo around the hook,
         // and slide the pool of light along the floor.
         const sway = prop.sway ? prop.sway.value : 0;
@@ -1804,12 +1983,13 @@ function draw_light_effects(context, props, time_seconds, wet, left_edge, right_
         context.translate(prop.x, prop.y);
         context.rotate(sway);
         context.translate(-prop.x, -prop.y);
-        // The cone: brightest at the bulb, spreading and fading toward the floor.
-        const cone = context.createLinearGradient(0, bulb_y, 0, floor_y);
-        cone.addColorStop(0, 'rgba(' + tint + ',' + (0.22 * strength).toFixed(3) + ')');
-        cone.addColorStop(1, 'rgba(' + tint + ',0)');
-        context.fillStyle = cone;
-        const spread = (floor_y - bulb_y) * 0.42;
+        context.globalAlpha = strength;
+        context.fillStyle = cached_gradient(context, prop, 'cone', function make_cone() {
+            const cone = context.createLinearGradient(0, bulb_y, 0, floor_y);
+            cone.addColorStop(0, 'rgba(' + tint + ',0.22)');
+            cone.addColorStop(1, 'rgba(' + tint + ',0)');
+            return cone;
+        });
         context.beginPath();
         context.moveTo(prop.x - 9, bulb_y);
         context.lineTo(prop.x + 9, bulb_y);
@@ -1817,35 +1997,75 @@ function draw_light_effects(context, props, time_seconds, wet, left_edge, right_
         context.lineTo(prop.x - spread, floor_y);
         context.closePath();
         context.fill();
-        // The halo around the bulb.
-        const halo = context.createRadialGradient(prop.x, bulb_y, 0, prop.x, bulb_y, 46);
-        halo.addColorStop(0, 'rgba(' + tint + ',' + (0.55 * strength).toFixed(3) + ')');
-        halo.addColorStop(1, 'rgba(' + tint + ',0)');
-        context.fillStyle = halo;
-        context.fillRect(prop.x - 46, bulb_y - 46, 92, 92);
+        stamp_glow(context, tint, prop.x, bulb_y, 46, 0.55 * strength);
         context.restore();
-        // The pool of light on the floor, and its reflection streaking down a wet surface.
-        const pool = context.createRadialGradient(pool_x, floor_y, 0, pool_x, floor_y, spread);
-        pool.addColorStop(0, 'rgba(' + tint + ',' + (0.18 * strength).toFixed(3) + ')');
-        pool.addColorStop(1, 'rgba(' + tint + ',0)');
-        context.fillStyle = pool;
+        // The pool of light on the floor (a flattened glow) and its streaky reflection when wet.
         context.save();
-        context.translate(0, floor_y);
+        context.translate(pool_x, floor_y);
         context.scale(1, 0.25);
-        context.beginPath();
-        context.arc(pool_x, 0, spread, 0, Math.PI * 2);
-        context.fill();
+        stamp_glow(context, tint, 0, 0, spread, 0.22 * strength);
         context.restore();
         if (wet) {
-            const reflection = context.createLinearGradient(0, floor_y, 0, floor_y + 34);
-            reflection.addColorStop(0, 'rgba(' + tint + ',' + (0.3 * strength).toFixed(3) + ')');
-            reflection.addColorStop(1, 'rgba(' + tint + ',0)');
-            context.fillStyle = reflection;
+            context.globalAlpha = strength;
+            context.fillStyle = cached_gradient(context, prop, 'reflection', function make_reflection() {
+                const reflection = context.createLinearGradient(0, floor_y, 0, floor_y + 34);
+                reflection.addColorStop(0, 'rgba(' + tint + ',0.3)');
+                reflection.addColorStop(1, 'rgba(' + tint + ',0)');
+                return reflection;
+            });
             const shimmer = Math.sin(time_seconds * 3 + prop.x) * 1.5;
             context.fillRect(pool_x - 4 + shimmer, floor_y, 8, 34);
             context.fillRect(pool_x - 12 - shimmer, floor_y + 2, 3, 20);
             context.fillRect(pool_x + 9 + shimmer, floor_y + 1, 3, 24);
+            context.globalAlpha = 1;
         }
+    }
+    context.restore();
+}
+
+// Shafts of light falling through windows: pale, slanted, slowly breathing. Cheap depth.
+function draw_light_shafts(context, props, time_seconds, left_edge, right_edge) {
+    context.save();
+    context.globalCompositeOperation = 'lighter';
+    for (const prop of props) {
+        if (prop.kind !== 'window' || !(prop.glow || prop.lit) || prop.x < left_edge || prop.x > right_edge) {
+            continue;
+        }
+        const w = prop.w || 60;
+        const h = prop.h || 80;
+        const reach = prop.shaft_reach || 160;
+        if (prop.skylight) {
+            context.globalAlpha = 0.7 + 0.3 * Math.sin(time_seconds * 0.4 + prop.x);
+            context.fillStyle = cached_gradient(context, prop, 'skylight', function make_skylight() {
+                const shaft = context.createLinearGradient(0, prop.y, 0, prop.y + reach);
+                shaft.addColorStop(0, 'rgba(170,195,230,0.16)');
+                shaft.addColorStop(1, 'rgba(170,195,230,0)');
+                return shaft;
+            });
+            context.beginPath();
+            context.moveTo(prop.x, prop.y);
+            context.lineTo(prop.x + w, prop.y);
+            context.lineTo(prop.x + w + reach * 0.22, prop.y + reach);
+            context.lineTo(prop.x + reach * 0.1, prop.y + reach);
+            context.closePath();
+            context.fill();
+            continue;
+        }
+        const breathe = 0.75 + 0.25 * Math.sin(time_seconds * 0.6 + prop.x);
+        context.globalAlpha = breathe;
+        context.fillStyle = cached_gradient(context, prop, 'shaft', function make_shaft() {
+            const shaft = context.createLinearGradient(prop.x, prop.y, prop.x + reach * 0.5, prop.y + h + reach);
+            shaft.addColorStop(0, prop.lit ? 'rgba(255,200,130,0.16)' : 'rgba(190,210,235,0.10)');
+            shaft.addColorStop(1, 'rgba(0,0,0,0)');
+            return shaft;
+        });
+        context.beginPath();
+        context.moveTo(prop.x, prop.y);
+        context.lineTo(prop.x + w, prop.y);
+        context.lineTo(prop.x + w + reach * 0.55, prop.y + h + reach);
+        context.lineTo(prop.x + reach * 0.35, prop.y + h + reach);
+        context.closePath();
+        context.fill();
     }
     context.restore();
 }
@@ -1853,107 +2073,110 @@ function draw_light_effects(context, props, time_seconds, wet, left_edge, right_
 // Covers the screen in darkness, then cuts soft holes where there's light.
 // Drawn on its own small canvas (half resolution, cheap on phones) so the holes don't
 // punch through the world itself, then stretched over the screen.
-function draw_lighting(context, light_canvas, lights, darkness, darkness_color, view_width) {
-    if (darkness <= 0.01) {
-        return;
-    }
+function draw_lighting(context, light_canvas, lights, darkness, darkness_color, view_width, vignette_strength) {
     const light_context = light_canvas.getContext('2d');
     const scale = light_canvas.width / view_width;
     light_context.setTransform(1, 0, 0, 1, 0, 0);
     light_context.globalCompositeOperation = 'source-over';
     light_context.clearRect(0, 0, light_canvas.width, light_canvas.height);
-    light_context.globalAlpha = darkness;
-    light_context.fillStyle = darkness_color;
-    light_context.fillRect(0, 0, light_canvas.width, light_canvas.height);
-    light_context.globalAlpha = 1;
-    light_context.globalCompositeOperation = 'destination-out';
-    for (const light of lights) {
-        const radius = light.radius * scale;
-        const center_x = light.x * scale;
-        const center_y = light.y * scale;
-        const gradient = light_context.createRadialGradient(center_x, center_y, 0, center_x, center_y, radius);
-        gradient.addColorStop(0, 'rgba(0,0,0,' + light.strength + ')');
-        gradient.addColorStop(0.4, 'rgba(0,0,0,' + (light.strength * 0.7) + ')');
-        gradient.addColorStop(1, 'rgba(0,0,0,0)');
-        light_context.fillStyle = gradient;
-        light_context.fillRect(center_x - radius, center_y - radius, radius * 2, radius * 2);
+    if (darkness > 0.01) {
+        light_context.globalAlpha = darkness;
+        light_context.fillStyle = darkness_color;
+        light_context.fillRect(0, 0, light_canvas.width, light_canvas.height);
+        light_context.globalAlpha = 1;
+        // Cut a soft hole of light for each lamp, window and character, by stamping a soft dot.
+        light_context.globalCompositeOperation = 'destination-out';
+        const hole = hole_sprite();
+        for (const light of lights) {
+            const radius = light.radius * scale;
+            light_context.globalAlpha = Math.min(1, light.strength);
+            light_context.drawImage(hole, light.x * scale - radius, light.y * scale - radius, radius * 2, radius * 2);
+        }
+        light_context.globalAlpha = 1;
+        light_context.globalCompositeOperation = 'source-over';
     }
+    // The edge darkening is painted into the same small layer, so it costs no extra full-screen pass.
+    light_context.globalAlpha = vignette_strength;
+    light_context.drawImage(vignette_sprite(), 0, 0, light_canvas.width, light_canvas.height);
+    light_context.globalAlpha = 1;
     context.drawImage(light_canvas, 0, 0, view_width, view_height);
     // Warm colour over the lights, so lamplight looks warm and not just bright.
     context.save();
     context.globalCompositeOperation = 'lighter';
     for (const light of lights) {
-        if (!light.color) {
-            continue;
+        if (light.glow_color) {
+            stamp_glow(context, light.glow_color, light.x, light.y, light.radius * 0.75, light.glow_strength);
         }
-        const glow = context.createRadialGradient(light.x, light.y, 0, light.x, light.y, light.radius * 0.75);
-        glow.addColorStop(0, light.color);
-        glow.addColorStop(1, 'rgba(0,0,0,0)');
-        context.fillStyle = glow;
-        context.fillRect(light.x - light.radius, light.y - light.radius, light.radius * 2, light.radius * 2);
     }
     context.restore();
 }
 
+// A soft darkening toward the screen's edges, painted once as a small picture.
+function vignette_sprite() {
+    if (!render_cache.vignette) {
+        const canvas = make_sprite_canvas(160, 90);
+        const vignette_context = canvas.getContext('2d');
+        const gradient = vignette_context.createRadialGradient(80, 50, 26, 80, 50, 96);
+        gradient.addColorStop(0, 'rgba(0,0,0,0)');
+        gradient.addColorStop(1, 'rgba(0,0,0,1)');
+        vignette_context.fillStyle = gradient;
+        vignette_context.fillRect(0, 0, 160, 90);
+        render_cache.vignette = canvas;
+    }
+    return render_cache.vignette;
+}
+
 // Rain in two depths: faint far streaks and brighter near ones, slanted by the wind.
 // Drops are skipped where they'd fall indoors (`is_sheltered` says where roofs are).
-function update_and_draw_rain(context, rain_drops, view_width, intensity, wind, delta_seconds, is_sheltered) {
-    const wanted = Math.floor(view_width * 0.2 * intensity);
+function update_and_draw_rain(context, rain_drops, view_width, intensity, wind, delta_seconds, is_sheltered, near) {
+    // Far rain: many thin, slow, faint streaks drawn behind the characters.
+    // Near rain: fewer long, fast, brighter streaks drawn in front of them.
+    const wanted = Math.floor(view_width * (near ? 0.07 : 0.14) * intensity);
     while (rain_drops.length < wanted) {
-        const near = Math.random() < 0.35;
-        rain_drops.push({ x: Math.random() * (view_width + 300) - 150, y: Math.random() * view_height, speed: near ? 1100 + Math.random() * 300 : 650 + Math.random() * 250, length: near ? 18 + Math.random() * 10 : 8 + Math.random() * 6, near: near });
+        rain_drops.push({
+            x: Math.random() * (view_width + 300) - 150, y: Math.random() * view_height,
+            speed: near ? 1150 + Math.random() * 350 : 620 + Math.random() * 220, length: near ? 20 + Math.random() * 12 : 7 + Math.random() * 6,
+        });
     }
     rain_drops.length = Math.min(rain_drops.length, wanted);
-    for (const layer of [false, true]) {
-        context.strokeStyle = layer ? 'rgba(190,205,222,0.42)' : 'rgba(150,170,195,0.22)';
-        context.lineWidth = layer ? 1.3 : 0.9;
-        context.beginPath();
-        for (const drop of rain_drops) {
-            if (drop.near !== layer) {
-                continue;
-            }
-            drop.y += drop.speed * delta_seconds;
-            drop.x += wind * drop.speed * 0.25 * delta_seconds;
-            if (drop.y > view_height) {
-                drop.y = -30;
-                drop.x = Math.random() * (view_width + 300) - 150;
-            }
-            if (is_sheltered && is_sheltered(drop.x, drop.y)) {
-                continue;
-            }
-            context.moveTo(drop.x, drop.y);
-            context.lineTo(drop.x + wind * drop.length * 0.3, drop.y + drop.length);
+    context.strokeStyle = near ? 'rgba(200,214,230,0.42)' : 'rgba(150,170,195,0.2)';
+    context.lineWidth = near ? 1.4 : 0.8;
+    context.beginPath();
+    for (const drop of rain_drops) {
+        drop.y += drop.speed * delta_seconds;
+        drop.x += wind * drop.speed * 0.25 * delta_seconds;
+        if (drop.y > view_height) {
+            drop.y = -30;
+            drop.x = Math.random() * (view_width + 300) - 150;
         }
-        context.stroke();
+        if (is_sheltered && is_sheltered(drop.x, drop.y)) {
+            continue;
+        }
+        context.moveTo(drop.x, drop.y);
+        context.lineTo(drop.x + wind * drop.length * 0.3, drop.y + drop.length);
     }
+    context.stroke();
 }
 
 // Darkens the edges of the screen, which draws the eye to the middle.
 function draw_vignette(context, view_width, strength) {
-    const gradient = context.createRadialGradient(view_width / 2, view_height * 0.55, view_height * 0.3, view_width / 2, view_height * 0.55, view_width * 0.72);
-    gradient.addColorStop(0, 'rgba(0,0,0,0)');
-    gradient.addColorStop(1, 'rgba(0,0,0,' + strength + ')');
-    context.fillStyle = gradient;
-    context.fillRect(0, 0, view_width, view_height);
+    context.globalAlpha = strength;
+    context.drawImage(vignette_sprite(), 0, 0, view_width, view_height);
+    context.globalAlpha = 1;
 }
 
 // Slow banks of mist drifting just above the floors: depth and weather in one cheap layer.
 function draw_mist(context, view_width, camera_left, time_seconds, color) {
+    const sprite = mist_sprite(color);
+    const cloud_width = view_width * 0.9;
+    const cloud_height = cloud_width * 0.25;
     for (let band = 0; band < 3; band++) {
         const band_y = view_height * (0.55 + band * 0.14);
-        const drift = ((time_seconds * (8 + band * 5) - camera_left * (0.6 + band * 0.2)) % (view_width * 1.5) + view_width * 1.5) % (view_width * 1.5);
-        for (const offset of [-view_width * 1.5, 0]) {
+        const loop = view_width * 1.5;
+        const drift = ((time_seconds * (8 + band * 5) - camera_left * (0.6 + band * 0.2)) % loop + loop) % loop;
+        for (const offset of [-loop, 0]) {
             const center_x = drift + offset + view_width * 0.4;
-            const mist = context.createRadialGradient(center_x, band_y, 0, center_x, band_y, view_width * 0.45);
-            mist.addColorStop(0, color);
-            mist.addColorStop(1, 'rgba(0,0,0,0)');
-            context.fillStyle = mist;
-            context.save();
-            context.translate(0, band_y);
-            context.scale(1, 0.18);
-            context.translate(0, -band_y);
-            context.fillRect(center_x - view_width * 0.45, band_y - view_width * 0.45, view_width * 0.9, view_width * 0.9);
-            context.restore();
+            context.drawImage(sprite, center_x - cloud_width / 2, band_y - cloud_height / 2, cloud_width, cloud_height);
         }
     }
 }
@@ -1964,30 +2187,20 @@ function draw_foreground(context, kind, view_width, camera_left, time_seconds, c
     if (!kind) {
         return;
     }
-    const factor = 1.35;
-    const spacing = 1100;
+    const sprite = blur_sprite(kind, color || 'rgba(4,6,10,0.92)');
+    const factor = 1.45;
+    const spacing = 1000;
     const shift = camera_left * factor;
+    const tall = kind === 'pillars' || kind === 'beams';
+    const draw_height = tall ? view_height * 1.15 : view_height * 0.5;
+    const draw_width = sprite.width * (draw_height / sprite.height) * (tall ? 1.6 : 1.4);
     for (let index = Math.floor(shift / spacing) - 1; index <= Math.floor((shift + view_width) / spacing) + 1; index++) {
         const x = index * spacing - shift + ((index * 397) % 300);
         // Fade any shape that passes in front of the player, so it never hides the action.
-        const distance = Math.abs(x + 20 - player_screen_x);
-        const alpha = Math.max(0.12, Math.min(1, (distance - 60) / 220));
-        context.globalAlpha = alpha;
-        context.fillStyle = color || 'rgba(4,6,10,0.92)';
-        if (kind === 'pillars' || kind === 'beams') {
-            context.fillRect(x, 0, kind === 'beams' ? 34 : 46, view_height);
-            context.fillRect(x - 24, view_height - 26, 94, 26);
-        } else if (kind === 'reeds' || kind === 'grass') {
-            context.beginPath();
-            for (let blade = 0; blade < 14; blade++) {
-                const blade_x = x + blade * 9;
-                const sway = Math.sin(time_seconds * 1.5 + blade + index) * 6;
-                context.moveTo(blade_x - 3, view_height);
-                context.quadraticCurveTo(blade_x + sway * 0.5, view_height - 50, blade_x + sway, view_height - 56 - (blade % 4) * 12);
-                context.lineTo(blade_x + 3, view_height);
-            }
-            context.fill();
-        }
+        const distance = Math.abs(x + draw_width / 2 - player_screen_x);
+        context.globalAlpha = Math.max(0.15, Math.min(1, (distance - 50) / 220));
+        const sway = tall ? 0 : Math.sin(time_seconds * 1.2 + index) * 4;
+        context.drawImage(sprite, x + sway, view_height - draw_height + (tall ? -view_height * 0.08 : 6), draw_width, draw_height);
     }
     context.globalAlpha = 1;
 }
@@ -2026,7 +2239,7 @@ function draw_vignette_scene(context, scene_name, time_seconds, width, height) {
         context.translate(x, feet_y);
         context.scale(figure_scale, figure_scale);
         const spec = kind === 'dog' ? { width: 46, height: 38 } : { width: 26, height: 86 };
-        const figure = Object.assign({ x: -spec.width / 2, y: -spec.height, width: spec.width, height: spec.height, facing: facing, pose: pose, walk_phase: time_seconds * 5, wag: 0.25, fear: 0, on_ground: true, kind: kind }, extra || {});
+        const figure = Object.assign({ x: -spec.width / 2, y: -spec.height, width: spec.width, height: spec.height, facing: facing, pose: pose, walk_phase: time_seconds * 5, wag: 0.25, fear: 0, on_ground: true, kind: kind, velocity_x: pose === 'walk' ? 140 : 0 }, extra || {});
         draw_contact_shadow(context, figure);
         if (kind === 'dog') {
             draw_dog(context, figure, time_seconds);
