@@ -133,6 +133,119 @@ async function check_care(page) {
     check('she gets hungry as time passes, a puppy faster than a grown dog', appetite.puppy > appetite.grown && appetite.grown > 0, JSON.stringify(appetite));
 }
 
+// Saving and continuing: a save made mid-chapter survives closing the page and puts the story,
+// the characters and Bodhi's needs back as they were. Tampered and broken saves are refused
+// and counted, and never crash the game or skip the story.
+async function check_saving(page) {
+    const debug_state = () => page.evaluate(() => window.until_we_find_home_debug.state());
+    const wait_for_event = async (name) => {
+        for (let tries = 0; tries < 300; tries++) {
+            if ((await debug_state()).happened.includes(name)) {
+                return true;
+            }
+            await page.waitForTimeout(50);
+        }
+        return false;
+    };
+    // Play chapter one up to the dog's section: the walkway collapses, she restores the power.
+    await page.evaluate(() => { localStorage.clear(); window.until_we_find_home_debug.set_speed(3); });
+    await start_chapter(page, 1);
+    await page.evaluate(() => window.until_we_find_home_debug.walk_to(1200));
+    await wait_for_event('separation_scene_finished');
+    await page.evaluate(() => window.until_we_find_home_debug.walk_to(220));
+    await page.waitForTimeout(2500);
+    await page.evaluate(() => window.until_we_find_home_debug.press('act'));
+    await wait_for_event('power_restored');
+    await page.waitForTimeout(400);
+    await page.evaluate(() => window.until_we_find_home_debug.set_care({ hunger: 0.6, dirt: 0.4, food: 4 }));
+    const saved = await page.evaluate(() => window.until_we_find_home_debug.save_now());
+    const before = await debug_state();
+    const saved_file = await page.evaluate(() => JSON.parse(localStorage.getItem('until_we_find_home_save')));
+    check('a save is made mid-chapter', saved && before.controlled === 'dog', before.controlled);
+
+    // Close the page and open it again, as when the app is closed: Continue picks up from the save.
+    await page.reload();
+    await page.waitForFunction(() => window.until_we_find_home_debug && window.until_we_find_home_debug.flipbook_ready(), null, { timeout: 20000 }).catch(() => {});
+    const title_text = await page.evaluate(() => document.getElementById('begin_button').textContent + ' | ' + document.getElementById('continue_note').textContent);
+    check('after reopening, the title offers Continue and names the chapter', title_text.startsWith('Continue') && title_text.includes('The Other Side'), title_text);
+    // Continue, and pause in the same instant, so the world hasn't moved on when it's read.
+    await page.evaluate(() => { const debug = window.until_we_find_home_debug; debug.continue_save(); debug.skip_card(); debug.set_paused(true); });
+    const after = await debug_state();
+    await page.evaluate(() => window.until_we_find_home_debug.set_paused(false));
+    const gate_open = await page.evaluate(() => window.until_we_find_home_debug.solid_active('luggage_gate'));
+    const walkway = await page.evaluate(() => window.until_we_find_home_debug.solid_active('walkway'));
+    const same_events = before.happened.every(function kept(name) { return after.happened.includes(name); });
+    check('continuing restores the story so far (events, the open gate, the fallen walkway)', same_events && gate_open === false && walkway === false, 'gate active: ' + gate_open + ', walkway active: ' + walkway);
+    check('continuing restores who you control and where they stand',
+        after.controlled === 'dog' && Math.abs(after.dog_x - saved_file.dog[0]) < 1.5 && Math.abs(after.human_x - saved_file.human[0]) < 1.5,
+        'dog saved at ' + saved_file.dog[0].toFixed(1) + ', back at ' + after.dog_x + '; her saved at ' + saved_file.human[0].toFixed(1) + ', back at ' + after.human_x);
+    check("continuing restores Bodhi's needs", Math.abs(after.care.hunger - 0.6) < 0.02 && after.care.food === 4, JSON.stringify(after.care));
+    check('replaying the save is silent (no story lines queued)', after.subtitle === '' || after.subtitle === before.subtitle, after.subtitle);
+
+    // Pausing saves.
+    await page.evaluate(() => { const debug = window.until_we_find_home_debug; debug.walk_to(1700); });
+    await page.waitForTimeout(1500);
+    const paused_save = await page.evaluate(() => { const debug = window.until_we_find_home_debug; debug.set_paused(true); const save = debug.read_save(); debug.set_paused(false); return save; });
+    check('pausing saves the game', paused_save && paused_save.level_index === 1 && !paused_save.at_start);
+
+    // Finishing a chapter moves the save to the start of the next one.
+    await page.evaluate(() => window.until_we_find_home_debug.finish_chapter());
+    const next_save = await page.evaluate(() => window.until_we_find_home_debug.read_save());
+    check('finishing a chapter saves the start of the next', next_save && next_save.level_index === 2 && next_save.at_start, JSON.stringify(next_save && { level_index: next_save.level_index, at_start: next_save.at_start }));
+
+    // Break it: tampered and broken saves.
+    const verdicts = await page.evaluate(() => {
+        const debug = window.until_we_find_home_debug;
+        const good = { version: 1, chapter: 'other_side', events: ['level_started'], human: [560, 300], dog: [660, 300], controlled: 'human', care: { hunger: 0.2, dirt: 0, food: 2 }, bond: { fear: 0.1, closeness: 0.3 }, seconds: 3 };
+        const variant = function variant(changes) { return JSON.stringify(Object.assign({}, good, changes)); };
+        const attempts = {
+            'not JSON': '{"version": 1, "chapter": ',
+            'far too big': 'x'.repeat(20000),
+            'a newer version': variant({ version: 2 }),
+            'a chapter that does not exist': variant({ chapter: 'nowhere' }),
+            'an event that cannot happen (a spoofed shortcut)': variant({ events: ['level_started', 'shared_route_opened'] }),
+            'the same event twice': variant({ events: ['level_started', 'walkway_collapsed', 'walkway_collapsed'] }),
+            'the event that ends the chapter': variant({ events: ['level_started', 'chapter_done'] }),
+            'a position of infinity': '{"version":1,"chapter":"other_side","events":["level_started"],"human":[1e999,300],"dog":[660,300],"controlled":"human"}',
+            'a character that does not exist': variant({ controlled: 'cat' }),
+            'events that are not a list': variant({ events: { 0: 'level_started' } }),
+            'not starting at the start': variant({ events: ['walkway_collapsed'] }),
+        };
+        const verdict = {};
+        for (const [name, text] of Object.entries(attempts)) {
+            verdict[name] = debug.read_save(text) === null;
+        }
+        // Odd but harmless numbers are cleaned, not refused.
+        const odd = debug.read_save(variant({ care: { hunger: 'starving', food: 1e9 }, bond: { fear: 7 } }));
+        verdict.odd_numbers_cleaned = Boolean(odd) && odd.care.hunger === 0.3 && odd.care.food === 9 && odd.bond.fear === 1;
+        // A save trying to add a property to every object in the page ("prototype pollution").
+        debug.read_save('{"version":1,"chapter":"other_side","events":["level_started"],"human":[560,300],"dog":[660,300],"controlled":"human","__proto__":{"polluted":true}}');
+        verdict.no_pollution = ({}).polluted === undefined;
+        verdict.refusals_counted = debug.refused_saves().count;
+        return verdict;
+    });
+    const refused_all = Object.entries(verdicts).filter(function attempt(entry) { return !['odd_numbers_cleaned', 'no_pollution', 'refusals_counted'].includes(entry[0]); });
+    for (const [name, refused] of refused_all) {
+        check('break it: a save with ' + name + ' is refused', refused);
+    }
+    check('break it: odd numbers in a save are cleaned, not trusted', verdicts.odd_numbers_cleaned);
+    check('break it: a save cannot add properties to every object', verdicts.no_pollution);
+    check('break it: every refusal is counted', verdicts.refusals_counted >= refused_all.length, String(verdicts.refusals_counted));
+
+    // Break it: a save that passes the checks but puts her inside a wall starts the chapter fresh.
+    await page.evaluate(() => {
+        localStorage.setItem('until_we_find_home_save', JSON.stringify({ version: 1, chapter: 'other_side', events: ['level_started'], human: [300, 450], dog: [660, 300], controlled: 'human' }));
+        const debug = window.until_we_find_home_debug;
+        debug.continue_save();
+        debug.skip_card();
+    });
+    await page.waitForTimeout(300);
+    const walled = await debug_state();
+    check('break it: a save putting her inside a wall starts the chapter fresh instead', walled.chapter === 'other_side' && walled.human_x < 700 && walled.happened.length >= 1,
+        'her x ' + walled.human_x);
+    await page.evaluate(() => { localStorage.clear(); window.until_we_find_home_debug.set_speed(1); });
+}
+
 async function main() {
     const browser = await chromium.launch();
     const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
@@ -142,6 +255,7 @@ async function main() {
     await page.waitForFunction(() => window.until_we_find_home_debug && window.until_we_find_home_debug.flipbook_ready(), null, { timeout: 20000 }).catch(() => {});
     await check_growth(page);
     await check_care(page);
+    await check_saving(page);
     check('the page logged no errors', page_errors.length === 0, page_errors.join(' | '));
     await browser.close();
     const failed = results.filter(function did_fail(result) { return !result.passed; });

@@ -87,6 +87,11 @@ const page = {
     memory_list: document.getElementById('memory_list'),
     aftermath_tally: document.getElementById('aftermath_tally'),
     care_status: document.getElementById('care_status'),
+    continue_note: document.getElementById('continue_note'),
+    new_game_button: document.getElementById('new_game_button'),
+    pause_status: document.getElementById('pause_status'),
+    pause_care: document.getElementById('pause_care'),
+    pause_saved: document.getElementById('pause_saved'),
 };
 
 // ---------- Small helpers ----------
@@ -254,6 +259,7 @@ function build_world(level) {
         },
         controlled: 'human',
         happened: new Set(),
+        event_order: [],            // The same events in the order they happened, for saving.
         fired_rules: new Set(),
         switching_allowed: false,
         follow: true,
@@ -296,21 +302,27 @@ function start_level(level_index) {
     game.rain_drops = [];
     game.near_rain_drops = [];
     prepare_level_lighting(game.level);
-    const start_human = game.world.characters.human;
-    const camera = game.camera;
-    camera.zoom = camera.base_zoom;
-    camera.center_x = center_x(start_human);
-    camera.center_y = game.level.height;
-    camera.look_ahead = 0;
-    update_camera(10);
-    camera.previous_center_x = camera.center_x;
-    camera.previous_center_y = camera.center_y;
+    snap_camera();
     page.subtitle.classList.remove('shown');
     page.objective.textContent = '';
     const scenery = game.level.scenery;
     set_weather_sound(scenery.rain_sound !== undefined ? scenery.rain_sound : (scenery.rain || 0), scenery.wind || 0);
     set_music_mood(game.world.mood);
     show_chapter_card();
+}
+
+// Puts the camera straight onto the controlled character, without gliding there: at the start
+// of a chapter, and after loading a save.
+function snap_camera() {
+    const camera = game.camera;
+    camera.zoom = camera.base_zoom;
+    camera.center_x = center_x(controlled_character());
+    camera.center_y = game.level.height;
+    camera.look_ahead = 0;
+    camera.anchor_y = undefined;
+    update_camera(10);
+    camera.previous_center_x = camera.center_x;
+    camera.previous_center_y = camera.center_y;
 }
 
 // Works out, once per chapter, where each lamp's light lands (the floor under it) and
@@ -355,7 +367,19 @@ function begin_play() {
     game.screen = 'play';
     document.body.classList.add('playing');
     update_touch_labels();
+    // Continuing a save: replay its story so far. If the save doesn't hold up, start fresh.
+    const save = game.pending_restore;
+    game.pending_restore = null;
+    if (save && restore_progress(save)) {
+        return;
+    }
+    if (save) {
+        game.world = build_world(game.level);
+        snap_camera();
+        show_toast("That save couldn't be used, so the chapter starts from the beginning");
+    }
     fire_event('level_started');
+    game.world.save_wanted = true;
 }
 
 // ---------- Story rules ----------
@@ -368,7 +392,10 @@ function fire_event(event_name) {
         return false;
     }
     world.happened.add(event_name);
-    game.play_log.push({ chapter: game.level.id, seconds: Number(world.elapsed_seconds.toFixed(2)), event: event_name });
+    world.event_order.push(event_name);
+    if (!world.replaying) {
+        game.play_log.push({ chapter: game.level.id, seconds: Number(world.elapsed_seconds.toFixed(2)), event: event_name });
+    }
     const rules = game.level.rules;
     for (let rule_index = 0; rule_index < rules.length; rule_index++) {
         const rule = rules[rule_index];
@@ -388,9 +415,16 @@ function fire_event(event_name) {
     return true;
 }
 
-// Carries out what a rule says should happen. Every key is optional.
+// Carries out what a rule says should happen. Every key is optional. While a save is being
+// replayed (world.replaying), only the lasting changes happen: no lines, sounds, shaking or
+// effects, and the chapter never ends.
 function apply_effects(rule) {
     const world = game.world;
+    const quiet = Boolean(world.replaying);
+    // A story moment that changes the beat, who you control or the goal is worth a save.
+    if (!quiet && (rule.beat || rule.control || rule.objective !== undefined)) {
+        world.save_wanted = true;
+    }
     if (rule.say) {
         queue_lines(rule.say, rule.voice || 'her');
     }
@@ -435,10 +469,10 @@ function apply_effects(rule) {
         world.mood = rule.mood;
         set_music_mood(rule.mood);
     }
-    if (rule.shake) {
+    if (rule.shake && !quiet) {
         game.camera.shake_seconds = rule.shake;
     }
-    if (rule.sound) {
+    if (rule.sound && !quiet) {
         play_sound(rule.sound, 0, 0);
     }
     if (rule.bond) {
@@ -465,7 +499,7 @@ function apply_effects(rule) {
             world.characters[kind].carrying = rule.carry[kind];
         }
     }
-    if (rule.effect) {
+    if (rule.effect && !quiet) {
         start_visual_effect(rule.effect);
     }
     for (const kind of Object.keys(rule.pose || {})) {
@@ -476,7 +510,7 @@ function apply_effects(rule) {
     if (rule.reunion) {
         start_reunion();
     }
-    if (rule.complete) {
+    if (rule.complete && !quiet) {
         finish_level();
     }
 }
@@ -490,7 +524,9 @@ function set_solid_active(solid_id, active) {
         solid.active = active;
         // How the change looks. Collision changes at once; the picture catches up physically.
         if (solid.kind === 'plank' && !active) {
-            break_into_pieces(solid);
+            if (!game.world.replaying) {
+                break_into_pieces(solid);
+            }
             solid.fade = 0;
         } else if (solid.kind === 'plank' && active) {
             solid.motion = { type: 'swing_down', seconds: 0 };
@@ -546,6 +582,9 @@ function set_objective(text) {
 // Adds story lines to the subtitle queue. `voice` changes the style: 'her' (her thoughts),
 // 'dog' (the dog's senses, in small capitals) or 'note' (something written).
 function queue_lines(lines, voice) {
+    if (game.world.replaying) {
+        return;
+    }
     for (const line of lines) {
         game.world.subtitle_queue.push({ text: personalize(line), voice: voice, queued_at: game.world.elapsed_seconds });
     }
@@ -1486,6 +1525,7 @@ function update_world(delta_seconds) {
     update_effects(delta_seconds);
     update_camera(delta_seconds);
     update_subtitles(delta_seconds);
+    update_autosave(delta_seconds);
 }
 
 // Fires the event of any area the right character has walked into.
@@ -1683,6 +1723,12 @@ function finish_level() {
     }
     world.complete = true;
     game.care = checked_care(world.care);  // How she is now carries into the next chapter.
+    // The save moves on to the start of the next chapter; after the last one, the story is done.
+    if (game.level_index + 1 < levels.length) {
+        save_chapter_start(game.level_index + 1);
+    } else {
+        clear_save();
+    }
     game.unlocked_chapters = Math.max(game.unlocked_chapters, Math.min(levels.length, game.level_index + 2));
     save_progress();
     game.fade_target = 1;
@@ -2124,12 +2170,39 @@ function show_title() {
         choice.append(number, name, count);
         choice.addEventListener('click', function choose_chapter() {
             start_audio();
+            game.pending_restore = null;
             start_level(index);
         });
         page.chapter_list.appendChild(choice);
     });
-    document.getElementById('begin_button').textContent = game.unlocked_chapters > 1 ? 'Continue' : 'Begin';
+    // Continue from the save when there is one, naming where it will take you.
+    game.title_save = read_save();
+    const saved_level = game.title_save ? levels[game.title_save.level_index] : null;
+    document.getElementById('begin_button').textContent = saved_level || game.unlocked_chapters > 1 ? 'Continue' : 'Begin';
+    page.continue_note.textContent = saved_level ? personalize(saved_level.eyebrow + ': ' + saved_level.title) : '';
+    page.new_game_button.hidden = !saved_level && game.unlocked_chapters <= 1;
+    page.new_game_button.textContent = 'New game';
+    game.new_game_armed = false;
     show_screen(page.title_screen);
+}
+
+// Starts the story over from the very beginning. With a save to lose, the first tap asks
+// "Start over?" and only a second tap within a few seconds does it.
+function new_game() {
+    if (game.title_save && !game.new_game_armed) {
+        game.new_game_armed = true;
+        page.new_game_button.textContent = 'Start over? Tap again';
+        window.setTimeout(function disarm() {
+            game.new_game_armed = false;
+            page.new_game_button.textContent = 'New game';
+        }, 4000);
+        return;
+    }
+    clear_save();
+    game.care = fresh_care();
+    game.pending_restore = null;
+    start_audio();
+    start_level(0);
 }
 
 // Pauses or resumes play.
@@ -2139,6 +2212,11 @@ function set_paused(paused) {
     }
     game.paused = paused;
     if (paused) {
+        save_checkpoint();
+        const stage = growth_stage_of(game.level);
+        page.pause_status.textContent = personalize(game.level.eyebrow + '  \u00b7  {dog}, ' + stage.label);
+        page.pause_care.textContent = care_summary(game.world.care, false);
+        page.pause_saved.textContent = saved_how_long_ago();
         show_screen(page.pause_screen);
     } else {
         hide_screen(page.pause_screen);
@@ -2284,8 +2362,15 @@ function connect_controls() {
 
     document.getElementById('begin_button').addEventListener('click', function begin() {
         start_audio();
-        start_level(Math.max(0, game.unlocked_chapters - 1));
+        const save = read_save();
+        if (save) {
+            continue_from_save(save);
+        } else {
+            game.pending_restore = null;
+            start_level(Math.max(0, game.unlocked_chapters - 1));
+        }
     });
+    page.new_game_button.addEventListener('click', new_game);
     document.getElementById('chapters_button').addEventListener('click', function toggle_chapters() {
         page.chapter_list.hidden = !page.chapter_list.hidden;
     });
@@ -2298,9 +2383,22 @@ function connect_controls() {
     document.getElementById('resume_button').addEventListener('click', function resume() { set_paused(false); });
     document.getElementById('restart_button').addEventListener('click', function restart() {
         set_paused(false);
+        game.pending_restore = null;
         start_level(game.level_index);
     });
+    // Back to the last save in this chapter (it was made when the pause began, if it was safe).
+    document.getElementById('checkpoint_button').addEventListener('click', function back_to_save() {
+        const save = read_save();
+        set_paused(false);
+        if (save && save.level_index === game.level_index) {
+            continue_from_save(save);
+        } else {
+            game.pending_restore = null;
+            start_level(game.level_index);
+        }
+    });
     document.getElementById('quit_button').addEventListener('click', function quit() {
+        save_checkpoint();
         set_paused(false);
         game.world = null;
         game.level = null;
@@ -2363,6 +2461,13 @@ window.until_we_find_home_debug = {
             update_world(fixed_step_seconds);
         }
     },
+    save_now: function debug_save_now() { return save_checkpoint(); },
+    solid_active: function debug_solid_active(id) { const solid = game.world.solids.find(function named(candidate) { return candidate.id === id; }); return solid ? solid.active : null; },
+    finish_chapter: function debug_finish_chapter() { finish_level(); },
+    read_save: function debug_read_save(text) { return read_save(text); },
+    continue_save: function debug_continue_save() { const save = read_save(); if (save) { continue_from_save(save); } return Boolean(save); },
+    refused_saves: function debug_refused_saves() { return { count: game.refused_saves || 0, last: game.last_refusal || null }; },
+    set_paused: function debug_set_paused(paused) { set_paused(paused); },
     set_care: function debug_set_care(care) { game.world.care = checked_care(Object.assign({}, game.world.care, care)); },
     walk_to: function debug_walk_to(x) { game.world.autopilot = { target_x: x }; },
     press: function debug_press(control) { set_control(control, true); set_control(control, false); },

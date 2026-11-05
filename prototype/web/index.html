@@ -192,9 +192,11 @@
     <p class="tagline">A woman, her dog, and the long way back to each other.</p>
     <div class="button_row">
       <button class="menu_button" type="button" id="begin_button">Begin</button>
+      <button class="menu_button quiet" type="button" id="new_game_button" hidden>New game</button>
       <button class="menu_button quiet" type="button" id="chapters_button">Chapters</button>
       <button class="menu_button quiet" type="button" id="memory_button">Memory box</button>
     </div>
+    <p class="small_note" id="continue_note"></p>
     <div id="chapter_list" hidden></div>
     <p class="small_note touch_note">Best with sound and headphones. Turn your phone sideways.</p>
     <p class="small_note keyboard_note">Best with sound. Keyboard: arrows or A/D to walk, Space to jump, E to use, Q to call, S to kneel or sniff, Tab to switch.</p>
@@ -223,12 +225,16 @@
 
   <section class="screen faded" id="pause_screen">
     <h2 class="card_title">Paused</h2>
+    <p class="card_place" id="pause_status"></p>
+    <p class="small_note" id="pause_care"></p>
     <div class="button_row">
       <button class="menu_button" type="button" id="resume_button">Resume</button>
+      <button class="menu_button quiet" type="button" id="checkpoint_button">Back to last save</button>
       <button class="menu_button quiet" type="button" id="restart_button">Restart chapter</button>
       <button class="menu_button quiet" type="button" id="sound_button">Sound: on</button>
-      <button class="menu_button quiet" type="button" id="quit_button">Title screen</button>
+      <button class="menu_button quiet" type="button" id="quit_button">Save and quit</button>
     </div>
+    <p class="small_note" id="pause_saved"></p>
   </section>
 </div>
 
@@ -242,4 +248,5 @@
 <script src="js/flipbook.js"></script>
 <script src="js/levels.js"></script>
 <script src="js/care.js"></script>
+<script src="js/save_game.js"></script>
 <script src="js/game.js"></script>
