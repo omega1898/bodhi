@@ -16,14 +16,14 @@ The iOS release is a native Swift app that carries the browser game inside it an
 
 ## Where things stand (5 November 2026)
 
-- **The story:** eight chapters covering Bodhi's first year, from the puppy coming home to the two of them asleep in their bed (`docs/story.md`).
-- **Systems:** Bodhi grows chapter by chapter (puppy drawings, then the grown build drawn smaller), feeding and cleaning, mid-chapter saving with Continue, a pause menu, film scenes with Skip.
+- **The story:** twelve chapters covering Bodhi's first year, from the puppy coming home to the two of them asleep in their bed. A mystery runs under it: the lost dog next door, Biscuit, and the chalk hearts his girl draws so he can follow her (`docs/story.md`).
+- **Systems:** Bodhi grows chapter by chapter (puppy drawings, then the grown build drawn smaller), feeding and cleaning, mid-chapter saving with Continue, a pause menu, film scenes with Skip, and a third character (Biscuit) who can follow Bodhi.
 - **Tests that pass in the cloud:**
-  - `playtest.js`: the robot plays all eight chapters.
-  - `systems_check.js`: 42 checks, including break-it checks on saves, care and films.
-  - `frames_check.js`, `filmstrip.js`, `frame_rate.js`: about 57 to 60 frames a second at iPhone size.
+  - `playtest.js`: the robot plays all twelve chapters.
+  - `systems_check.js`: 47 checks, including break-it checks on saves, care, films and Biscuit.
+  - `frames_check.js`, `filmstrip.js`, `frame_rate.js`: about 57 to 60 frames a second at iPhone size, in every chapter measured.
 - **Not tested anywhere yet:** the Swift app itself, and the game on a real iPhone (memory, heat, touch feel).
-- **Play time:** the robot's shortest run is 6.7 minutes. A first-time player is estimated at 25 to 45 minutes, a guess until measured. The target is at least five hours; the plan is in `docs/story.md`.
+- **Play time:** the robot's shortest run is 10.8 minutes. A first-time player is estimated at 45 to 75 minutes, a guess until measured. The target is at least five hours; the plan is in `docs/story.md`.
 
 ## Milestones
 

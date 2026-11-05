@@ -17,30 +17,56 @@
 
 **Names:** the dog is **Bodhi**, a female goldendoodle (`story_config` in `prototype/web/js/levels.js`, pronouns her/her). She has no name in the text yet; fill it in from `docs/characters.md` if she should have one.
 
+## The thread: Mina, Biscuit and the hearts
+
+The journey home is driven by a second, smaller story the player pieces together: a lost dog.
+
+**Who they are** (invented supporting characters, not real people):
+- **Mina Osei**, 10, lives two doors down, behind the blue door.
+- **Ama Osei**, her mother: the night nurse who stayed with the four patients who couldn't be moved.
+- **Biscuit**, their dog: 13, grey with a white muzzle, deaf in one ear, a blue collar. He loves puppies.
+
+**What happened to them:** in the flood, Mina and Ama were rescued but Biscuit wasn't. Mina went looking for her mother, and on the way she drew chalk hearts on the road so Biscuit could follow her. Biscuit did follow, by smell, always a few days behind. And Bodhi follows Biscuit's smell, so the player is always one step behind both of them.
+
+**Why it works:**
+- It gives every chapter a question beyond "will they reunite?": is Biscuit alive, and will they catch him?
+- It mirrors the main story: another person separated from her dog.
+- It pays off the theme: Bodhi pulls her toward other people (`docs/design.md`).
+- The darkest moment (the empty collar in the snow) comes just before the best one: Biscuit found, alive, and run straight into Mina's arms.
+
+| Chapter | What the player learns |
+|---|---|
+| Coming Home | The old dog next door, over the fence. A welcome card: "From Mina (10) and Biscuit (13). He LOVES puppies." |
+| The Storm | Biscuit howling next door. In the rescue boat, Mina calling his name over the water. He isn't with them |
+| The Last Morning | Mina's poster: LOST IN THE FLOOD: BISCUIT. Her mother is a nurse at St Agnes, west |
+| The Other Side | A chalk heart with an arrow. Grey hairs on the bench: "Biscuit waited here." Bodhi smells him: days ago, going west |
+| The Motorway | A heart on every car door. Mina's note under a wiper: "I drew hearts so he can follow me." His scent under a car |
+| Visiting Hours | Biscuit visited the children's ward on Thursdays. Ama's letter to Mina: gone north to Northgate |
+| The Orchard | The farmer's note: an old grey dog slept in the barn, "looking for someone". The hollow he left in the hay, still warm |
+| Lessons | Bodhi bolts because she smells him. In the register: "MINA was here. BISCUIT, GO NORTH." |
+| First Snow | His collar, caught on a fence wire in the snow. "If found, call Ama." No one to call |
+| The Crossing | Ribbons tied at a dog's height, a ribbon every hundred steps |
+| High Farm | Mina asks, "Have you seen Biscuit?" Bodhi smells him on the wind, trapped in a byre on the hill. Freed, he runs to Mina |
+| Home | Two doors down, a light comes on behind the blue door. Biscuit barks once. Bodhi answers |
+
 ## Chapters
 
-Each chapter names Bodhi's age (`dog_age`), which sets her size, her drawings and how high she jumps (`dog_growth` in `levels.js`).
+Each chapter names Bodhi's age (`dog_age`), which sets her size, her drawings and how high she jumps (`dog_growth` in `levels.js`). She is bigger in every chapter than the one before; a test checks it.
 
-| # | Chapter | Bodhi | Place | What happens | Quiet scene |
-|---|---|---|---|---|---|
-| P | Coming Home | 8 weeks | The house with the green door | A film: she brings the puppy home. Then the first day teaches everything: fetch, the whistle, a mark on the doorframe, a meal, a bath, the photograph. At night the puppy cries in her basket; you play her, climbing onto the bed | The puppy asleep on her feet; the basket empty |
-| 1 | The Storm | 4 months | The same house, at night | The river floods the house. The stairs go; she is upstairs, the puppy below in rising water. The puppy climbs the furniture; she lowers knotted sheets | A rescue boat at dawn, taking them east to the city |
-| 2 | The Last Morning | 5 months | The emergency flat, far from home | The water rises again. She takes the photograph of Bodhi on their sofa and they set out west, home | Walking out of the city at dawn |
-| 3 | The Other Side | 6 months | Flooded railway station | The walkway collapses. Power, scent, the glove, the fence | The cabin stove; the glove drying |
-| 4 | Visiting Hours | 7 months | Hospital children's wing | Fire doors; the vent only a dog fits; the lift | Painted stars; the toy rabbit |
-| 5 | Lessons | 9 months | Primary school | **She chooses to leave**, after other people. The bell, the bridge | The chalkboard: "Northgate. We are alive." |
-| 6 | The Crossing | 11 months | Northgate, the river in flood | The river takes the bridge and the dog. **The photograph blows away**: she chooses Bodhi | Dawn; she can't picture the photograph, only the dog |
-| E | Home | one year | The road west, and the green door | The house survived. A second mark beside the first, her bowl, a towel, and bed: she tucks Bodhi in and lies down beside her | Both asleep; down the road, another light comes on |
-
-## How the emotional arc builds
-
-1. **Coming Home:** the bond from its first hour. The player learns her habits while she is small enough to fit in one hand.
-2. **The Storm:** the first loss: the house, and for a while each other. She is too small to climb out alone, so both of them have to act.
-3. **The Last Morning:** far from home. The photograph is all that's left of it, and it shows Bodhi, not the house.
-4. **The Other Side, Visiting Hours:** after each separation the dog stays close for a while, driven by the `closeness` number.
-5. **Lessons:** a reversal. For the first time she leaves, for other people.
-6. **The Crossing:** she can't hold both the photograph and the dog, and chooses the dog.
-7. **Home:** the place was home all along, but only because they came back to it together.
+| # | Chapter | Bodhi | Place | What happens |
+|---|---|---|---|---|
+| P | Coming Home | 8 weeks | The house with the green door | A film: she brings the puppy home. The first day teaches fetch, the whistle, the doorframe, a meal, a bath, the photograph; at night you play the puppy, climbing onto her bed |
+| 1 | The Storm | 4 months | The same house, at night | The flood. The stairs go; the puppy climbs out of rising water; knotted sheets; a rescue boat takes them east |
+| 2 | The Last Morning | 5 months | The emergency flat, far from home | Mina's poster. They set out west |
+| 3 | The Other Side | 6 months | Flooded railway station | The walkway collapses; power, scent, the glove, the fence |
+| 4 | The Motorway | 6½ months | Abandoned cars on a flooded motorway | The bridge deck drops; a ladder; Bodhi swims; a chained barrier |
+| 5 | Visiting Hours | 7 months | Hospital children's wing | Fire doors; the vent; the lift; Ama's letter |
+| 6 | The Orchard | 8 months | A farm gone wild | Bodhi under the locked gate; the key; the hayloft; a rusted bolt |
+| 7 | Lessons | 9 months | Primary school | Bodhi leaves her, after Biscuit's scent; the bell, the bridge |
+| 8 | First Snow | 10 months | The pass over the moor | The snow edge gives way; the hut, the stove, a hurdle; the collar; a frozen gate |
+| 9 | The Crossing | 11 months | Northgate, the river in flood | The river takes the bridge and the dog; the photograph blows away |
+| 10 | High Farm | 11½ months | The fire on the hill | Mina; Biscuit found under a fallen beam; the two of them together again |
+| E | Home | one year | The road west, and the green door | A second mark beside the first, her bowl, a towel, and bed: she tucks Bodhi in and lies down beside her |
 
 ## Looking after her
 
@@ -52,20 +78,14 @@ Each chapter hides three keepsakes, and each tells one small story about someone
 
 ## Play time: where it stands, and the road to five hours
 
-**Measured:** the robot playtest (`node prototype/web/tests/playtest.js`) finishes the whole story in **6.7 minutes of game time**. That is the floor: it knows every answer, never explores, reads nothing and finds 2 of 24 keepsakes.
+**Measured:** the robot playtest (`node prototype/web/tests/playtest.js`) finishes all twelve chapters in **10.8 minutes of game time**. That is the floor: it knows every answer, never explores, reads nothing and finds 2 of 37 keepsakes.
 
-**Estimated, not measured:** a first-time player, reading, exploring and looking for keepsakes, might take 25 to 45 minutes. This is a guess until people play it (milestone T in `docs/build_plan.md`).
+**Estimated, not measured:** a first-time player, reading, exploring and looking for keepsakes, might take 45 to 75 minutes. This is a guess until people play it (milestone T in `docs/build_plan.md`).
 
-**The target is at least five hours.** That is about seven times more game than exists. Two things get there, and both cost real time:
+**The target is at least five hours,** about five times more game than exists. All twelve chapters of Bodhi's first year are now built, so the rest has to come from deeper chapters, about 25 minutes each instead of 4 to 7:
+- a second separation in each chapter;
+- more rooms, and side routes with keepsakes;
+- more of the dog's own routes;
+- care moments (feeding, drying, resting).
 
-1. **Deeper chapters.** About 20 to 25 minutes each instead of 3 to 6: two or three separations per chapter, more rooms, side areas with keepsakes, more of the dog's own routes, and care moments.
-2. **More chapters,** one per stage of her first year:
-
-| Bodhi | New chapter (planned, not built) | Idea |
-|---|---|---|
-| 6½ months | The Motorway | A jam of abandoned cars as platforms; a frightened stray Bodhi befriends |
-| 8 months | The Orchard | Autumn on an empty farm: food, rest and a farmer's notes; a quiet, care-heavy chapter |
-| 10 months | First Snow | A mountain pass; keeping her warm becomes part of looking after her |
-| 11½ months | High Farm | The Northgate people and their dogs: stay with them, or go home |
-
-Twelve chapters of 20 to 25 minutes come to roughly four to five hours. Padding with chores or long walks would reach the number faster and lose the players; the measure is whether people choose to keep playing.
+A later step could add the journey of Mina and Biscuit themselves, told in a few short chapters played as Biscuit. Padding with chores or long walks would reach the number faster and lose the players; the measure is whether people choose to keep playing.

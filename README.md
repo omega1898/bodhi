@@ -2,7 +2,7 @@
 
 A narrative game about a human and their dog: separated by a disaster, each works toward the other, and the player earns the reunion.
 
-**Current stage:** the whole story is playable as a browser game in `prototype/web/`: Bodhi's first year, from the day she comes home as a puppy to the two of them asleep in their bed, in eight chapters (`docs/story.md`). Open `prototype/web/index.html` to play. The iOS app in `ios/` carries this game; its first build on an iPhone is next (`docs/build_plan.md`). Chapter three's rules also run in engine-independent C++ in `core/`, kept for the later PC game.
+**Current stage:** the whole story is playable as a browser game in `prototype/web/`: Bodhi's first year, from the day she comes home as a puppy to the two of them asleep in their bed, in twelve chapters, with the lost dog next door to find on the way (`docs/story.md`). Open `prototype/web/index.html` to play. The iOS app in `ios/` carries this game; its first build on an iPhone is next (`docs/build_plan.md`). Chapter three's rules also run in engine-independent C++ in `core/`, kept for the later PC game.
 
 ## Layout
 
