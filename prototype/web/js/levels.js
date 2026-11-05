@@ -11,8 +11,27 @@
 // and every line of the story updates. Pronouns: use "her"/"her", "him"/"his" or "them"/"their".
 const story_config = {
     dog_name: 'Bodhi',
-    dog_object_pronoun: 'them',
-    dog_possessive_pronoun: 'their',
+    dog_object_pronoun: 'her',
+    dog_possessive_pronoun: 'her',
+};
+
+// How Bodhi grows through the story, one stage per chapter (a chapter names its stage with
+// `dog_age`). Goldendoodles grow fast: about full height at a year.
+//   label: shown on the chapter card.
+//   size: her height compared with a grown goldendoodle (1). Her collision box and drawing
+//     both scale by it, so a puppy fits through gaps a grown dog can't.
+//   drawing: which set of hand-drawn frames shows her: 'bodhi_puppy' (big head, short legs)
+//     until about six months, then 'bodhi' (the grown build, drawn smaller while she grows).
+//   jump: how high she jumps compared with a grown dog.
+const dog_growth = {
+    eight_weeks: { label: '8 weeks old', size: 0.46, drawing: 'bodhi_puppy', jump: 0.8 },
+    four_months: { label: '4 months old', size: 0.6, drawing: 'bodhi_puppy', jump: 0.88 },
+    five_months: { label: '5 months old', size: 0.66, drawing: 'bodhi_puppy', jump: 0.92 },
+    six_months: { label: '6 months old', size: 0.74, drawing: 'bodhi', jump: 1 },
+    seven_months: { label: '7 months old', size: 0.8, drawing: 'bodhi', jump: 1 },
+    nine_months: { label: '9 months old', size: 0.88, drawing: 'bodhi', jump: 1 },
+    eleven_months: { label: '11 months old', size: 0.95, drawing: 'bodhi', jump: 1 },
+    one_year: { label: 'one year old', size: 1, drawing: 'bodhi', jump: 1 },
 };
 
 // Shorthand for building chapters. A "floor block" is solid from its top down to the bottom
@@ -28,6 +47,7 @@ const levels = [
     // ------------------------------------------------------------------ Prologue
     {
         id: 'last_morning',
+        dog_age: 'five_months',
         eyebrow: 'Prologue',
         title: 'The Last Morning',
         place: 'Our flat above the flooded street',
@@ -98,6 +118,7 @@ const levels = [
     // ------------------------------------------------------------------ Chapter one
     {
         id: 'other_side',
+        dog_age: 'six_months',
         eyebrow: 'Chapter One',
         title: 'The Other Side',
         place: 'A flooded railway station, nightfall',
@@ -216,6 +237,7 @@ const levels = [
     // ------------------------------------------------------------------ Chapter two
     {
         id: 'visiting_hours',
+        dog_age: 'seven_months',
         eyebrow: 'Chapter Two',
         title: 'Visiting Hours',
         place: "St Agnes Hospital, the children's wing",
@@ -318,6 +340,7 @@ const levels = [
     // ------------------------------------------------------------------ Chapter three
     {
         id: 'lessons',
+        dog_age: 'nine_months',
         eyebrow: 'Chapter Three',
         title: 'Lessons',
         place: 'Hillside Primary School, a grey afternoon',
@@ -423,6 +446,7 @@ const levels = [
     // ------------------------------------------------------------------ Chapter four
     {
         id: 'crossing',
+        dog_age: 'eleven_months',
         eyebrow: 'Chapter Four',
         title: 'The Crossing',
         place: 'Northgate shelter, the river in flood',
@@ -534,6 +558,7 @@ const levels = [
     // ------------------------------------------------------------------ Epilogue
     {
         id: 'home',
+        dog_age: 'one_year',
         eyebrow: 'Epilogue',
         title: 'Home',
         place: 'The old road west',

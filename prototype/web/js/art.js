@@ -102,7 +102,22 @@ function draw_contact_shadow(context, character) {
 // `dog` carries pose, facing, walk_phase, wag, fear, ear_lift, which the game updates.
 function draw_dog(context, dog, time_seconds) {
     if (typeof flipbook !== 'undefined' && flipbook.ready) {
-        draw_flipbook_character(context, dog, 'bodhi', time_seconds);  // The hand-drawn frames, once loaded.
+        // The hand-drawn frames, once loaded: the puppy's or the grown dog's.
+        draw_flipbook_character(context, dog, dog.drawing === 'bodhi_puppy' ? 'bodhi_puppy' : 'bodhi', time_seconds);
+        return;
+    }
+    const size = dog.size_scale || 1;
+    if (size !== 1) {
+        // The drawings below (shown only while the frames load) are made for a grown dog: draw
+        // one standing on the same feet, scaled down to her size.
+        const feet_x = dog.x + dog.width / 2;
+        const feet_y = dog.y + dog.height;
+        context.save();
+        context.translate(feet_x, feet_y);
+        context.scale(size, size);
+        context.translate(-feet_x, -feet_y);
+        draw_dog(context, Object.assign({}, dog, { x: feet_x - 23, y: feet_y - 38, width: 46, height: 38, size_scale: 1 }), time_seconds);
+        context.restore();
         return;
     }
     if (puppets.ready) {
@@ -2222,7 +2237,11 @@ function draw_chair(context, x, floor_y, scale) {
 
 // Draws one of the still, slowly moving scenes shown after a chapter ends. The characters
 // are drawn large here: this is where the player gets to look at them properly.
-function draw_vignette_scene(context, scene_name, time_seconds, width, height) {
+// `dog_look` is Bodhi's growth stage in that chapter ({ size, drawing }), so she is the size
+// she was in the chapter just played.
+function draw_vignette_scene(context, scene_name, time_seconds, width, height, dog_look) {
+    const dog_size = dog_look ? dog_look.size : 1;
+    const dog_drawing = dog_look ? dog_look.drawing : 'bodhi';
     const scale = height / 540;
     context.save();
     context.setTransform(1, 0, 0, 1, 0, 0);
@@ -2238,8 +2257,9 @@ function draw_vignette_scene(context, scene_name, time_seconds, width, height) {
         context.save();
         context.translate(x, feet_y);
         context.scale(figure_scale, figure_scale);
-        const spec = kind === 'dog' ? { width: 46, height: 38 } : { width: 26, height: 86 };
-        const figure = Object.assign({ x: -spec.width / 2, y: -spec.height, width: spec.width, height: spec.height, facing: facing, pose: pose, walk_phase: time_seconds * 5, wag: 0.25, fear: 0, on_ground: true, kind: kind, velocity_x: pose === 'walk' ? 140 : 0 }, extra || {});
+        const spec = kind === 'dog' ? { width: 46 * dog_size, height: 38 * dog_size } : { width: 26, height: 86 };
+        const growth = kind === 'dog' ? { size_scale: dog_size, drawing: dog_drawing } : {};
+        const figure = Object.assign({ x: -spec.width / 2, y: -spec.height, width: spec.width, height: spec.height, facing: facing, pose: pose, walk_phase: time_seconds * 5, wag: 0.25, fear: 0, on_ground: true, kind: kind, velocity_x: pose === 'walk' ? 140 : 0 }, growth, extra || {});
         draw_contact_shadow(context, figure);
         if (kind === 'dog') {
             draw_dog(context, figure, time_seconds);

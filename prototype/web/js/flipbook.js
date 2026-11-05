@@ -48,6 +48,21 @@ const flipbook_playback = {
 // The jump drawings run from the first speed, through the top of the arc, to the second.
 const flipbook_jump_speeds = { her: { rise: 620, fall: 700 }, bodhi: { rise: 690, fall: 700 } };
 
+// The puppy drawings (bodhi_puppy) are the same moves with a puppy's build, so they play
+// exactly as the grown dog's do.
+flipbook_playback.bodhi_puppy = flipbook_playback.bodhi;
+flipbook_jump_speeds.bodhi_puppy = flipbook_jump_speeds.bodhi;
+
+// True for either set of the dog's drawings.
+function is_dog_drawing(character_name) {
+    return character_name === 'bodhi' || character_name === 'bodhi_puppy';
+}
+
+// How sharply each set is painted, compared with the grown characters. The puppy is never
+// drawn at more than about two thirds of full size, so painting her at 0.7 looks the same and
+// uses half the memory, which matters on a phone.
+const flipbook_paint_scale = { bodhi_puppy: 0.7 };
+
 // Drawings a second when getting up: an intro played backwards, faster than getting down.
 const getting_up_rate = 30;
 
@@ -121,8 +136,9 @@ function paint_flipbook_sheet(character_name, animation_name) {
     const entry = frames_atlas[character_name].animations[animation_name];
     const columns = entry.columns || entry.frames;
     const rows = Math.ceil(entry.frames / columns);
-    const frame_width = Math.round(cell.width * flipbook.pixels_per_unit);
-    const frame_height = Math.round(cell.height * flipbook.pixels_per_unit);
+    const pixels_per_unit = flipbook.pixels_per_unit * (flipbook_paint_scale[character_name] || 1);
+    const frame_width = Math.round(cell.width * pixels_per_unit);
+    const frame_height = Math.round(cell.height * pixels_per_unit);
     const canvas = make_sprite_canvas(frame_width * columns, frame_height * rows);
     canvas.getContext('2d').drawImage(flipbook.sheets[character_name][animation_name], 0, 0, canvas.width, canvas.height);
     flipbook.frames[character_name][animation_name] = { canvas: canvas, frame_width: frame_width, frame_height: frame_height, columns: columns };
@@ -143,6 +159,7 @@ const flipbook_levels = {
         embrace: { level: 'hugging', up_from: 'embrace' },
     },
 };
+flipbook_levels.bodhi_puppy = flipbook_levels.bodhi;
 
 // The level of a pose: 'upright' unless the table above says otherwise.
 function level_of(character_name, pose) {
@@ -271,7 +288,9 @@ function choose_flipbook_frame(character, character_name, time_seconds) {
         const frame_count = animations.jump.frames;
         const speeds = flipbook_jump_speeds[character_name];
         const velocity_y = character.velocity_y || 0;
-        const through_arc = velocity_y < 0 ? 1 + velocity_y / speeds.rise : 1 + velocity_y / speeds.fall;
+        // A puppy takes off slower (she jumps lower), so her arc starts from her own speed.
+        const rise = speeds.rise * (character.jump_scale || 1);
+        const through_arc = velocity_y < 0 ? 1 + velocity_y / rise : 1 + velocity_y / speeds.fall;
         state.starting_stride = true;  // Landing into a run starts the stride from the feet.
         return ['jump', safe_frame(Math.round(clamp_between(through_arc, 0, 2) * (frame_count - 1) / 2), frame_count)];
     }
@@ -306,6 +325,8 @@ function choose_flipbook_frame(character, character_name, time_seconds) {
         // Walk or run (trot or gallop for the dog), by speed. Two thresholds, so a speed near
         // the line doesn't flicker between the two.
         const slow_gait = character_name === 'her' ? 'walk' : 'trot';
+        // A smaller dog's stride is shorter in the world, so her cycle covers less ground.
+        const size = character.size_scale || 1;
         const fast_gait = character_name === 'her' ? 'run' : 'gallop';
         const switch_speed = character_name === 'her' ? 125 : 150;
         if (state.gait !== fast_gait && speed > switch_speed + 10) {
@@ -321,7 +342,7 @@ function choose_flipbook_frame(character, character_name, time_seconds) {
             state.phase = state.last_feet ? closest_phase(entry, state.last_feet, state.facing) : walk_start_phase;
             state.starting_stride = false;
         } else {
-            state.phase = (state.phase + state.moved / entry.cycle_length) % 1;
+            state.phase = (state.phase + state.moved / (entry.cycle_length * size)) % 1;
         }
         return [gait, safe_frame(Math.floor(state.phase * entry.frames), entry.frames)];
     }
@@ -329,7 +350,7 @@ function choose_flipbook_frame(character, character_name, time_seconds) {
     // stance each time it begins, which is exactly where landings, turns and stops end.
     const animation_name = pose === 'stand' || !animations[pose] ? 'idle' : pose;
     const playback = Object.assign({}, playbacks[animation_name]);
-    if (character_name === 'bodhi' && animation_name === 'idle') {
+    if (is_dog_drawing(character_name) && animation_name === 'idle') {
         playback.rate = 6 + clamp_between(character.wag || 0, 0, 1) * 14;  // A happier dog wags faster.
     }
     let started = state.pose_started;
@@ -358,12 +379,14 @@ function draw_flipbook_character(context, character, character_name, time_second
     state.last_feet = points.feet.map(function on_screen(foot) { return [foot[0] * drawn_facing, foot[1]]; });
     context.save();
     context.translate(character.x + character.width / 2, character.y + character.height);
-    context.scale(drawn_facing * (character.squash_x || 1), character.squash_y || 1);
+    // Frames are drawn for a full-grown body; a growing dog is drawn smaller around her feet.
+    const size = character.size_scale || 1;
+    context.scale(drawn_facing * (character.squash_x || 1) * size, (character.squash_y || 1) * size);
     const column = frame_index % painted.columns;
     const row = Math.floor(frame_index / painted.columns);
     context.drawImage(painted.canvas, column * painted.frame_width, row * painted.frame_height, painted.frame_width, painted.frame_height,
         -cell.feet_x, -cell.feet_y, cell.width, cell.height);
-    if (character_name === 'bodhi') {
+    if (is_dog_drawing(character_name)) {
         draw_dog_blink(context, character, animation_name, points.eye);
         if (character.carrying) {
             draw_carried_item(context, character.carrying, points.mouth[0], points.mouth[1]);
@@ -383,13 +406,15 @@ function draw_dog_blink(context, dog, animation_name, eye) {
     if (((dog.x || 0) * 0.29 + performance.now() / 1000) % 3.7 >= 0.11) {
         return;
     }
+    // The puppy's bigger head has a bigger eye: the atlas gives its size after its angle.
+    const eye_size = Number.isFinite(eye[3]) ? clamp_between(eye[3], 0.5, 2) : 1;
     context.fillStyle = '#ecc791';
     context.beginPath();
-    context.ellipse(eye[0], eye[1], 2.3, 2.4, eye[2], 0, Math.PI * 2);
+    context.ellipse(eye[0], eye[1], 2.3 * eye_size, 2.4 * eye_size, eye[2], 0, Math.PI * 2);
     context.fill();
     context.strokeStyle = '#3a2418';
     context.lineWidth = 0.5;
     context.beginPath();
-    context.arc(eye[0], eye[1] + 0.2, 1.7, 0.25, Math.PI - 0.25);
+    context.arc(eye[0], eye[1] + 0.2 * eye_size, 1.7 * eye_size, 0.25, Math.PI - 0.25);
     context.stroke();
 }

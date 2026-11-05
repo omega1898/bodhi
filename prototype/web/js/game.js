@@ -68,6 +68,7 @@ const page = {
     card_eyebrow: document.getElementById('card_eyebrow'),
     card_title: document.getElementById('card_title'),
     card_place: document.getElementById('card_place'),
+    card_age: document.getElementById('card_age'),
     aftermath_screen: document.getElementById('aftermath_screen'),
     aftermath_text: document.getElementById('aftermath_text'),
     aftermath_continue: document.getElementById('aftermath_continue'),
@@ -204,16 +205,34 @@ function fill_memory_box() {
 
 // ---------- Building a level ----------
 
-// Makes a character in its starting position.
-function make_character(kind, x, y) {
-    const spec = character_specs[kind];
+// Bodhi's growth stage in a chapter (dog_growth in levels.js). A chapter without one, or naming
+// a stage that doesn't exist, gets the grown dog, and sizes are kept within sensible limits,
+// so a typing mistake in the level data can't make her vanish or fill the screen.
+function growth_stage_of(level) {
+    const stage = (level && dog_growth[level.dog_age]) || dog_growth.one_year;
     return {
-        kind: kind, x: x, y: y - spec.height, width: spec.width, height: spec.height,
+        label: stage.label,
+        size: clamp_between(Number(stage.size) || 1, 0.3, 1.2),
+        drawing: stage.drawing === 'bodhi_puppy' ? 'bodhi_puppy' : 'bodhi',
+        jump: clamp_between(Number(stage.jump) || 1, 0.5, 1.2),
+    };
+}
+
+// Makes a character in its starting position. `stage` (the dog only) sets how big she is,
+// which drawings show her, and how high she jumps.
+function make_character(kind, x, y, stage) {
+    const spec = character_specs[kind];
+    const size = stage ? stage.size : 1;
+    const width = spec.width * size;
+    const height = spec.height * size;
+    return {
+        kind: kind, x: x - (width - spec.width) / 2, y: y - height, width: width, height: height,
+        size_scale: size, drawing: stage ? stage.drawing : null, jump_scale: stage ? stage.jump : 1,
         velocity_x: 0, velocity_y: 0, on_ground: false, facing: 1, walk_phase: 0,
         pose: 'stand', pose_override: null, in_water: false, blocked: false, blocked_seconds: 0,
         rest_seconds: 0, jump_cooldown: 0, call_cooldown: 0, ear_lift: 0, wag: 0.4, fear: 0,
         carrying: null, kneeling: false, idle_seconds: 0, ahead_target: null, ahead_timer: 6,
-        safe_x: x, safe_y: y - spec.height, safe_timer: 0, speed_ratio: 0, step_parity: 0, whine_timer: 4,
+        safe_x: x, safe_y: y - height, safe_timer: 0, speed_ratio: 0, step_parity: 0, whine_timer: 4,
     };
 }
 
@@ -229,7 +248,7 @@ function build_world(level) {
         }),
         characters: {
             human: make_character('human', level.start.human[0], level.start.human[1]),
-            dog: make_character('dog', level.start.dog[0], level.start.dog[1]),
+            dog: make_character('dog', level.start.dog[0], level.start.dog[1], growth_stage_of(level)),
         },
         controlled: 'human',
         happened: new Set(),
@@ -318,6 +337,7 @@ function show_chapter_card() {
     page.card_eyebrow.textContent = game.level.eyebrow;
     page.card_title.textContent = personalize(game.level.title);
     page.card_place.textContent = personalize(game.level.place);
+    page.card_age.textContent = game.level.dog_age ? personalize('{dog}, ' + growth_stage_of(game.level).label) : '';
     show_screen(page.chapter_card);
     window.clearTimeout(game.card_timer);
     game.card_timer = window.setTimeout(begin_play, 3400 / game.speed_multiplier);
@@ -635,7 +655,7 @@ function move_character(character, direction, wants_jump, delta_seconds, speed_s
     // "Coyote time": a jump still works for a tenth of a second after walking off an edge.
     character.ground_grace = character.on_ground ? 0.1 : Math.max(0, (character.ground_grace || 0) - delta_seconds);
     if (wants_jump && character.ground_grace > 0) {
-        character.velocity_y = -spec.jump_speed;
+        character.velocity_y = -spec.jump_speed * (character.jump_scale || 1);  // A puppy jumps lower.
         character.on_ground = false;
         character.ground_grace = 0;
         character.jump_cut_allowed = true;
@@ -903,7 +923,7 @@ function update_companion(companion, leader, delta_seconds) {
         companion.blocked_seconds += delta_seconds;
         // Only try a jump if the obstacle could be cleared. Facing a tall fence, a sensible dog
         // doesn't leap at it over and over: it sits and waits.
-        const jump_reach = Math.pow(character_specs[companion.kind].jump_speed, 2) / (2 * gravity);
+        const jump_reach = Math.pow(character_specs[companion.kind].jump_speed * (companion.jump_scale || 1), 2) / (2 * gravity);
         const hopeless = (companion.y + companion.height) - (companion.blocked_by_top || 0) > jump_reach;
         if (hopeless) {
             companion.blocked_seconds = 2;
@@ -963,8 +983,9 @@ function update_ball(delta_seconds) {
     }
     if (ball.held_by) {
         const holder = world.characters[ball.held_by];
-        ball.x = center_x(holder) + holder.facing * (holder.kind === 'dog' ? 30 : 12);
-        ball.y = holder.y + (holder.kind === 'dog' ? 12 : 42);
+        // In the dog's mouth (nearer for a small puppy) or in her hand.
+        ball.x = center_x(holder) + holder.facing * (holder.kind === 'dog' ? 30 * holder.size_scale : 12);
+        ball.y = holder.y + (holder.kind === 'dog' ? 12 * holder.size_scale : 42);
         return;
     }
     ball.velocity_y = Math.min(900, ball.velocity_y + gravity * 0.8 * delta_seconds);
@@ -2256,7 +2277,7 @@ function frame(timestamp) {
     game.fade += (game.fade_target - game.fade) * Math.min(1, delta_seconds * 1.5);
     if (game.screen === 'aftermath') {
         game.aftermath_seconds += delta_seconds;
-        draw_vignette_scene(aftermath_context, game.level.aftermath.scene, game.aftermath_seconds, aftermath_canvas.width, aftermath_canvas.height);
+        draw_vignette_scene(aftermath_context, game.level.aftermath.scene, game.aftermath_seconds, aftermath_canvas.width, aftermath_canvas.height, growth_stage_of(game.level));
     } else {
         render(delta_seconds);
     }
@@ -2283,7 +2304,7 @@ window.until_we_find_home_debug = {
     drawn_x: function debug_drawn_x() { return game.last_drawn_player_x === undefined ? null : game.last_drawn_player_x; },
     character_state: function debug_character_state(kind) {
         const character = game.world.characters[kind];
-        return { x: character.x, y: character.y, velocity_x: character.velocity_x, velocity_y: character.velocity_y, facing: character.facing, facing_blend: character.facing_blend, lean: character.lean ? character.lean.value : 0, on_ground: character.on_ground, pose: character.pose, shown: character.flipbook_state ? character.flipbook_state.shown : null, shown_facing: character.flipbook_state ? character.flipbook_state.shown_facing : null };
+        return { x: character.x, y: character.y, width: character.width, height: character.height, size_scale: character.size_scale, drawing: character.drawing, velocity_x: character.velocity_x, velocity_y: character.velocity_y, facing: character.facing, facing_blend: character.facing_blend, lean: character.lean ? character.lean.value : 0, on_ground: character.on_ground, pose: character.pose, shown: character.flipbook_state ? character.flipbook_state.shown : null, shown_facing: character.flipbook_state ? character.flipbook_state.shown_facing : null };
     },
     flipbook_ready: function debug_flipbook_ready() { return flipbook.ready; },
     camera: function debug_camera() { return { center_x: game.camera.center_x, center_y: game.camera.center_y, zoom: game.camera.zoom }; },
