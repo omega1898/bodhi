@@ -245,6 +245,31 @@ function make_character(kind, x, y, stage) {
     };
 }
 
+// A visiting dog (Biscuit, the old dog next door), from a chapter's `guest` data:
+//   start: [x, feet y]; size: compared with a grown goldendoodle; pose: what he's doing at the
+//   start ('sleep', 'sit'); mode: 'still' (stays put), 'follow' (follows Bodhi) or 'gone';
+//   hidden: true to keep him out of sight until a story rule shows him.
+// Odd values in the data fall back to safe ones, so a typing mistake can't break the chapter.
+function make_guest(spec) {
+    const size = clamp_between(Number(spec.size) || 0.86, 0.3, 1.2);
+    const start = Array.isArray(spec.start) ? spec.start : [0, 0];
+    const guest = make_character('dog', Number(start[0]) || 0, Number(start[1]) || 0, { size: size, drawing: 'biscuit', jump: 0.85 });
+    guest.is_guest = true;
+    guest.mode = ['still', 'follow', 'gone'].includes(spec.mode) ? spec.mode : 'still';
+    guest.hidden = spec.hidden === true;
+    guest.wag = 0.4;
+    if (spec.pose) {
+        guest.pose_override = { pose: String(spec.pose), seconds: 9999 };
+    }
+    return guest;
+}
+
+// The character a story rule names: 'human' or 'dog', or 'guest' for the visiting dog.
+function story_character(kind) {
+    const world = game.world;
+    return kind === 'guest' ? world.guest : world.characters[kind];
+}
+
 // Creates the live state of a level from its data. The data itself is never changed,
 // so restarting a chapter always starts from the same place.
 function build_world(level) {
@@ -292,6 +317,7 @@ function build_world(level) {
         subtitle_seconds: 0,
         subtitle_showing: false,
         autopilot: null,
+        guest: level.guest ? make_guest(level.guest) : null,
     };
     return world;
 }
@@ -303,6 +329,7 @@ function start_level(level_index) {
     game.level_index = level_index;
     game.level = levels[level_index];
     use_dog_drawings(growth_stage_of(game.level).drawing);  // Paint this chapter's dog drawings; free the others.
+    use_guest_drawings(game.level.guest ? 'biscuit' : null);
     game.world = build_world(game.level);
     load_scenery_art(game.level);
     game.backdrop_layers = render_backdrop(game.level, game.pixel_scale, view_width, view_height);
@@ -446,7 +473,10 @@ function apply_effects(rule) {
     }
     if (rule.place) {
         for (const kind of Object.keys(rule.place)) {
-            const character = world.characters[kind];
+            const character = story_character(kind);
+            if (!character) {
+                continue;
+            }
             character.x = rule.place[kind][0] - character.width / 2;
             character.y = rule.place[kind][1] - character.height;
             character.velocity_x = 0;
@@ -510,7 +540,10 @@ function apply_effects(rule) {
         start_visual_effect(rule.effect);
     }
     for (const kind of Object.keys(rule.pose || {})) {
-        const character = world.characters[kind];
+        const character = story_character(kind);
+        if (!character) {
+            continue;
+        }
         character.kneeling = false;
         character.pose_override = { pose: rule.pose[kind][0], seconds: rule.pose[kind][1] };
     }
@@ -535,10 +568,21 @@ function apply_effects(rule) {
     }
     // Someone out of sight: for example she has got into bed, and the bed now shows her asleep.
     for (const kind of Object.keys(rule.hide || {})) {
-        world.characters[kind].hidden = Boolean(rule.hide[kind]);
+        if (story_character(kind)) {
+            story_character(kind).hidden = Boolean(rule.hide[kind]);
+        }
     }
     for (const kind of Object.keys(rule.face || {})) {
-        world.characters[kind].facing = rule.face[kind] < 0 ? -1 : 1;
+        if (story_character(kind)) {
+            story_character(kind).facing = rule.face[kind] < 0 ? -1 : 1;
+        }
+    }
+    // The visiting dog: start following Bodhi, stay put, or leave the scene.
+    if (rule.guest && world.guest && ['still', 'follow', 'gone'].includes(rule.guest)) {
+        world.guest.mode = rule.guest;
+        if (rule.guest !== 'gone') {
+            world.guest.hidden = false;
+        }
     }
     if (rule.camera !== undefined) {
         world.camera_hold = rule.camera;
@@ -800,7 +844,7 @@ function move_character(character, direction, wants_jump, delta_seconds, speed_s
         character.jump_cut_allowed = true;
         character.squash_y = 1.12;  // A stretch as the legs push off.
         character.squash_x = 0.92;
-        if (game.world && character.kind === game.world.controlled) {
+        if (game.world && character === controlled_character()) {
             play_sound('step', 0.3, 0);
         }
     }
@@ -861,7 +905,7 @@ function move_character(character, direction, wants_jump, delta_seconds, speed_s
         for (let index = 0; index < 6; index++) {
             game.world.particles.push({ kind: 'puff', x: center_x(character) + (index - 2.5) * 6, y: character.y + character.height - 3, velocity_x: (index - 2.5) * 22, velocity_y: -12, gravity: 0, life: 0.45, max_life: 0.45, size: 5 });
         }
-        if (character.kind === game.world.controlled) {
+        if (character === controlled_character()) {
             play_sound('step', 0.1, 0);
         }
     }
@@ -1595,6 +1639,7 @@ function update_world(delta_seconds) {
             use_action();
         }
         update_companion(world.characters[world.controlled === 'human' ? 'dog' : 'human'], controlled_character(), delta_seconds);
+        update_guest(delta_seconds);
     } else {
         world.prompt = null;
     }
@@ -1629,6 +1674,42 @@ function update_world(delta_seconds) {
     update_camera(delta_seconds);
     update_subtitles(delta_seconds);
     update_autosave(delta_seconds);
+}
+
+// The visiting dog, each step. Following, he keeps a little way behind Bodhi at an old dog's
+// pace, hops up when something is in the way, and sits when he can't get through. Still, he
+// stays where he is (gravity still works). Gone or hidden, nothing happens.
+function update_guest(delta_seconds) {
+    const world = game.world;
+    const guest = world.guest;
+    if (!guest || guest.hidden || guest.mode === 'gone') {
+        return;
+    }
+    guest.previous_x = guest.x;
+    guest.previous_y = guest.y;
+    let direction = 0;
+    let wants_jump = false;
+    if (guest.mode === 'follow') {
+        const leader = world.characters.dog;
+        const target_x = center_x(leader) - leader.facing * 56;
+        const distance = target_x - center_x(guest);
+        if (Math.abs(distance) > 60) {
+            guest.following = true;
+        } else if (Math.abs(distance) < 24) {
+            guest.following = false;
+        }
+        if (guest.following) {
+            direction = Math.sign(distance);
+            guest.pose_override = null;
+        }
+        guest.jump_cooldown = Math.max(0, (guest.jump_cooldown || 0) - delta_seconds);
+        if (direction !== 0 && guest.blocked && guest.on_ground && guest.jump_cooldown <= 0) {
+            wants_jump = true;
+            guest.jump_cooldown = 0.8;
+        }
+    }
+    move_character(guest, direction, wants_jump, delta_seconds, 0.8);
+    update_pose(guest, delta_seconds);
 }
 
 // Fires the event of any area the right character has walked into.
@@ -1944,6 +2025,7 @@ function render(delta_seconds) {
     }
     const player = controlled_character();
     const companion = companion_character();
+    const guest = world.guest && !world.guest.hidden && world.guest.mode !== 'gone' ? world.guest : null;
     for (const item of level.interactables) {
         if (item.x > left_edge && item.x < right_edge && !(item.hidden && !world.revealed.has(reveal_name(item)))) {
             const available = interactable_available(item, player) || interactable_available(item, companion);
@@ -1953,7 +2035,7 @@ function render(delta_seconds) {
     if (world.ball && !world.ball.held_by) {
         draw_ball(context, world.ball);
     }
-    for (const character of [companion, player]) {
+    for (const character of guest ? [guest, companion, player] : [companion, player]) {
         if (character.hidden) {
             continue;
         }
@@ -2618,8 +2700,11 @@ window.until_we_find_home_debug = {
     render_scale: function debug_render_scale() { return game.render_scale; },
     drawn_x: function debug_drawn_x() { return game.last_drawn_player_x === undefined ? null : game.last_drawn_player_x; },
     character_state: function debug_character_state(kind) {
-        const character = game.world.characters[kind];
-        return { x: character.x, y: character.y, width: character.width, height: character.height, size_scale: character.size_scale, drawing: character.drawing, velocity_x: character.velocity_x, velocity_y: character.velocity_y, facing: character.facing, facing_blend: character.facing_blend, lean: character.lean ? character.lean.value : 0, on_ground: character.on_ground, pose: character.pose, shown: character.flipbook_state ? character.flipbook_state.shown : null, shown_facing: character.flipbook_state ? character.flipbook_state.shown_facing : null };
+        const character = story_character(kind);
+        if (!character) {
+            return null;
+        }
+        return { hidden: Boolean(character.hidden), mode: character.mode || null, x: character.x, y: character.y, width: character.width, height: character.height, size_scale: character.size_scale, drawing: character.drawing, velocity_x: character.velocity_x, velocity_y: character.velocity_y, facing: character.facing, facing_blend: character.facing_blend, lean: character.lean ? character.lean.value : 0, on_ground: character.on_ground, pose: character.pose, shown: character.flipbook_state ? character.flipbook_state.shown : null, shown_facing: character.flipbook_state ? character.flipbook_state.shown_facing : null };
     },
     flipbook_ready: function debug_flipbook_ready() { return flipbook.ready; },
     camera: function debug_camera() { return { center_x: game.camera.center_x, center_y: game.camera.center_y, zoom: game.camera.zoom }; },

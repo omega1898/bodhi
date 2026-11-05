@@ -110,6 +110,7 @@ function save_checkpoint() {
     const human = world.characters.human;
     const dog = world.characters.dog;
     const rounded = function rounded(value) { return Math.round(value * 10) / 10; };
+    const guest = world.guest && !world.guest.hidden && world.guest.mode !== 'gone' ? world.guest : null;
     return write_save({
         version: save_version,
         chapter: game.level.id,
@@ -118,6 +119,7 @@ function save_checkpoint() {
         // could come back a hair inside it.
         human: [center_x(human), human.y + human.height],
         dog: [center_x(dog), dog.y + dog.height],
+        guest: guest ? [center_x(guest), guest.y + guest.height] : null,  // Biscuit, when he's with them.
         controlled: world.controlled,
         dog_run_target: world.dog_run_target,
         care: checked_care(world.care),
@@ -225,6 +227,10 @@ function read_save(text) {
     if (parsed.controlled !== 'human' && parsed.controlled !== 'dog') {
         return refuse_save('unknown character');
     }
+    // Biscuit's place is optional (most chapters don't have him), but if given it must be real.
+    if (parsed.guest !== undefined && parsed.guest !== null && !point_inside_level(parsed.guest, level)) {
+        return refuse_save('position outside the chapter');
+    }
     const fraction = function fraction(value, fallback) {
         return typeof value === 'number' && Number.isFinite(value) ? clamp_between(value, 0, 1) : fallback;
     };
@@ -232,6 +238,7 @@ function read_save(text) {
     clean.human = parsed.human.slice();
     clean.dog = parsed.dog.slice();
     clean.controlled = parsed.controlled;
+    clean.guest = Array.isArray(parsed.guest) ? parsed.guest.slice() : null;
     clean.bond = { fear: fraction(bond.fear, 0.05), closeness: fraction(bond.closeness, 0.3) };
     clean.seconds = typeof parsed.seconds === 'number' && Number.isFinite(parsed.seconds) ? clamp_between(parsed.seconds, 0, 1e6) : 0;
     const target = parsed.dog_run_target;
@@ -289,6 +296,19 @@ function restore_progress(save) {
         character.kneeling = false;
         character.safe_x = x;
         character.safe_y = y;
+    }
+    // Biscuit goes back where he was, or beside Bodhi if that spot is somewhere he can't stand.
+    const guest = world.guest;
+    if (guest && save.guest && !guest.hidden && guest.mode !== 'gone') {
+        const guest_y = save.guest[1] - guest.height;
+        const guest_x = free_spot_near(guest, save.guest[0] - guest.width / 2, guest_y);
+        const dog = world.characters.dog;
+        guest.x = guest_x !== null ? guest_x : dog.x;
+        guest.y = guest_x !== null ? guest_y : dog.y + dog.height - guest.height;
+        guest.previous_x = guest.x;
+        guest.previous_y = guest.y;
+        guest.velocity_x = 0;
+        guest.velocity_y = 0;
     }
     world.autopilot = null;
     world.dog_run_target = save.dog_run_target;

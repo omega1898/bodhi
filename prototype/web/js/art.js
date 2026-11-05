@@ -101,7 +101,8 @@ function draw_contact_shadow(context, character) {
 // Draws the goldendoodle with its feet at the bottom of its collision box.
 // `dog` carries pose, facing, walk_phase, wag, fear, ear_lift, which the game updates.
 function draw_dog(context, dog, time_seconds) {
-    const drawing = dog.drawing === 'bodhi_puppy' ? 'bodhi_puppy' : 'bodhi';
+    // The puppy's, the grown dog's or Biscuit's drawings; anything unknown draws Bodhi grown.
+    const drawing = typeof is_dog_drawing !== 'undefined' && is_dog_drawing(dog.drawing) ? dog.drawing : 'bodhi';
     if (typeof flipbook !== 'undefined' && flipbook_set_ready(drawing)) {
         // The hand-drawn frames, once painted: the puppy's or the grown dog's.
         draw_flipbook_character(context, dog, drawing, time_seconds);

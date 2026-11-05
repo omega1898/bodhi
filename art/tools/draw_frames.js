@@ -463,6 +463,9 @@ function body_point(base, axis, along, up) {
 //   lower_body: how far the body sinks toward the paws when standing (0 = adult height).
 const adult_build = { head: 1, ear: 1, tail: 1, leg_width: 1, leg_bone: 1, lower_body: 0 };
 const puppy_build = { head: 1.34, ear: 1.15, tail: 0.6, leg_width: 1.1, leg_bone: 0.8, lower_body: 0.27 };
+// Biscuit, the old dog next door: the grown build, carried a little lower, with a slightly
+// smaller head and a shorter, heavier tail. His colours and smoother coat are in biscuit_look.
+const old_dog_build = { head: 0.96, ear: 1.05, tail: 0.85, leg_width: 0.96, leg_bone: 1, lower_body: 0.05 };
 
 // A puppy's body sits lower over its paws. Standing, the whole body (hips, shoulders and head
 // together, so its angle doesn't change) comes down by `lower_body` of the hips' height. Sitting
@@ -762,10 +765,11 @@ const cells = {
     her: { width: 64, height: 106, feet_x: 30, feet_y: 99 },
     bodhi: { width: 90, height: 84, feet_x: 42, feet_y: 76 },
     bodhi_puppy: { width: 90, height: 84, feet_x: 42, feet_y: 76 },
+    biscuit: { width: 90, height: 84, feet_x: 42, feet_y: 76 },
 };
 
 // Which build each dog drawing set uses. Both sets share the same poses and timing.
-const dog_builds = { bodhi: adult_build, bodhi_puppy: puppy_build };
+const dog_builds = { bodhi: adult_build, bodhi_puppy: puppy_build, biscuit: old_dog_build };
 
 // How far each walking cycle travels, in game units (see cycle_length_of). The gallop's planted
 // paws move back about 10 units per key over its 6 keys. In-betweens don't change the distance.
@@ -774,6 +778,7 @@ const cycle_lengths = {
     bodhi: { trot: (trot_paw_path[0][0] - trot_paw_path[1][0]) * trot_paw_path.length, gallop: 60 },
 };
 cycle_lengths.bodhi_puppy = cycle_lengths.bodhi;  // The puppy's paws travel the same paths.
+cycle_lengths.biscuit = cycle_lengths.bodhi;
 
 // Points the game draws things at, per frame: what she holds goes in her near hand; what the dog
 // carries goes in its mouth; its blink goes over its eye (with the head's angle).
@@ -833,10 +838,11 @@ const hand_overs = {
     ],
 };
 hand_overs.bodhi_puppy = hand_overs.bodhi;  // Same moves, checked again with puppy proportions.
+hand_overs.biscuit = hand_overs.bodhi;
 
 // Prints every hand-over's gap, marking any big enough to see as a jump.
 function report_hand_overs() {
-    const animations = { her: her_animations, bodhi: dog_animations, bodhi_puppy: dog_animations };
+    const animations = { her: her_animations, bodhi: dog_animations, bodhi_puppy: dog_animations, biscuit: dog_animations };
     const lines = [];
     let worst = 0;
     for (const [character, pairs] of Object.entries(hand_overs)) {
@@ -911,6 +917,40 @@ function puppy_definitions(definitions) {
     return result;
 }
 
+// Biscuit's look: grey and white, the muzzle gone white with age, a blue collar, and a
+// smoother coat (less fur noise at the edge, fainter curls), so he reads as a different and
+// older dog at a glance. Used on the sheet's definitions and on every drawn frame.
+const biscuit_changes = [
+    // Coat, light coat, shadowed coat and ears.
+    ['#f6d39c', '#e4e0d8'], ['#e0a867', '#c2bdb3'], ['#ad773f', '#8e887d'],
+    ['#cf9558', '#aaa499'], ['#8a5a30', '#6d675d'],
+    ['#fae2b6', '#f1efea'], ['#e3ae70', '#cfcac1'],
+    ['#c88746', '#857d70'], ['#7c4a24', '#4f4940'],
+    // Muzzle, beard, moustache, brow, curl shading, the closed-eye lid.
+    ['#f1cd96', '#ece9e2'], ['#dba86c', '#d3cfc7'], ['#cf9a5e', '#c4bfb6'], ['#f4d6a6', '#f2f0ea'], ['#b07a46', '#8a8478'], ['#9a6233', '#6f6a62'], ['#f0d0a0', '#e8e5de'],
+    // A blue collar instead of Bodhi's red.
+    ['#9a2f2a', '#2f4f8a'], ['#c45a50', '#5a78b8'],
+    // A smoother coat.
+    ['scale="22"', 'scale="9"'], ['opacity="0.42"', 'opacity="0.16"'],
+];
+function biscuit_look(markup) {
+    let result = markup;
+    for (const [from, to] of biscuit_changes) {
+        result = result.split(from).join(to);
+    }
+    return result;
+}
+// Every change must still find something to change, or a repaint of the art could leave him
+// half golden without anyone noticing. Checked once, against the sheet and one drawn frame.
+function check_biscuit_look(definitions) {
+    const sample = definitions + draw_dog(dog_animations.idle[0], old_dog_build) + draw_dog(dog_animations.sleep[0], old_dog_build);
+    for (const [from] of biscuit_changes) {
+        if (sample.indexOf(from) === -1) {
+            throw new Error('biscuit_look: "' + from + '" is no longer in the art; update biscuit_changes');
+        }
+    }
+}
+
 // The largest hand-over gap allowed, in game units. Bigger shows on screen as a jump.
 const largest_smooth_gap = 2.5;
 
@@ -925,13 +965,15 @@ function main() {
     // A lighter grain for whole frames (the painted parts already carry their own).
     const her_definitions = extract_definitions(her_sheet) + '<linearGradient id="sleeve_lit" x1="1" y1="0" x2="0" y2="0"><stop offset="0" stop-color="#5aa59f"/><stop offset="1" stop-color="#2c625f"/></linearGradient>' + '<filter id="grain_soft" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="1" seed="9" result="noise"/><feColorMatrix in="noise" type="saturate" values="0" result="mono"/><feComponentTransfer in="mono" result="faint"><feFuncA type="table" tableValues="0 0.06"/></feComponentTransfer><feComposite in="faint" in2="SourceGraphic" operator="in" result="grain"/><feBlend in="grain" in2="SourceGraphic" mode="multiply"/></filter>';
     const dog_definitions = extract_definitions(dog_sheet);
-    const atlas = { her: { cell: cells.her, animations: {} }, bodhi: { cell: cells.bodhi, animations: {} }, bodhi_puppy: { cell: cells.bodhi_puppy, animations: {} } };
+    check_biscuit_look(dog_definitions);
+    const atlas = { her: { cell: cells.her, animations: {} }, bodhi: { cell: cells.bodhi, animations: {} }, bodhi_puppy: { cell: cells.bodhi_puppy, animations: {} }, biscuit: { cell: cells.biscuit, animations: {} } };
     for (const [name, frames] of Object.entries(her_animations)) {
         atlas.her.animations[name] = write_animation('her', name, frames, her_definitions, draw_her);
     }
     for (const [name, frames] of Object.entries(dog_animations)) {
         atlas.bodhi.animations[name] = write_animation('bodhi', name, frames, dog_definitions, function adult(pose) { return draw_dog(pose, adult_build); });
         atlas.bodhi_puppy.animations[name] = write_animation('bodhi_puppy', name, frames, puppy_definitions(dog_definitions), function puppy(pose) { return draw_dog(pose, puppy_build); });
+        atlas.biscuit.animations[name] = write_animation('biscuit', name, frames, biscuit_look(dog_definitions), function old_dog(pose) { return biscuit_look(draw_dog(pose, old_dog_build)); });
     }
     const header = [
         '// Purpose: where each animation frame is: one sheet per animation, frames in rows.',
