@@ -354,6 +354,17 @@ function draw_carried_item(context, item_name, x, y) {
         context.ellipse(x + 3, y - 5, 1.6, 4.5, -0.2, 0, Math.PI * 2);
         context.ellipse(x + 6.5, y - 4.5, 1.6, 4.5, 0.25, 0, Math.PI * 2);
         context.fill();
+    } else if (item_name === 'collar') {
+        // Biscuit's blue collar, with its brass tag.
+        context.strokeStyle = '#2f4f8a';
+        context.lineWidth = 1.8;
+        context.beginPath();
+        context.ellipse(x + 2, y + 1, 5, 3.5, 0.2, 0, Math.PI * 2);
+        context.stroke();
+        context.fillStyle = '#e2bf68';
+        context.beginPath();
+        context.arc(x + 3, y + 5, 1.6, 0, Math.PI * 2);
+        context.fill();
     } else if (item_name === 'photo') {
         context.fillStyle = '#ece4d1';
         context.fillRect(x - 6, y - 4, 12, 9);
@@ -1244,6 +1255,17 @@ function draw_solid_shape(context, solid, palette, time_seconds) {
             context.fillRect(x, y, w, 2);
             break;
         }
+        case 'bale': {
+            // A hay bale: straw-coloured, with two lines of twine.
+            context.fillStyle = solid.color || '#c9a44c';
+            context.fillRect(x, y, w, h);
+            context.fillStyle = 'rgba(255,240,190,0.25)';
+            context.fillRect(x, y, w, 3);
+            context.fillStyle = 'rgba(90,60,20,0.35)';
+            context.fillRect(x + w * 0.25, y, 2, h);
+            context.fillRect(x + w * 0.7, y, 2, h);
+            break;
+        }
         case 'suitcase': {
             context.fillStyle = solid.color || '#6a3f35';
             context.beginPath();
@@ -1554,6 +1576,18 @@ function draw_prop(context, prop, palette, time_seconds) {
                 context.arc(x + offset_x + sway, y + offset_y, radius, 0, Math.PI * 2);
                 context.fill();
             }
+            if (prop.fruit) {
+                // Apples among the leaves, and a few windfalls in the grass.
+                const random = make_seeded_random(Math.round(x));
+                context.fillStyle = prop.fruit;
+                for (let apple = 0; apple < 14; apple++) {
+                    const apple_x = apple < 11 ? x + (random() - 0.5) * 100 + sway : x + (random() - 0.5) * 120;
+                    const apple_y = apple < 11 ? y - 110 - random() * 80 : y - 3;
+                    context.beginPath();
+                    context.arc(apple_x, apple_y, 3.2, 0, Math.PI * 2);
+                    context.fill();
+                }
+            }
             break;
         }
         case 'house': {
@@ -1597,8 +1631,9 @@ function draw_prop(context, prop, palette, time_seconds) {
             break;
         }
         case 'car': {
-            // Her small car at the kerb, the day she brought the puppy home.
-            context.fillStyle = '#3f5a6e';
+            // A small car: hers at the kerb the day she brought the puppy home, or (with a colour
+            // and `wreck`) one of the cars left on the flooded motorway.
+            context.fillStyle = prop.color || '#3f5a6e';
             context.beginPath();
             context.moveTo(x, y - 14);
             context.lineTo(x + 6, y - 40);
@@ -1610,9 +1645,19 @@ function draw_prop(context, prop, palette, time_seconds) {
             context.lineTo(x + 162, y - 14);
             context.closePath();
             context.fill();
-            context.fillStyle = 'rgba(190,215,230,0.55)';
+            context.fillStyle = prop.wreck ? 'rgba(20,24,30,0.85)' : 'rgba(190,215,230,0.55)';
             context.fillRect(x + 64, y - 64, 24, 18);
             context.fillRect(x + 92, y - 64, 22, 18);
+            if (prop.wreck) {
+                context.strokeStyle = 'rgba(200,210,220,0.35)';
+                context.lineWidth = 0.8;
+                context.beginPath();
+                context.moveTo(x + 68, y - 60);
+                context.lineTo(x + 80, y - 50);
+                context.moveTo(x + 76, y - 62);
+                context.lineTo(x + 70, y - 48);
+                context.stroke();
+            }
             context.fillStyle = 'rgba(255,255,255,0.12)';
             context.fillRect(x + 4, y - 40, 156, 3);
             context.fillStyle = '#1d2127';
@@ -1823,8 +1868,203 @@ function draw_prop(context, prop, palette, time_seconds) {
             }
             break;
         }
+        case 'garden_fence': {
+            // A low wooden fence between gardens.
+            const width = prop.w || 120;
+            context.fillStyle = '#8a7356';
+            context.fillRect(x, y - 30, width, 4);
+            context.fillRect(x, y - 14, width, 4);
+            for (let post_x = x; post_x <= x + width; post_x += 14) {
+                context.fillRect(post_x, y - 38, 5, 38);
+                context.beginPath();
+                context.moveTo(post_x - 1, y - 38);
+                context.lineTo(post_x + 2.5, y - 43);
+                context.lineTo(post_x + 6, y - 38);
+                context.fill();
+            }
+            break;
+        }
+        case 'poster': {
+            // A paper notice on a wall: a big title, then short lines (separated by \n).
+            context.save();
+            context.translate(x, y);
+            context.rotate(-0.03);
+            context.fillStyle = '#ece6d6';
+            context.fillRect(0, 0, 70, 86);
+            context.fillStyle = 'rgba(0,0,0,0.12)';
+            context.fillRect(0, 84, 70, 2);
+            context.fillStyle = '#9a2f2a';
+            context.font = '700 10px "Atkinson Hyperlegible", Arial, sans-serif';
+            context.fillText(prop.title || '', 6, 14);
+            // A quick crayon dog: grey body, white muzzle, blue collar.
+            context.fillStyle = '#9b968c';
+            context.beginPath();
+            context.ellipse(30, 32, 14, 8, 0, 0, Math.PI * 2);
+            context.fill();
+            context.beginPath();
+            context.ellipse(46, 26, 7, 6, 0, 0, Math.PI * 2);
+            context.fill();
+            context.fillStyle = '#f2f0ea';
+            context.beginPath();
+            context.ellipse(51, 28, 3.5, 2.5, 0, 0, Math.PI * 2);
+            context.fill();
+            context.fillStyle = '#2f4f8a';
+            context.fillRect(40, 30, 5, 2);
+            context.fillStyle = '#2b2b2b';
+            context.font = '6px "Atkinson Hyperlegible", Arial, sans-serif';
+            String(prop.text || '').split('\n').forEach(function line_of_text(line, index) {
+                context.fillText(line, 6, 50 + index * 8);
+            });
+            context.restore();
+            break;
+        }
+        case 'chalk_heart': {
+            // A child's chalk heart, sometimes with an arrow showing the way (`arrow`: 1 right, -1 left).
+            context.strokeStyle = 'rgba(244,240,230,0.75)';
+            context.lineWidth = 1.6;
+            context.lineCap = 'round';
+            context.beginPath();
+            context.moveTo(x, y + 8);
+            context.bezierCurveTo(x - 12, y - 1, x - 7, y - 10, x, y - 4);
+            context.bezierCurveTo(x + 7, y - 10, x + 12, y - 1, x, y + 8);
+            context.stroke();
+            if (prop.arrow) {
+                const direction = prop.arrow < 0 ? -1 : 1;
+                context.beginPath();
+                context.moveTo(x + direction * 12, y);
+                context.lineTo(x + direction * 30, y);
+                context.lineTo(x + direction * 25, y - 4);
+                context.moveTo(x + direction * 30, y);
+                context.lineTo(x + direction * 25, y + 4);
+                context.stroke();
+            }
+            break;
+        }
+        case 'crash_barrier': {
+            // A motorway crash barrier: a steel rail on short posts, along `w`.
+            const width = prop.w || 300;
+            context.fillStyle = '#5c646b';
+            for (let post_x = x; post_x <= x + width; post_x += 40) {
+                context.fillRect(post_x, y - 26, 4, 26);
+            }
+            context.fillStyle = '#8b949b';
+            context.fillRect(x, y - 28, width, 9);
+            context.fillStyle = 'rgba(255,255,255,0.15)';
+            context.fillRect(x, y - 28, width, 2);
+            break;
+        }
+        case 'road_sign': {
+            // A big motorway direction sign on two legs: white text on blue.
+            context.fillStyle = '#4a5157';
+            context.fillRect(x + 10, y - 150, 5, 150);
+            context.fillRect(x + 145, y - 150, 5, 150);
+            context.fillStyle = '#1f4f8a';
+            context.fillRect(x, y - 200, 160, 60);
+            context.strokeStyle = '#e8eef4';
+            context.lineWidth = 1.5;
+            context.strokeRect(x + 3, y - 197, 154, 54);
+            context.fillStyle = '#e8eef4';
+            context.font = '700 12px "Atkinson Hyperlegible", Arial, sans-serif';
+            String(prop.text || '').split('\n').forEach(function sign_line(line, index) {
+                context.fillText(line, x + 10, y - 178 + index * 16);
+            });
+            break;
+        }
+        case 'snow_drift': {
+            // A soft mound of snow, `w` wide and `h` high.
+            const width = prop.w || 120;
+            const height = prop.h || 30;
+            const drift = context.createLinearGradient(0, y - height, 0, y);
+            drift.addColorStop(0, '#f4f7f9');
+            drift.addColorStop(1, '#c9d3da');
+            context.fillStyle = drift;
+            context.beginPath();
+            context.moveTo(x, y);
+            context.quadraticCurveTo(x + width * 0.3, y - height * 1.3, x + width * 0.55, y - height);
+            context.quadraticCurveTo(x + width * 0.85, y - height * 0.8, x + width, y);
+            context.closePath();
+            context.fill();
+            break;
+        }
+        case 'hay': {
+            // Loose hay piled on a floor, `w` wide.
+            const width = prop.w || 120;
+            const random = make_seeded_random(Math.round(x));
+            context.fillStyle = '#c9a44c';
+            context.beginPath();
+            context.moveTo(x, y);
+            for (let step = 0; step <= 12; step++) {
+                context.lineTo(x + (width / 12) * step, y - 10 - random() * 12);
+            }
+            context.lineTo(x + width, y);
+            context.closePath();
+            context.fill();
+            context.strokeStyle = 'rgba(120,90,30,0.5)';
+            context.lineWidth = 0.8;
+            for (let straw = 0; straw < 20; straw++) {
+                const straw_x = x + random() * width;
+                context.beginPath();
+                context.moveTo(straw_x, y - 2);
+                context.lineTo(straw_x + (random() - 0.5) * 10, y - 8 - random() * 10);
+                context.stroke();
+            }
+            break;
+        }
+        case 'stove': {
+            // A small iron stove with a glowing door and a pipe up to the roof.
+            context.fillStyle = '#26221f';
+            context.fillRect(x - 22, y - 46, 44, 46);
+            context.fillRect(x - 5, y - 150, 10, 104);
+            context.fillStyle = 'rgba(255,140,60,' + (0.7 + 0.3 * Math.sin(time_seconds * 7) * Math.sin(time_seconds * 3.3)).toFixed(2) + ')';
+            context.fillRect(x - 13, y - 34, 26, 16);
+            break;
+        }
+        case 'tent': {
+            // A canvas tent, glowing a little from a lamp inside.
+            context.fillStyle = prop.color || '#6b7a5a';
+            context.beginPath();
+            context.moveTo(x, y);
+            context.lineTo(x + 50, y - 64);
+            context.lineTo(x + 100, y);
+            context.closePath();
+            context.fill();
+            context.fillStyle = 'rgba(255,200,130,0.35)';
+            context.beginPath();
+            context.moveTo(x + 40, y);
+            context.lineTo(x + 50, y - 40);
+            context.lineTo(x + 60, y);
+            context.closePath();
+            context.fill();
+            break;
+        }
+        case 'people': {
+            // People round a fire, as dark shapes against its light: `count` of them, some sitting.
+            const random = make_seeded_random(Math.round(x) + 3);
+            for (let person = 0; person < (prop.count || 5); person++) {
+                const person_x = x + person * 34 + random() * 10;
+                const sitting = random() < 0.5;
+                const height = sitting ? 40 : 66 + random() * 10;
+                const lean = Math.sin(time_seconds * 0.7 + person) * 1.2;
+                context.fillStyle = 'rgba(28,22,20,0.92)';
+                context.beginPath();
+                if (context.roundRect) {
+                    context.roundRect(person_x - 8 + lean, y - height, 16, height - (sitting ? 0 : 26), 6);
+                } else {
+                    context.rect(person_x - 8 + lean, y - height, 16, height - (sitting ? 0 : 26));
+                }
+                context.fill();
+                if (!sitting) {
+                    context.fillRect(person_x - 6, y - 28, 5, 28);
+                    context.fillRect(person_x + 1, y - 28, 5, 28);
+                }
+                context.beginPath();
+                context.arc(person_x + lean, y - height - 7, 7, 0, Math.PI * 2);
+                context.fill();
+            }
+            break;
+        }
         case 'fire': {
-            draw_fire(context, x, y, 1, time_seconds);
+            draw_fire(context, x, y, prop.size || 1, time_seconds);
             break;
         }
         case 'rail': {
@@ -2064,6 +2304,23 @@ function draw_interactable(context, item, time_seconds, in_reach, available) {
                 context.fillRect(x - 7, y - 18, 14, 9);
                 context.fillStyle = '#8f3f2b';
                 context.fillRect(x - 10, y - 29, 20, 4);
+            }
+            break;
+        }
+        case 'collar': {
+            // Biscuit's collar, caught on a fence wire, until it's taken.
+            if (!item.done) {
+                context.strokeStyle = '#59616a';
+                context.lineWidth = 1.5;
+                context.beginPath();
+                context.moveTo(x - 30, y - 26);
+                context.lineTo(x + 30, y - 24);
+                context.stroke();
+                context.save();
+                context.translate(x, y - 20);
+                context.scale(1.6, 1.6);
+                draw_carried_item(context, 'collar', 0, 0);
+                context.restore();
             }
             break;
         }
@@ -2427,6 +2684,32 @@ function vignette_sprite() {
 
 // Rain in two depths: faint far streaks and brighter near ones, slanted by the wind.
 // Drops are skipped where they'd fall indoors (`is_sheltered` says where roofs are).
+// Falling snow over the screen: slow, drifting flakes, more of them for a heavier fall.
+// `flakes` is kept between frames; `intensity` is about 0.5 (light) to 1.5 (a blizzard).
+function update_and_draw_snow(context, flakes, view_width, view_height, intensity, wind, delta_seconds) {
+    const wanted = Math.round(90 * intensity);
+    while (flakes.length < wanted) {
+        flakes.push({ x: Math.random() * view_width, y: Math.random() * view_height, speed: 22 + Math.random() * 40, size: 1 + Math.random() * 2.2, phase: Math.random() * 6 });
+    }
+    flakes.length = Math.min(flakes.length, wanted);
+    context.fillStyle = 'rgba(244,247,250,0.85)';
+    for (const flake of flakes) {
+        flake.phase += delta_seconds;
+        flake.y += flake.speed * delta_seconds;
+        flake.x += (wind * 30 + Math.sin(flake.phase * 1.3) * 12) * delta_seconds;
+        if (flake.y > view_height) {
+            flake.y = -4;
+            flake.x = Math.random() * view_width;
+        }
+        if (flake.x < -4) {
+            flake.x += view_width + 8;
+        } else if (flake.x > view_width + 4) {
+            flake.x -= view_width + 8;
+        }
+        context.fillRect(flake.x, flake.y, flake.size, flake.size);
+    }
+}
+
 function update_and_draw_rain(context, rain_drops, view_width, intensity, wind, delta_seconds, is_sheltered, near) {
     // Far rain: many thin, slow, faint streaks drawn behind the characters.
     // Near rain: fewer long, fast, brighter streaks drawn in front of them.
@@ -2562,6 +2845,50 @@ function draw_her_asleep(context, x, y, time_seconds) {
     context.lineWidth = 0.6;
     context.beginPath();
     context.arc(2.6, 4.6, 1.2, 0.3, Math.PI - 0.3);
+    context.stroke();
+    context.restore();
+}
+
+// Mina, ten, kneeling with her arms out round a dog's neck, seen against firelight: a dark
+// figure with two short plaits, rim-lit orange on the side facing the fire (to her right).
+function draw_mina_kneeling(context, x, floor_y, time_seconds) {
+    const breath = Math.sin(time_seconds * 1.4) * 1.2;
+    context.save();
+    context.translate(x, floor_y);
+    const body = new Path2D();
+    body.moveTo(-26, 0);                       // Knees and shins on the ground.
+    body.quadraticCurveTo(-30, -26, -14, -34);  // Back of the thighs, sitting on her heels.
+    body.quadraticCurveTo(-24, -70, -10, -96 + breath);   // Back, curved forward.
+    body.quadraticCurveTo(8, -104 + breath, 22, -84 + breath);  // Shoulders reaching forward.
+    body.quadraticCurveTo(30, -60, 34, -36);   // Front of the body.
+    body.lineTo(40, 0);
+    body.closePath();
+    context.fillStyle = 'rgba(28,22,20,0.97)';
+    context.fill(body);
+    context.beginPath();
+    context.arc(8, -118 + breath, 16, 0, Math.PI * 2);  // Her head, bent to his.
+    context.fill();
+    for (const side of [-1, 1]) {               // Two short plaits.
+        context.beginPath();
+        context.ellipse(8 + side * 15, -108 + breath, 4, 10, side * 0.4, 0, Math.PI * 2);
+        context.fill();
+    }
+    context.strokeStyle = 'rgba(28,22,20,0.97)';  // Her arms, round his neck.
+    context.lineWidth = 10;
+    context.lineCap = 'round';
+    context.beginPath();
+    context.moveTo(18, -86 + breath);
+    context.quadraticCurveTo(50, -88, 66, -66);
+    context.stroke();
+    context.strokeStyle = 'rgba(255,150,70,0.55)';  // Firelight on her edge.
+    context.lineWidth = 2.5;
+    context.beginPath();
+    context.arc(8, -118 + breath, 16, -1.2, 0.6);
+    context.stroke();
+    context.beginPath();
+    context.moveTo(22, -84 + breath);
+    context.quadraticCurveTo(30, -60, 34, -36);
+    context.lineTo(40, 0);
     context.stroke();
     context.restore();
 }
@@ -2719,6 +3046,11 @@ function draw_vignette_scene(context, scene_name, time_seconds, width, height, d
         road_dawn: ['#3d3c55', '#e0a675'], hill_sunrise: ['#4b5a86', '#f2bf86'], river_dawn: ['#2f3d4f', '#b8b0a6'],
         ward_stars: ['#121a2c', '#0a0d16'], gym_night: ['#1d1a16', '#0c0b09'], cabin_fire: ['#1b1411', '#0c0807'],
         first_night: ['#151b2c', '#0a0d16'], rescue_boat: ['#0b1019', '#05070b'], bedtime: ['#2b1e17', '#120c09'],
+        camper_van: ['#0d1424', '#1d2536'], orchard_barn: ['#2a1d12', '#120c07'], snow_hut: ['#1c2129', '#0d1015'], farm_fire: ['#0b0d16', '#1a1410'],
+    };
+    // Biscuit, drawn in a quiet scene: the old dog's own drawings, at his own size.
+    const biscuit_look = function biscuit_look() {
+        return { drawing: 'biscuit', size_scale: 0.86, x: -46 * 0.86 / 2, y: -38 * 0.86, width: 46 * 0.86, height: 38 * 0.86 };
     };
     const colors = palettes[scene_name] || palettes.cabin_fire;
     background.addColorStop(0, colors[0]);
@@ -2882,6 +3214,141 @@ function draw_vignette_scene(context, scene_name, time_seconds, width, height, d
             context.lineTo(drop_x - 4, drop_y + 14);
             context.stroke();
         }
+    } else if (scene_name === 'camper_van') {
+        // Night on the motorway: stars, a line of dead cars, and one camper van with a lamp lit.
+        const random = make_seeded_random(17);
+        for (let star = 0; star < 70; star++) {
+            context.fillStyle = 'rgba(230,236,250,' + (0.3 + 0.5 * random() * (0.6 + 0.4 * Math.sin(time_seconds + star))).toFixed(2) + ')';
+            context.fillRect(random() * scene_width, random() * 240, 1.5, 1.5);
+        }
+        context.fillStyle = '#1b222c';
+        context.fillRect(0, floor_y, scene_width, 140);
+        for (let car = 0; car < 6; car++) {
+            context.save();
+            context.translate(car * 260 - 200, floor_y - 8);
+            context.scale(1.2, 1.2);
+            draw_prop(context, { kind: 'car', x: 0, y: 0, color: '#2a313b', wreck: true }, {}, time_seconds);
+            context.restore();
+        }
+        const van_x = center_x - 220;
+        context.fillStyle = '#d8d2c2';
+        context.beginPath();
+        if (context.roundRect) {
+            context.roundRect(van_x, floor_y - 230, 440, 210, 26);
+        } else {
+            context.rect(van_x, floor_y - 230, 440, 210);
+        }
+        context.fill();
+        const inside = context.createLinearGradient(0, floor_y - 200, 0, floor_y - 40);
+        inside.addColorStop(0, '#5a4330');
+        inside.addColorStop(1, '#3a2a1e');
+        context.fillStyle = inside;
+        context.fillRect(van_x + 40, floor_y - 200, 330, 150);
+        context.fillStyle = '#6a4a36';  // The van's bench seat.
+        context.fillRect(van_x + 120, floor_y - 104, 70, 52);
+        draw_figure('human', 'sit', van_x + 150, floor_y - 52, 1, { eyes_closed: true });
+        draw_figure('dog', 'sleep', van_x + 270, floor_y - 50, -1, {});
+        add_warm_glow(context, van_x + 200, floor_y - 140, 300, 0.4);
+        context.fillStyle = '#c9c2b0';
+        context.fillRect(van_x + 200, floor_y - 200, 10, 150);
+        context.fillStyle = '#1d2128';
+        for (const wheel_x of [van_x + 80, van_x + 360]) {
+            context.beginPath();
+            context.arc(wheel_x, floor_y - 18, 26, 0, Math.PI * 2);
+            context.fill();
+        }
+        context.save();
+        context.translate(van_x + 400, floor_y - 120);
+        context.scale(2.2, 2.2);
+        draw_prop(context, { kind: 'chalk_heart', x: 0, y: 0, arrow: 1 }, {}, time_seconds);
+        context.restore();
+    } else if (scene_name === 'orchard_barn') {
+        // The barn: lantern light, hay, a few apples; Bodhi asleep in the hollow Biscuit left.
+        for (let plank_x = 0; plank_x < scene_width; plank_x += 42) {
+            context.fillStyle = plank_x % 84 === 0 ? '#3a2818' : '#332315';
+            context.fillRect(plank_x, 0, 41, floor_y);
+        }
+        context.fillStyle = '#4a3720';
+        context.fillRect(0, floor_y, scene_width, 140);
+        context.save();
+        context.translate(center_x - 300, floor_y);
+        context.scale(2.3, 2.3);
+        draw_prop(context, { kind: 'hay', x: 0, y: 0, w: 260 }, {}, time_seconds);
+        context.restore();
+        draw_figure('human', 'sit', center_x - 160, floor_y - 10, 1, { eyes_closed: true });
+        draw_figure('dog', 'sleep', center_x + 10, floor_y - 18, -1, {});
+        context.fillStyle = '#b8402e';
+        for (const [apple_x, apple_y] of [[center_x + 150, floor_y + 20], [center_x + 175, floor_y + 28], [center_x + 196, floor_y + 18]]) {
+            context.beginPath();
+            context.arc(apple_x, apple_y, 8, 0, Math.PI * 2);
+            context.fill();
+        }
+        context.fillStyle = '#2a2018';
+        context.fillRect(center_x + 238, floor_y - 260, 4, 80);
+        context.fillStyle = 'rgba(255,190,110,0.95)';
+        context.fillRect(center_x + 228, floor_y - 182, 24, 30);
+        add_warm_glow(context, center_x + 240, floor_y - 170, 520, 0.45 + Math.sin(time_seconds * 6) * 0.03);
+    } else if (scene_name === 'snow_hut') {
+        // A stone hut at the top of the pass: snow at the window, the stove, Biscuit's empty collar.
+        const random = make_seeded_random(23);
+        for (let stone_y = 0; stone_y < floor_y; stone_y += 34) {
+            for (let stone_x = (stone_y / 34) % 2 === 0 ? 0 : -30; stone_x < scene_width; stone_x += 60) {
+                context.fillStyle = random() < 0.5 ? '#2e3238' : '#353a41';
+                context.fillRect(stone_x + 2, stone_y + 2, 56, 30);
+            }
+        }
+        context.fillStyle = '#1a1c20';
+        context.fillRect(center_x + 160, 110, 120, 130);
+        context.fillStyle = '#5c6b7a';
+        context.fillRect(center_x + 168, 118, 104, 114);
+        context.fillStyle = '#eef3f7';
+        for (let flake = 0; flake < 40; flake++) {
+            const flake_x = center_x + 168 + ((flake * 37 + time_seconds * 14) % 104);
+            const flake_y = 118 + ((flake * 53 + time_seconds * 30) % 114);
+            context.fillRect(flake_x, flake_y, 2, 2);
+        }
+        context.fillStyle = '#2a2622';
+        context.fillRect(0, floor_y, scene_width, 140);
+        context.save();
+        context.translate(center_x + 300, floor_y);
+        context.scale(2.3, 2.3);
+        draw_prop(context, { kind: 'stove', x: 0, y: 0 }, {}, time_seconds);
+        context.restore();
+        draw_chair(context, center_x - 120, floor_y, 2.3);
+        draw_figure('human', 'sit', center_x - 120, floor_y, 1, { holding: 'collar' });
+        draw_figure('dog', 'sleep', center_x - 30, floor_y + 4, -1, {});
+        add_warm_glow(context, center_x + 300, floor_y - 60, 520, 0.42 + Math.sin(time_seconds * 8) * 0.03);
+    } else if (scene_name === 'farm_fire') {
+        // The fire on the hill at High Farm: people round it, Mina on her knees with Biscuit in her
+        // arms, and the two of them watching from the other side of the flames.
+        const random = make_seeded_random(31);
+        for (let star = 0; star < 60; star++) {
+            context.fillStyle = 'rgba(230,236,250,' + (0.25 + 0.5 * random()).toFixed(2) + ')';
+            context.fillRect(random() * scene_width, random() * 200, 1.5, 1.5);
+        }
+        context.fillStyle = '#16140f';
+        context.beginPath();
+        context.moveTo(0, floor_y - 40);
+        context.quadraticCurveTo(center_x, floor_y - 120, scene_width, floor_y - 30);
+        context.lineTo(scene_width, 540);
+        context.lineTo(0, 540);
+        context.fill();
+        context.fillStyle = '#231c14';
+        context.fillRect(0, floor_y, scene_width, 140);
+        draw_prop(context, { kind: 'people', x: center_x - 380, y: floor_y, count: 4 }, {}, time_seconds);
+        draw_prop(context, { kind: 'people', x: center_x + 260, y: floor_y, count: 3 }, {}, time_seconds);
+        draw_fire(context, center_x, floor_y - 6, 2.4, time_seconds);
+        add_warm_glow(context, center_x, floor_y - 60, 640, 0.5 + Math.sin(time_seconds * 7) * 0.04);
+        // Mina, kneeling, arms round Biscuit's neck: a dark shape against the fire, with the
+        // firelight catching her edge.
+        draw_figure('dog', 'lean', center_x - 150, floor_y + 6, 1, biscuit_look());
+        draw_mina_kneeling(context, center_x - 214, floor_y, time_seconds);
+        context.fillStyle = '#3a2a1c';  // A log by the fire.
+        context.beginPath();
+        context.ellipse(center_x + 150, floor_y - 10, 60, 14, 0, 0, Math.PI * 2);
+        context.fill();
+        draw_figure('human', 'sit', center_x + 150, floor_y - 6, -1, {});
+        draw_figure('dog', 'sit', center_x + 80, floor_y + 6, -1, { wag: 0.6 });
     } else if (scene_name === 'ward_stars') {
         const random = make_seeded_random(3);
         for (let index = 0; index < 46; index++) {

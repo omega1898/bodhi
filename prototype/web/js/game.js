@@ -2085,6 +2085,9 @@ function render(delta_seconds) {
     if (scenery.rain) {
         update_and_draw_rain(context, game.near_rain_drops, view_width, scenery.rain, scenery.wind_slant || -0.25, delta_seconds, is_sheltered_on_screen, true);
     }
+    if (scenery.snow) {
+        update_and_draw_snow(context, game.snow_flakes || (game.snow_flakes = []), view_width, view_height, scenery.snow, scenery.wind || 0, game.paused ? 0 : delta_seconds);
+    }
     // The outdoor foreground (grass, reeds) fades away indoors, under a roof.
     const indoors = game.shelters.some(function covers(shelter) { return draw_center_x >= shelter.x && draw_center_x <= shelter.x + shelter.w && shelter.y + shelter.h >= game.level.height - 120; });
     game.foreground_alpha = move_toward(game.foreground_alpha === undefined ? 1 : game.foreground_alpha, indoors ? 0 : 1, delta_seconds * 2);

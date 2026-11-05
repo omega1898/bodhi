@@ -295,6 +295,59 @@ async function check_films(page) {
         skipped.happened.join(', '));
 }
 
+// Biscuit, the visiting dog: there only in chapters that place him, safe with nonsense data, and
+// saved and restored with the story (after he's freed he follows Bodhi, and comes back doing so).
+async function check_guest(page) {
+    const chapters = await page.evaluate(() => {
+        const debug = window.until_we_find_home_debug;
+        const seen = {};
+        levels.forEach(function look(level, index) {
+            debug.start_level(index);
+            const guest = debug.character_state('guest');
+            seen[level.id] = guest ? guest.drawing + ' ' + guest.mode : 'none';
+        });
+        return seen;
+    });
+    check('Biscuit is next door in Coming Home and trapped at High Farm, and nowhere else',
+        chapters.coming_home === 'biscuit still' && chapters.high_farm === 'biscuit still'
+        && Object.entries(chapters).every(function elsewhere(entry) { return ['coming_home', 'high_farm'].includes(entry[0]) || entry[1] === 'none'; }),
+        JSON.stringify(chapters));
+    const odd = await page.evaluate(() => {
+        const guest = make_guest({ start: 'nowhere', size: NaN, mode: 'fly', pose: 7 });
+        return { size: guest.size_scale, mode: guest.mode, x: guest.x, drawing: guest.drawing };
+    });
+    check('break it: nonsense guest data becomes safe values', odd.size === 0.86 && odd.mode === 'still' && Number.isFinite(odd.x) && odd.drawing === 'biscuit',
+        JSON.stringify(odd));
+    // A save from just after he's freed: he comes back following Bodhi, where he stood.
+    const farm_index = await page.evaluate(() => levels.findIndex(function named(level) { return level.id === 'high_farm'; }));
+    const freed = { version: 1, chapter: 'high_farm',
+        events: ['level_started', 'intro_1', 'intro_2', 'intro_3', 'arrival_done', 'stew_shared', 'scent_on_wind', 'found_biscuit', 'barked_for_help',
+            'gate_opened', 'pair_at_byre', 'beam_levered', 'biscuit_dug', 'biscuit_free'],
+        human: [3010, 400], dog: [3040, 400], guest: [2960, 400], controlled: 'human', care: { hunger: 0.2, dirt: 0, food: 2 } };
+    const restored = await page.evaluate((save) => {
+        localStorage.setItem('until_we_find_home_save', JSON.stringify(save));
+        const debug = window.until_we_find_home_debug;
+        debug.continue_save();
+        debug.skip_card();
+        debug.set_paused(true);
+        const guest = debug.character_state('guest');
+        const state = debug.state();
+        debug.set_paused(false);
+        return { guest: guest, beam: debug.solid_active('byre_beam'), cutscene: state.cutscene, chapter: state.chapter };
+    }, freed);
+    check('after loading, Biscuit is free, following Bodhi, where he stood', restored.chapter === 'high_farm' && restored.guest && restored.guest.mode === 'follow'
+        && !restored.guest.hidden && Math.abs(restored.guest.x + restored.guest.width / 2 - 2960) < 3 && restored.beam === false && !restored.cutscene,
+        JSON.stringify(restored));
+    const tampered = await page.evaluate((save) => {
+        const debug = window.until_we_find_home_debug;
+        return debug.read_save(JSON.stringify(Object.assign({}, save, { guest: [99999, 400] }))) === null
+            && debug.read_save(JSON.stringify(Object.assign({}, save, { guest: 'here' }))) === null;
+    }, freed);
+    check('break it: a save putting Biscuit outside the chapter is refused', tampered);
+    await page.evaluate(() => localStorage.clear());
+    check('the farm chapter is where the save says', farm_index > 0);
+}
+
 async function main() {
     const browser = await chromium.launch();
     const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
@@ -306,6 +359,7 @@ async function main() {
     await check_care(page);
     await check_saving(page);
     await check_films(page);
+    await check_guest(page);
     check('the page logged no errors', page_errors.length === 0, page_errors.join(' | '));
     await browser.close();
     const failed = results.filter(function did_fail(result) { return !result.passed; });
