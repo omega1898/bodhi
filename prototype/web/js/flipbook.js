@@ -387,6 +387,7 @@ function draw_flipbook_character(context, character, character_name, time_second
     context.drawImage(painted.canvas, column * painted.frame_width, row * painted.frame_height, painted.frame_width, painted.frame_height,
         -cell.feet_x, -cell.feet_y, cell.width, cell.height);
     if (is_dog_drawing(character_name)) {
+        draw_mud(context, character.dirt, points.feet);
         draw_dog_blink(context, character, animation_name, points.eye);
         if (character.carrying) {
             draw_carried_item(context, character.carrying, points.mouth[0], points.mouth[1]);

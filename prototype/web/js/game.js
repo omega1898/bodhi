@@ -50,6 +50,7 @@ const game = {
     found_keepsakes: new Set(),  // Names like 'other_side:ticket', kept between visits.
     toast_timer: 0,
     frame_costs: [],             // Milliseconds of work per frame, newest last.
+    care: fresh_care(),          // Bodhi's hunger, dirt and the food in the bag, carried between chapters.
 };
 
 const input = {
@@ -85,6 +86,7 @@ const page = {
     memory_box: document.getElementById('memory_box'),
     memory_list: document.getElementById('memory_list'),
     aftermath_tally: document.getElementById('aftermath_tally'),
+    care_status: document.getElementById('care_status'),
 };
 
 // ---------- Small helpers ----------
@@ -263,6 +265,7 @@ function build_world(level) {
         objective: '',
         scheduled: [],
         bond: Object.assign({ fear: 0.05, closeness: 0.3 }, level.bond || {}),
+        care: checked_care(game.care),  // A copy: restarting the chapter starts from the same needs.
         revealed: new Set(),
         reunion: null,
         ball: level.ball ? { x: level.ball[0], y: level.ball[1], velocity_x: 0, velocity_y: 0, held_by: null } : null,
@@ -957,6 +960,9 @@ function update_companion(companion, leader, delta_seconds) {
             companion.facing = toward_leader;
         }
     }
+    if (companion.kind === 'dog') {
+        speed_scale *= care_speed_scale(world.care);  // A hungry dog drags a little.
+    }
     move_character(companion, direction, wants_jump, delta_seconds, speed_scale);
 }
 
@@ -1070,14 +1076,21 @@ function update_answer(delta_seconds) {
     fire_event(answerer.kind + '_answered');
 }
 
+// The name a hidden thing is remembered by once the dog has sniffed it out: a keepsake's name,
+// or for anything else (food she can smell), the event it fires.
+function reveal_name(item) {
+    return item.keepsake || item.event;
+}
+
 // The dog sniffs: a faint trail of scent drifts toward wherever the story says her scent leads.
+// Hidden things nearby (keepsakes, food) show themselves.
 function sniff(dog) {
     const world = game.world;
     dog.pose_override = { pose: 'sniff', seconds: 1.5 };
     world.sniff_seconds = 3;
     for (const item of game.level.interactables) {
-        if (item.hidden && !world.revealed.has(item.keepsake) && Math.abs(item.x - center_x(dog)) < 300 && Math.abs(item.y - (dog.y + dog.height)) < 120) {
-            world.revealed.add(item.keepsake);
+        if (item.hidden && !world.revealed.has(reveal_name(item)) && Math.abs(item.x - center_x(dog)) < 300 && Math.abs(item.y - (dog.y + dog.height)) < 120) {
+            world.revealed.add(reveal_name(item));
             dog.ear_lift = 1;
             for (let index = 0; index < 18; index++) {
                 world.particles.push({ kind: 'scent', x: item.x + (Math.random() - 0.5) * 30, y: item.y - 20 - Math.random() * 30, velocity_x: 0, velocity_y: -12, gravity: 0, life: 2.4, max_life: 2.4, size: 4 });
@@ -1131,7 +1144,11 @@ function interactable_available(item, character) {
     if (world.happened.has(item.event) && !item.repeatable) {
         return false;
     }
-    if (item.hidden && !world.revealed.has(item.keepsake)) {
+    if (item.hidden && !world.revealed.has(reveal_name(item))) {
+        return false;
+    }
+    // Some things need the dog right there: a bath, a bowl, her bed.
+    if (item.needs_dog && !dog_is_near(item.x, 120)) {
         return false;
     }
     if ((item.requires || []).some(function missing(name) { return !world.happened.has(name); })) {
@@ -1141,6 +1158,13 @@ function interactable_available(item, character) {
         return false;
     }
     return true;
+}
+
+// True when the dog is within `distance` of a spot along the floor, on about the same level.
+function dog_is_near(x, distance) {
+    const dog = game.world.characters.dog;
+    const human = game.world.characters.human;
+    return Math.abs(center_x(dog) - x) < distance && Math.abs((dog.y + dog.height) - (human.y + human.height)) < 40;
 }
 
 // True when the character stands close enough to use the thing.
@@ -1180,10 +1204,16 @@ function find_current_prompt() {
     if (nearest) {
         return { x: nearest.x, y: nearest.y - 84, text: personalize(nearest.label), control: 'act', item: nearest };
     }
+    // Looking after her comes before the ball and petting: feeding when she's hungry,
+    // towelling when she's muddy.
+    const together = Math.abs(center_x(other) - center_x(character)) < 70 && Math.abs((other.y + other.height) - (character.y + character.height)) < 30;
+    const care_prompt = find_care_prompt(character, world.characters.dog, together);
+    if (care_prompt) {
+        return care_prompt;
+    }
     if (character.kind === 'human' && ball && !ball.held_by && Math.abs(ball.x - center_x(character)) < 40 && Math.abs(ball.y - (character.y + character.height)) < 40) {
         return { x: ball.x, y: ball.y - 40, text: 'Pick up the ball', control: 'act', action: 'pick_up' };
     }
-    const together = Math.abs(center_x(other) - center_x(character)) < 70 && Math.abs((other.y + other.height) - (character.y + character.height)) < 30;
     if (together && character.kind === 'human') {
         return { x: center_x(other), y: other.y - 26, text: personalize('Pet {dog}'), control: 'act', action: 'pet' };
     }
@@ -1218,6 +1248,10 @@ function use_action() {
     } else if (prompt.action === 'pick_up') {
         world.ball.held_by = 'human';
         play_sound('pickup', 0, 0);
+    } else if (prompt.action === 'feed') {
+        feed_dog(true);
+    } else if (prompt.action === 'clean') {
+        clean_dog(false);
     } else if (prompt.action === 'pet' || prompt.action === 'lean') {
         const dog = world.characters.dog;
         dog.pose_override = { pose: 'lean', seconds: 1.6 };
@@ -1240,6 +1274,18 @@ function use_action() {
         }
         if (item.keepsake) {
             record_keepsake(item);
+        }
+        // Things that look after the dog: food to carry, a meal, a treat she found, a bath.
+        if (item.food) {
+            pick_up_food(item.food);
+        }
+        if (item.care === 'meal') {
+            feed_dog(false);
+        } else if (item.care === 'treat') {
+            world.care.hunger = Math.max(0, world.care.hunger - 0.5);
+            character.pose_override = { pose: 'sniff', seconds: 1.5 };
+        } else if (item.care === 'bath') {
+            clean_dog(true);
         }
         fire_event(item.event);
     }
@@ -1423,7 +1469,7 @@ function update_world(delta_seconds) {
         update_spring(human.head_tilt, dog_close && Math.abs(human.velocity_x) < 20 ? 0.16 : 0, 40, 10, delta_seconds);
     }
     dog.fear = world.bond.fear;
-    dog.wag += ((world.bond.fear > 0.5 ? 0.1 : 0.45) - dog.wag) * delta_seconds * 0.4;
+    dog.wag += ((world.bond.fear > 0.5 ? 0.1 : 0.45) * (dog_is_hungry(world.care) ? 0.6 : 1) - dog.wag) * delta_seconds * 0.4;
 
     // Fear fades slowly; the need to stay close fades even more slowly. After a frightening
     // separation the dog keeps close for a while, which says more than any line of text.
@@ -1431,6 +1477,8 @@ function update_world(delta_seconds) {
     world.bond.closeness = Math.max(0.3, world.bond.closeness - delta_seconds * 0.004);
 
     update_ball(delta_seconds);
+    update_care(delta_seconds);
+    update_care_status();
     check_zones();
     update_answer(delta_seconds);
     update_scent(delta_seconds);
@@ -1617,6 +1665,16 @@ function update_camera(delta_seconds) {
     camera.center_y = smooth_follow(camera.center_y, camera.anchor_y, camera, 'velocity_y', 0.45, delta_seconds);
 }
 
+// Shows how Bodhi is, in the corner, only when she needs something. Writes to the page only
+// when the words change.
+function update_care_status() {
+    const text = care_summary(game.world.care, true);
+    if (text !== game.care_status_text) {
+        game.care_status_text = text;
+        page.care_status.textContent = text;
+    }
+}
+
 // Ends the chapter: fades out, then shows the quiet scene that follows it.
 function finish_level() {
     const world = game.world;
@@ -1624,6 +1682,7 @@ function finish_level() {
         return;
     }
     world.complete = true;
+    game.care = checked_care(world.care);  // How she is now carries into the next chapter.
     game.unlocked_chapters = Math.max(game.unlocked_chapters, Math.min(levels.length, game.level_index + 2));
     save_progress();
     game.fade_target = 1;
@@ -1730,7 +1789,7 @@ function render(delta_seconds) {
     const player = controlled_character();
     const companion = companion_character();
     for (const item of level.interactables) {
-        if (item.x > left_edge && item.x < right_edge && !(item.hidden && !world.revealed.has(item.keepsake))) {
+        if (item.x > left_edge && item.x < right_edge && !(item.hidden && !world.revealed.has(reveal_name(item)))) {
             const available = interactable_available(item, player) || interactable_available(item, companion);
             draw_interactable(context, item, time_seconds, available && in_reach(item, player) && interactable_available(item, player), available);
         }
@@ -2296,6 +2355,15 @@ window.until_we_find_home_debug = {
     start_level: function debug_start_level(index) { start_level(index); },
     skip_card: function debug_skip_card() { begin_play(); },
     set_speed: function debug_set_speed(multiplier) { game.speed_multiplier = multiplier; },
+    // Advances the world by `count` fixed steps at once (at most ten minutes' worth), for tests
+    // that need time to pass without waiting for it.
+    step: function debug_step(count) {
+        const steps = Math.min(60 * 600, Math.max(0, Math.floor(Number(count) || 0)));
+        for (let index = 0; index < steps && game.world && game.screen === 'play'; index++) {
+            update_world(fixed_step_seconds);
+        }
+    },
+    set_care: function debug_set_care(care) { game.world.care = checked_care(Object.assign({}, game.world.care, care)); },
     walk_to: function debug_walk_to(x) { game.world.autopilot = { target_x: x }; },
     press: function debug_press(control) { set_control(control, true); set_control(control, false); },
     hold: function debug_hold(control, pressed) { set_control(control, pressed); },
@@ -2321,6 +2389,7 @@ window.until_we_find_home_debug = {
             happened: Array.from(world.happened), complete: world.complete, reunion: world.reunion ? world.reunion.stage : null,
             switching: world.switching_allowed,
             keepsakes_found: Array.from(game.found_keepsakes),
+            care: Object.assign({}, world.care),
             subtitle: page.subtitle.textContent,
         };
     },

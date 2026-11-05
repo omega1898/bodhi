@@ -129,7 +129,12 @@
     background: rgba(13,17,24,0.45); color: var(--paper); font-size: 1rem; font-family: var(--font_interface);
   }
   #pause_screen { background: rgba(13,17,24,0.82); }
-  body:not(.playing) #pause_button, body:not(.playing) #objective { display: none; }
+  #care_status {
+    position: absolute; top: calc(max(14px, env(safe-area-inset-top, 0px)) + 1.5rem); left: max(16px, env(safe-area-inset-left, 0px));
+    max-width: min(60%, 26rem); margin: 0; font-size: 0.82rem; color: var(--lamplight);
+    text-shadow: 0 1px 3px rgba(0,0,0,0.9); pointer-events: none;
+  }
+  body:not(.playing) #pause_button, body:not(.playing) #objective, body:not(.playing) #care_status { display: none; }
   body:not(.playing) #touch_controls { display: none !important; }
   body.touch_mode .keyboard_note { display: none; }
   .touch_note { display: none; }
@@ -163,6 +168,7 @@
   <canvas id="world_canvas" aria-label="The game world"></canvas>
 
   <p id="objective" aria-live="polite"></p>
+  <p id="care_status" aria-live="polite"></p>
   <p id="subtitle" aria-live="polite"></p>
   <button id="pause_button" type="button" aria-label="Pause">II</button>
   <p id="toast" aria-live="polite"></p>
@@ -235,4 +241,5 @@
 <script src="js/frames_atlas.js"></script>
 <script src="js/flipbook.js"></script>
 <script src="js/levels.js"></script>
+<script src="js/care.js"></script>
 <script src="js/game.js"></script>

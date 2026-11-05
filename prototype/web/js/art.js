@@ -1942,6 +1942,29 @@ function draw_particles(context, particles) {
             context.fillStyle = '#6a523c';
             context.fillRect(-particle.width / 2, -particle.height / 2, particle.width, 3);
             context.restore();
+        } else if (particle.kind === 'bowl') {
+            // A steel dog bowl on the floor, while she eats. Fades out at the end.
+            context.save();
+            context.translate(particle.x, particle.y);
+            context.scale(particle.size, particle.size);
+            context.globalAlpha = Math.min(1, life_left * 4);
+            context.fillStyle = '#7d8790';
+            context.beginPath();
+            context.moveTo(-9, -5);
+            context.lineTo(9, -5);
+            context.lineTo(6.5, 0);
+            context.lineTo(-6.5, 0);
+            context.closePath();
+            context.fill();
+            context.fillStyle = '#b9c3cb';
+            context.beginPath();
+            context.ellipse(0, -5, 9, 2, 0, 0, Math.PI * 2);
+            context.fill();
+            context.fillStyle = '#8a5a30';
+            context.beginPath();
+            context.ellipse(0, -5.2, 6.5 * life_left, 1.2 * life_left, 0, 0, Math.PI * 2);
+            context.fill();
+            context.restore();
         } else if (particle.kind === 'puff') {
             context.fillStyle = 'rgba(190,190,185,' + (0.35 * life_left).toFixed(3) + ')';
             context.beginPath();
