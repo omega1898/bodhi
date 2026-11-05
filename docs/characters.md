@@ -3,7 +3,9 @@
 The iOS game is built around two real characters, the owner's partner and their dog, and released publicly on the App Store.
 
 - **The human:** blonde hair, blue eyes.
-- **The dog:** a goldendoodle.
+- **The dog:** Bodhi, a female goldendoodle. In the game she grows from an eight-week-old puppy to one year old (`dog_growth` in `prototype/web/js/levels.js`).
+
+**How Bodhi is drawn now** (from goldendoodle breed descriptions; no reference photo was available in the cloud session): a shaggy, wavy-to-curly golden-apricot coat with no shine, a rounded "teddy bear" head with a top knot, a beard and moustache, a fringe over the eyes, long floppy ears in a darker shade, fluffy legs and a plumed tail. The puppy is a deeper apricot, because goldendoodles usually lighten as they grow. If the real Bodhi is cream, red or another shade, the colours are in `art/characters/bodhi.svg` (and the puppy's in `puppy_coat_colors` in `art/tools/draw_frames.js`).
 
 ## Decision: fixed main characters, no customization in the iOS release
 
@@ -21,8 +23,8 @@ On iPhone, Epic's own limits for MetaHuman characters are hair drawn as flat car
 **Details to collect** (fill these in):
 
 - Dog:
-  - name
-  - coat color (cream / apricot / red / chocolate / other)
+  - name: **Bodhi** (female)
+  - coat color (cream / apricot / red / chocolate / other); the game uses golden apricot until you say otherwise
   - curl type (wavy / curly / fleece)
   - approximate weight and height
   - ear shape and tail
@@ -44,9 +46,9 @@ On iPhone, Epic's own limits for MetaHuman characters are hair drawn as flat car
 
 ## Consent
 
-A public release puts her likeness in front of strangers and in marketing. Before release:
-- get her explicit agreement, in writing; a short likeness release is common practice (this is not legal advice);
-- give her a say in how she's depicted.
+A public release puts her likeness in front of strangers and in marketing.
+- **Written agreement:** the owner confirmed on 5 November 2026 that they have it. Keep it somewhere safe, outside this repository.
+- Keep giving her a say in how she's depicted, especially in marketing.
 
 ## Reference photos stay out of git
 

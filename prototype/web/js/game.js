@@ -2635,6 +2635,7 @@ window.until_we_find_home_debug = {
             walking: Boolean(world.autopilot), prompt: world.prompt ? world.prompt.text : null,
             happened: Array.from(world.happened), complete: world.complete, reunion: world.reunion ? world.reunion.stage : null,
             cutscene: Boolean(world.cutscene), caption: page.caption.textContent,
+            seconds_played: Math.round(world.elapsed_seconds),
             switching: world.switching_allowed,
             keepsakes_found: Array.from(game.found_keepsakes),
             care: Object.assign({}, world.care),

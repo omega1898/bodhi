@@ -116,8 +116,10 @@ async function play_chapter(page, chapter_index, steps) {
             await page.waitForTimeout(150);
         }
     }
-    await wait_until(page, (state) => state.complete, 40, 'chapter ' + chapter_index + ' to finish');
-    return page.evaluate(() => window.until_we_find_home_debug.frame_costs());
+    const finished = await wait_until(page, (state) => state.complete, 40, 'chapter ' + chapter_index + ' to finish');
+    const costs = await page.evaluate(() => window.until_we_find_home_debug.frame_costs());
+    costs.seconds_played = finished.seconds_played;
+    return costs;
 }
 
 // Runs every chapter, then reports timings and any page errors.
@@ -143,13 +145,15 @@ async function main() {
     await page.evaluate((speed) => window.until_we_find_home_debug.set_speed(speed), test_speed);
 
     let failed = false;
+    let robot_seconds = 0;
     for (let chapter_index = 0; chapter_index < playthroughs.length; chapter_index++) {
         try {
             const costs = await play_chapter(page, chapter_index, playthroughs[chapter_index]);
+            robot_seconds += costs.seconds_played;
             costs.sort((a, b) => a - b);
             const average = costs.reduce((total, cost) => total + cost, 0) / Math.max(1, costs.length);
             const slowest_tenth = costs[Math.floor(costs.length * 0.9)] || 0;
-            console.log('chapter ' + chapter_index + ' finished | frame work: average ' + average.toFixed(2) + ' ms, 90th percentile ' + slowest_tenth.toFixed(2) + ' ms (at ' + test_speed + 'x speed)');
+            console.log('chapter ' + chapter_index + ' finished in ' + costs.seconds_played + ' game seconds | frame work: average ' + average.toFixed(2) + ' ms, 90th percentile ' + slowest_tenth.toFixed(2) + ' ms (at ' + test_speed + 'x speed)');
             if (average > slowest_allowed_frame_ms) {
                 console.log('  TOO SLOW: average frame work is over ' + slowest_allowed_frame_ms + ' ms');
                 failed = true;
@@ -162,6 +166,9 @@ async function main() {
             failed = true;
         }
     }
+    // The robot knows every answer and never explores, so this is the shortest possible play
+    // time, not how long a person takes.
+    console.log('shortest play through the whole story: ' + (robot_seconds / 60).toFixed(1) + ' minutes of game time');
     const keepsakes = await page.evaluate(() => Array.from(window.until_we_find_home_debug.state().keepsakes_found || []));
     console.log('keepsakes found during the run: ' + keepsakes.join(', '));
     if (page_errors.length > 0) {
