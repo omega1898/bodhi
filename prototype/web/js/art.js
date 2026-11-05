@@ -101,9 +101,10 @@ function draw_contact_shadow(context, character) {
 // Draws the goldendoodle with its feet at the bottom of its collision box.
 // `dog` carries pose, facing, walk_phase, wag, fear, ear_lift, which the game updates.
 function draw_dog(context, dog, time_seconds) {
-    if (typeof flipbook !== 'undefined' && flipbook.ready) {
-        // The hand-drawn frames, once loaded: the puppy's or the grown dog's.
-        draw_flipbook_character(context, dog, dog.drawing === 'bodhi_puppy' ? 'bodhi_puppy' : 'bodhi', time_seconds);
+    const drawing = dog.drawing === 'bodhi_puppy' ? 'bodhi_puppy' : 'bodhi';
+    if (typeof flipbook !== 'undefined' && flipbook_set_ready(drawing)) {
+        // The hand-drawn frames, once painted: the puppy's or the grown dog's.
+        draw_flipbook_character(context, dog, drawing, time_seconds);
         return;
     }
     const size = dog.size_scale || 1;
@@ -448,7 +449,7 @@ function draw_boot(context, foot) {
 
 // Draws the woman with her feet at the bottom of her collision box.
 function draw_human(context, human, time_seconds) {
-    if (typeof flipbook !== 'undefined' && flipbook.ready) {
+    if (typeof flipbook !== 'undefined' && flipbook_set_ready('her')) {
         draw_flipbook_character(context, human, 'her', time_seconds);  // The hand-drawn frames, once loaded.
         return;
     }
@@ -1555,6 +1556,10 @@ function draw_prop(context, prop, palette, time_seconds) {
             break;
         }
         case 'house': {
+            if (prop.whole || prop.weathered) {
+                draw_home_outside(context, x, y, prop.weathered === true);
+                break;
+            }
             // The house in the photograph, years later: walls standing, roof gone, ivy everywhere.
             const wall = context.createLinearGradient(x, 0, x + 300, 0);
             wall.addColorStop(0, '#7f7464');
@@ -1587,6 +1592,233 @@ function draw_prop(context, prop, palette, time_seconds) {
                 context.beginPath();
                 context.ellipse(leaf_x, leaf_y, 3 + random() * 4, 2 + random() * 3, random() * 3, 0, Math.PI * 2);
                 context.fill();
+            }
+            break;
+        }
+        case 'car': {
+            // Her small car at the kerb, the day she brought the puppy home.
+            context.fillStyle = '#3f5a6e';
+            context.beginPath();
+            context.moveTo(x, y - 14);
+            context.lineTo(x + 6, y - 40);
+            context.lineTo(x + 40, y - 44);
+            context.lineTo(x + 58, y - 70);
+            context.lineTo(x + 118, y - 70);
+            context.lineTo(x + 140, y - 44);
+            context.lineTo(x + 160, y - 38);
+            context.lineTo(x + 162, y - 14);
+            context.closePath();
+            context.fill();
+            context.fillStyle = 'rgba(190,215,230,0.55)';
+            context.fillRect(x + 64, y - 64, 24, 18);
+            context.fillRect(x + 92, y - 64, 22, 18);
+            context.fillStyle = 'rgba(255,255,255,0.12)';
+            context.fillRect(x + 4, y - 40, 156, 3);
+            context.fillStyle = '#1d2127';
+            for (const wheel_x of [x + 34, x + 128]) {
+                context.beginPath();
+                context.arc(wheel_x, y - 12, 12, 0, Math.PI * 2);
+                context.fill();
+            }
+            context.fillStyle = '#8a929a';
+            for (const wheel_x of [x + 34, x + 128]) {
+                context.beginPath();
+                context.arc(wheel_x, y - 12, 4.5, 0, Math.PI * 2);
+                context.fill();
+            }
+            break;
+        }
+        case 'carrier': {
+            // A pet carrier on the path, its little grille door open once the puppy is out.
+            context.fillStyle = '#c7b9a3';
+            context.fillRect(x - 18, y - 24, 36, 24);
+            context.fillStyle = '#a9998a';
+            context.fillRect(x - 18, y - 27, 36, 4);
+            context.fillRect(x - 6, y - 31, 12, 4);
+            context.strokeStyle = '#5a534c';
+            context.lineWidth = 1.2;
+            const door_x = prop.open ? x + 18 : x + 14;
+            for (let bar = 0; bar < 4; bar++) {
+                context.beginPath();
+                context.moveTo(prop.open ? door_x + bar * 2.5 : door_x, y - 20 + bar * 5);
+                context.lineTo(prop.open ? door_x + 10 + bar * 2.5 : door_x + 4, y - 20 + bar * 5 + (prop.open ? 1 : 0));
+                context.stroke();
+            }
+            break;
+        }
+        case 'kitchen': {
+            // A counter with cupboards under it, a sink and a kettle, shelves above.
+            const width = prop.w || 260;
+            context.fillStyle = '#8a7a66';
+            context.fillRect(x, y - 46, width, 46);
+            context.fillStyle = '#c9bca8';
+            context.fillRect(x - 4, y - 50, width + 8, 6);
+            context.strokeStyle = 'rgba(40,30,20,0.35)';
+            context.lineWidth = 1.5;
+            for (let door_x = x + 6; door_x < x + width - 30; door_x += 44) {
+                context.strokeRect(door_x, y - 40, 38, 34);
+            }
+            context.fillStyle = '#9aa6ad';
+            context.fillRect(x + width * 0.55, y - 52, 46, 4);
+            context.fillStyle = '#c45a42';
+            context.beginPath();
+            context.ellipse(x + width * 0.3, y - 58, 9, 8, 0, 0, Math.PI * 2);
+            context.fill();
+            context.fillStyle = '#7a6a56';
+            context.fillRect(x + 10, y - 150, width - 20, 6);
+            context.fillRect(x + 10, y - 110, width - 20, 6);
+            const random = make_seeded_random(Math.round(x));
+            for (let jar_x = x + 20; jar_x < x + width - 30; jar_x += 22 + random() * 16) {
+                context.fillStyle = random() < 0.5 ? '#c9a25c' : '#7f9a8a';
+                context.fillRect(jar_x, y - 168, 12, 18);
+                context.fillStyle = random() < 0.5 ? '#d8c8a8' : '#a36a4a';
+                context.fillRect(jar_x + 4, y - 128, 10, 18);
+            }
+            break;
+        }
+        case 'bathtub': {
+            context.fillStyle = '#e9e6df';
+            context.beginPath();
+            if (context.roundRect) {
+                context.roundRect(x, y - 40, 130, 32, 10);
+            } else {
+                context.rect(x, y - 40, 130, 32);
+            }
+            context.fill();
+            context.fillStyle = '#c9c5bc';
+            context.fillRect(x, y - 40, 130, 5);
+            context.fillStyle = '#b9b3a8';
+            for (const foot_x of [x + 10, x + 114]) {
+                context.fillRect(foot_x, y - 9, 6, 9);
+            }
+            context.fillStyle = '#9aa6ad';
+            context.fillRect(x + 112, y - 62, 4, 24);
+            context.fillRect(x + 104, y - 62, 14, 4);
+            if (prop.full) {
+                context.fillStyle = 'rgba(170,205,225,0.65)';
+                context.fillRect(x + 6, y - 36, 118, 6);
+            }
+            break;
+        }
+        case 'dog_basket': {
+            // A round wicker basket with a cushion: the bed she was meant to sleep in.
+            context.fillStyle = '#9a7448';
+            context.beginPath();
+            context.ellipse(x, y - 8, 30, 10, 0, 0, Math.PI * 2);
+            context.fill();
+            context.fillStyle = '#b48c5c';
+            context.fillRect(x - 30, y - 16, 60, 9);
+            context.fillStyle = '#c9b9d9';
+            context.beginPath();
+            context.ellipse(x, y - 15, 24, 5, 0, 0, Math.PI * 2);
+            context.fill();
+            context.strokeStyle = 'rgba(60,40,20,0.4)';
+            context.lineWidth = 1;
+            for (let weave = -26; weave < 30; weave += 6) {
+                context.beginPath();
+                context.moveTo(x + weave, y - 16);
+                context.lineTo(x + weave + 3, y - 4);
+                context.stroke();
+            }
+            break;
+        }
+        case 'sofa': {
+            context.fillStyle = '#6f5a4f';
+            context.fillRect(x, y - 52, 160, 28);
+            context.fillStyle = '#806a5e';
+            context.fillRect(x, y - 30, 160, 22);
+            context.fillRect(x - 6, y - 40, 14, 34);
+            context.fillRect(x + 152, y - 40, 14, 34);
+            context.fillStyle = '#c99a5a';
+            context.fillRect(x + 20, y - 46, 30, 18);
+            context.fillStyle = '#3e322b';
+            context.fillRect(x + 4, y - 8, 5, 8);
+            context.fillRect(x + 151, y - 8, 5, 8);
+            break;
+        }
+        case 'double_bed': {
+            draw_double_bed(context, x, y, prop.blanket || '#5f7f9a');
+            if (prop.occupied) {
+                // Her, asleep under the blanket: head on the pillow, the blanket over her.
+                draw_her_asleep(context, x + 30, y - 46, time_seconds);
+                context.fillStyle = prop.blanket || '#5f7f9a';
+                context.beginPath();
+                context.ellipse(x + 92, y - 44, 44, 7 + Math.sin(time_seconds * 1.1) * 0.4, 0, Math.PI, 0);
+                context.fill();
+            }
+            break;
+        }
+        case 'tucked_blanket': {
+            // The blanket pulled up over Bodhi's back once she's tucked in; drawn in front of her.
+            context.fillStyle = prop.blanket || '#7a5a8a';
+            context.beginPath();
+            context.moveTo(x + 104, y - 22);
+            context.quadraticCurveTo(x + 100, y - 52, x + 130, y - 54);
+            context.quadraticCurveTo(x + 160, y - 54, x + 172, y - 40);
+            context.lineTo(x + 172, y - 20);
+            context.closePath();
+            context.fill();
+            context.fillStyle = 'rgba(255,255,255,0.12)';
+            context.beginPath();
+            context.moveTo(x + 104, y - 46);
+            context.quadraticCurveTo(x + 130, y - 56, x + 160, y - 50);
+            context.lineTo(x + 160, y - 47);
+            context.quadraticCurveTo(x + 130, y - 53, x + 104, y - 43);
+            context.closePath();
+            context.fill();
+            break;
+        }
+        case 'stairs': {
+            // A wooden staircase from the floor at y up to `top`, rising to the right.
+            const top = prop.top;
+            const width = prop.w || 200;
+            const steps = 10;
+            if (prop.down_right) {
+                // Mirror the drawing so the top of the stairs is on the left.
+                context.save();
+                context.translate(x * 2 + width, 0);
+                context.scale(-1, 1);
+            }
+            context.fillStyle = '#4e3e30';
+            context.beginPath();
+            context.moveTo(x, y);
+            context.lineTo(x + width, top);
+            context.lineTo(x + width, top + 14);
+            context.lineTo(x + 14, y);
+            context.closePath();
+            context.fill();
+            context.fillStyle = '#6a5440';
+            for (let step = 0; step < steps; step++) {
+                const step_x = x + (width / steps) * step;
+                const step_y = y - ((y - top) / steps) * (step + 1);
+                context.fillRect(step_x, step_y, width / steps + 2, 4);
+            }
+            context.strokeStyle = '#3a2e24';
+            context.lineWidth = 3;
+            context.beginPath();
+            context.moveTo(x + 10, y - 44);
+            context.lineTo(x + width, top - 44);
+            context.stroke();
+            if (prop.down_right) {
+                context.restore();
+            }
+            break;
+        }
+        case 'doorframe': {
+            // A wooden doorframe with pencil height marks; each mark is [height above floor, words].
+            context.fillStyle = '#7a5e44';
+            context.fillRect(x - 6, y - 150, 12, 150);
+            context.fillRect(x - 6, y - 156, 70, 8);
+            context.font = 'italic 7px "Newsreader", Georgia, serif';
+            context.fillStyle = 'rgba(40,30,20,0.85)';
+            context.strokeStyle = 'rgba(40,30,20,0.85)';
+            context.lineWidth = 1;
+            for (const mark of prop.marks || []) {
+                context.beginPath();
+                context.moveTo(x - 6, y - mark[0]);
+                context.lineTo(x + 6, y - mark[0]);
+                context.stroke();
+                context.fillText(personalize_if_available(mark[1]), x + 9, y - mark[0] + 2.5);
             }
             break;
         }
@@ -1820,6 +2052,34 @@ function draw_interactable(context, item, time_seconds, in_reach, available) {
                 context.fillRect(-6, -4, 12, 2);
                 context.restore();
             }
+            break;
+        }
+        case 'food_bag': {
+            // A bag of dog food, rolled shut.
+            if (!item.done) {
+                context.fillStyle = '#b5543a';
+                context.fillRect(x - 10, y - 26, 20, 26);
+                context.fillStyle = '#e8d7b0';
+                context.fillRect(x - 7, y - 18, 14, 9);
+                context.fillStyle = '#8f3f2b';
+                context.fillRect(x - 10, y - 29, 20, 4);
+            }
+            break;
+        }
+        case 'bowl': {
+            // Her bowl at home, by the counter.
+            context.fillStyle = '#7d8790';
+            context.beginPath();
+            context.moveTo(x - 9, y - 5);
+            context.lineTo(x + 9, y - 5);
+            context.lineTo(x + 6.5, y);
+            context.lineTo(x - 6.5, y);
+            context.closePath();
+            context.fill();
+            context.fillStyle = '#b9c3cb';
+            context.beginPath();
+            context.ellipse(x, y - 5, 9, 2, 0, 0, Math.PI * 2);
+            context.fill();
             break;
         }
         case 'crate_top': {
@@ -2256,6 +2516,167 @@ function draw_chair(context, x, floor_y, scale) {
     context.restore();
 }
 
+// Her, asleep: lying on her back with her head on the pillow at (x, y), eyes closed, her blonde
+// hair spread on the pillow, the blanket (drawn by the bed) up to her shoulders. Drawn facing up,
+// not her standing profile turned on its side, which looked wrong. Breathing lifts her a little.
+function draw_her_asleep(context, x, y, time_seconds) {
+    const breath = Math.sin(time_seconds * 1.1) * 0.35;
+    context.save();
+    context.translate(x, y + breath);
+    // Hair spread over the pillow, behind the head.
+    const hair = context.createLinearGradient(-12, -8, 12, 8);
+    hair.addColorStop(0, human_shades.hair_light);
+    hair.addColorStop(1, human_shades.hair_dark);
+    context.fillStyle = hair;
+    context.beginPath();
+    context.ellipse(-2, -1, 12, 8.5, -0.15, 0, Math.PI * 2);
+    context.fill();
+    context.beginPath();
+    context.moveTo(-10, 2);
+    context.quadraticCurveTo(-16, 6, -12, 10);
+    context.quadraticCurveTo(-8, 7, -6, 4);
+    context.fill();
+    // The face, seen from above and a little to the side.
+    context.fillStyle = human_shades.skin;
+    context.beginPath();
+    context.ellipse(1.5, 0.5, 6.4, 7.4, -0.15, 0, Math.PI * 2);
+    context.fill();
+    context.fillStyle = human_shades.hair_light;  // Her fringe.
+    context.beginPath();
+    context.ellipse(-2.5, -4.5, 5.5, 3, -0.3, 0, Math.PI * 2);
+    context.fill();
+    context.strokeStyle = '#6b4a36';  // Closed eyes.
+    context.lineWidth = 0.7;
+    context.lineCap = 'round';
+    for (const eye_x of [0, 4.2]) {
+        context.beginPath();
+        context.arc(eye_x, 0.3, 1.4, 0.2, Math.PI - 0.2);
+        context.stroke();
+    }
+    context.fillStyle = 'rgba(220,120,110,0.28)';
+    context.beginPath();
+    context.arc(5.5, 3, 1.6, 0, Math.PI * 2);
+    context.fill();
+    context.strokeStyle = '#b07a66';  // A small, content mouth.
+    context.lineWidth = 0.6;
+    context.beginPath();
+    context.arc(2.6, 4.6, 1.2, 0.3, Math.PI - 0.3);
+    context.stroke();
+    context.restore();
+}
+
+// A small bedside table with a lamp, its shade glowing.
+function draw_bedside_lamp(context, x, floor_y) {
+    context.fillStyle = '#4a3527';
+    context.fillRect(x - 16, floor_y - 30, 32, 30);
+    context.fillStyle = '#5c4433';
+    context.fillRect(x - 18, floor_y - 33, 36, 4);
+    context.fillStyle = '#3a2a20';
+    context.fillRect(x - 1.5, floor_y - 50, 3, 18);
+    context.fillStyle = '#f2d9a6';
+    context.beginPath();
+    context.moveTo(x - 9, floor_y - 50);
+    context.lineTo(x + 9, floor_y - 50);
+    context.lineTo(x + 6, floor_y - 64);
+    context.lineTo(x - 6, floor_y - 64);
+    context.closePath();
+    context.fill();
+}
+
+// Their double bed: headboard on the left, two pillows, a blanket. Used in the house and in the
+// quiet scenes of the first night and the last.
+function draw_double_bed(context, x, y, blanket_color) {
+    context.fillStyle = '#5a4434';
+    context.fillRect(x, y - 78, 10, 78);
+    context.fillRect(x + 166, y - 44, 8, 44);
+    context.fillStyle = '#e6dfd2';
+    context.fillRect(x + 8, y - 40, 162, 16);
+    context.fillStyle = '#f3eee4';
+    context.beginPath();
+    context.ellipse(x + 30, y - 44, 18, 7, 0, 0, Math.PI * 2);
+    context.fill();
+    context.beginPath();
+    context.ellipse(x + 30, y - 52, 16, 6, 0, 0, Math.PI * 2);
+    context.fill();
+    context.fillStyle = blanket_color;
+    context.beginPath();
+    context.moveTo(x + 50, y - 42);
+    context.quadraticCurveTo(x + 110, y - 48, x + 172, y - 40);
+    context.lineTo(x + 172, y - 18);
+    context.lineTo(x + 50, y - 22);
+    context.closePath();
+    context.fill();
+    context.fillStyle = 'rgba(255,255,255,0.12)';
+    context.fillRect(x + 50, y - 42, 122, 3);
+    context.fillStyle = '#3e3026';
+    context.fillRect(x + 6, y - 24, 164, 6);
+}
+
+// The house from outside, standing: whole on the day she brought the puppy home, or weathered
+// after the flood (`weathered`): tiles missing under a tarp, a board on one window, ivy starting,
+// but still a house. The green door, the step, warm windows.
+function draw_home_outside(context, x, y, weathered) {
+    const wall = context.createLinearGradient(x, 0, x + 300, 0);
+    wall.addColorStop(0, weathered ? '#857a69' : '#b9a88e');
+    wall.addColorStop(1, weathered ? '#665c4d' : '#958670');
+    context.fillStyle = wall;
+    context.fillRect(x, y - 190, 300, 190);
+    context.fillStyle = weathered ? '#5a4a3e' : '#7a4a3a';
+    context.beginPath();
+    context.moveTo(x - 16, y - 188);
+    context.lineTo(x + 150, y - 262);
+    context.lineTo(x + 316, y - 188);
+    context.closePath();
+    context.fill();
+    if (weathered) {
+        context.fillStyle = '#3f6a7a';  // A blue tarp over the missing tiles.
+        context.beginPath();
+        context.moveTo(x + 170, y - 252);
+        context.lineTo(x + 250, y - 216);
+        context.lineTo(x + 236, y - 200);
+        context.lineTo(x + 160, y - 236);
+        context.closePath();
+        context.fill();
+    }
+    context.fillStyle = 'rgba(0,0,0,0.18)';
+    context.fillRect(x, y - 190, 300, 6);
+    context.fillStyle = '#2f6a42';  // The green door.
+    context.fillRect(x + 120, y - 120, 56, 120);
+    context.fillStyle = 'rgba(0,0,0,0.22)';
+    context.fillRect(x + 124, y - 116, 22, 50);
+    context.fillRect(x + 150, y - 116, 22, 50);
+    context.fillStyle = '#e2bf68';
+    context.beginPath();
+    context.arc(x + 166, y - 60, 3, 0, Math.PI * 2);
+    context.fill();
+    context.fillStyle = '#8b8170';
+    context.fillRect(x + 110, y - 8, 76, 8);  // The step.
+    context.fillStyle = 'rgba(255,214,150,0.75)';
+    context.fillRect(x + 30, y - 150, 50, 50);
+    if (weathered) {
+        context.fillStyle = '#6b5a44';  // One window boarded up.
+        context.fillRect(x + 216, y - 154, 58, 58);
+        context.fillStyle = '#7d6a52';
+        context.fillRect(x + 214, y - 136, 62, 8);
+        context.fillRect(x + 214, y - 116, 62, 8);
+    } else {
+        context.fillRect(x + 220, y - 150, 50, 50);
+    }
+    context.strokeStyle = 'rgba(60,50,40,0.6)';
+    context.lineWidth = 3;
+    context.strokeRect(x + 30, y - 150, 50, 50);
+    context.strokeRect(x + 220, y - 150, 50, 50);
+    if (weathered) {
+        const random = make_seeded_random(9);
+        for (let leaf = 0; leaf < 50; leaf++) {
+            context.fillStyle = random() < 0.5 ? '#4c6e3f' : '#5e8049';
+            context.beginPath();
+            context.ellipse(x + random() * 90, y - Math.pow(random(), 1.4) * 150, 3 + random() * 3, 2 + random() * 2, random() * 3, 0, Math.PI * 2);
+            context.fill();
+        }
+    }
+}
+
 // ---------- The quiet scenes between chapters ----------
 
 // Draws one of the still, slowly moving scenes shown after a chapter ends. The characters
@@ -2296,6 +2717,7 @@ function draw_vignette_scene(context, scene_name, time_seconds, width, height, d
     const palettes = {
         road_dawn: ['#3d3c55', '#e0a675'], hill_sunrise: ['#4b5a86', '#f2bf86'], river_dawn: ['#2f3d4f', '#b8b0a6'],
         ward_stars: ['#121a2c', '#0a0d16'], gym_night: ['#1d1a16', '#0c0b09'], cabin_fire: ['#1b1411', '#0c0807'],
+        first_night: ['#151b2c', '#0a0d16'], rescue_boat: ['#0b1019', '#05070b'], bedtime: ['#2b1e17', '#120c09'],
     };
     const colors = palettes[scene_name] || palettes.cabin_fire;
     background.addColorStop(0, colors[0]);
@@ -2339,6 +2761,126 @@ function draw_vignette_scene(context, scene_name, time_seconds, width, height, d
         draw_figure('human', 'sit', center_x - 120, floor_y, 1, { eyes_closed: true });
         draw_figure('dog', 'sleep', center_x - 10, floor_y + 4, -1, {});
         add_warm_glow(context, center_x + 210, floor_y - 50, 520, 0.42 + Math.sin(time_seconds * 9) * 0.03);
+    } else if (scene_name === 'first_night' || scene_name === 'bedtime') {
+        // Their bedroom. The first night: moonlight, the puppy curled on her feet, the basket
+        // empty. The last: lamplight, the grown dog tucked in beside her, both asleep.
+        const last = scene_name === 'bedtime';
+        context.fillStyle = last ? '#3a2a20' : '#1b2233';
+        context.fillRect(0, 0, scene_width, floor_y);
+        draw_prop(context, { kind: 'window', x: center_x + 170, y: 110, w: 110, h: 130, lit: false }, {}, time_seconds);
+        if (!last) {
+            context.save();
+            context.globalCompositeOperation = 'lighter';
+            const moon = context.createLinearGradient(center_x + 220, 120, center_x - 60, floor_y);
+            moon.addColorStop(0, 'rgba(160,185,230,0.24)');
+            moon.addColorStop(1, 'rgba(160,185,230,0)');
+            context.fillStyle = moon;
+            context.beginPath();
+            context.moveTo(center_x + 170, 110);
+            context.lineTo(center_x + 280, 240);
+            context.lineTo(center_x + 60, floor_y + 60);
+            context.lineTo(center_x - 200, floor_y + 60);
+            context.closePath();
+            context.fill();
+            context.restore();
+        }
+        context.fillStyle = last ? '#4a3527' : '#20283a';
+        context.fillRect(0, floor_y, scene_width, 140);
+        const bed_x = center_x - 230;
+        context.save();
+        context.translate(bed_x, floor_y);
+        context.scale(2.3, 2.3);
+        draw_double_bed(context, 0, 0, last ? '#7a5a8a' : '#4d6a86');
+        draw_her_asleep(context, 30, -46, time_seconds);
+        context.restore();
+        if (last) {
+            // Bodhi beside her, head on the pillow end, the blanket tucked over her back.
+            draw_figure('dog', 'sleep', bed_x + 210, floor_y - 40 * 2.3 + 6, -1, {});
+            context.save();
+            context.translate(bed_x, floor_y);
+            context.scale(2.3, 2.3);
+            context.fillStyle = '#7a5a8a';
+            context.beginPath();
+            context.moveTo(96, -42);
+            context.quadraticCurveTo(128, -60 + Math.sin(time_seconds * 1.2) * 0.6, 172, -42);
+            context.lineTo(172, -22);
+            context.lineTo(96, -24);
+            context.closePath();
+            context.fill();
+            context.fillStyle = 'rgba(255,255,255,0.12)';
+            context.fillRect(100, -46, 70, 2);
+            context.restore();
+            context.save();
+            context.translate(center_x - 300, floor_y);
+            context.scale(2.3, 2.3);
+            draw_bedside_lamp(context, 0, 0);
+            context.restore();
+            add_warm_glow(context, center_x - 300, floor_y - 130, 460, 0.42);
+        } else {
+            draw_figure('dog', 'sleep', bed_x + 330, floor_y - 40 * 2.3 + 4, -1, {});
+            context.save();
+            context.translate(center_x + 60, floor_y);
+            context.scale(2.3, 2.3);
+            draw_prop(context, { kind: 'dog_basket', x: 0, y: 0 }, {}, time_seconds);
+            context.restore();
+        }
+    } else if (scene_name === 'rescue_boat') {
+        // Night, rain, the street a river. A rescue boat's searchlight; the two of them aboard.
+        context.fillStyle = '#121822';
+        for (let roof = 0; roof < 6; roof++) {
+            const roof_x = roof * scene_width / 5 - 60;
+            context.fillRect(roof_x, floor_y - 160 - (roof % 3) * 30, 130, 200);
+        }
+        const flood = context.createLinearGradient(0, floor_y - 40, 0, 540);
+        flood.addColorStop(0, '#2b3a48');
+        flood.addColorStop(1, '#0d131a');
+        context.fillStyle = flood;
+        context.fillRect(0, floor_y - 40, scene_width, 200);
+        context.save();
+        context.globalCompositeOperation = 'lighter';
+        const beam = context.createLinearGradient(center_x + 120, floor_y - 80, center_x + 520, floor_y - 260);
+        beam.addColorStop(0, 'rgba(255,240,200,0.35)');
+        beam.addColorStop(1, 'rgba(255,240,200,0)');
+        context.fillStyle = beam;
+        context.beginPath();
+        context.moveTo(center_x + 120, floor_y - 84);
+        context.lineTo(center_x + 600, floor_y - 330);
+        context.lineTo(center_x + 600, floor_y - 170);
+        context.closePath();
+        context.fill();
+        context.restore();
+        const bob = Math.sin(time_seconds * 1.4) * 3;
+        context.save();
+        context.translate(0, bob);
+        draw_figure('human', 'sit', center_x - 40, floor_y - 24, 1, { eyes_closed: false });
+        draw_figure('dog', 'lean', center_x + 40, floor_y - 24, -1, {});
+        context.fillStyle = '#c45a2a';
+        context.beginPath();
+        context.moveTo(center_x - 200, floor_y - 40);
+        context.lineTo(center_x + 170, floor_y - 40);
+        context.lineTo(center_x + 130, floor_y + 6);
+        context.lineTo(center_x - 170, floor_y + 6);
+        context.closePath();
+        context.fill();
+        context.fillStyle = '#e3e0d8';
+        context.fillRect(center_x - 200, floor_y - 44, 370, 6);
+        context.fillStyle = '#2a2f36';
+        context.fillRect(center_x + 110, floor_y - 92, 8, 52);
+        context.fillStyle = '#f6efd8';
+        context.beginPath();
+        context.arc(center_x + 120, floor_y - 88, 7, 0, Math.PI * 2);
+        context.fill();
+        context.restore();
+        context.strokeStyle = 'rgba(180,200,220,0.25)';
+        context.lineWidth = 1;
+        for (let drop = 0; drop < 90; drop++) {
+            const drop_x = (drop * 97 + time_seconds * 260) % scene_width;
+            const drop_y = (drop * 53 + time_seconds * 520) % 540;
+            context.beginPath();
+            context.moveTo(drop_x, drop_y);
+            context.lineTo(drop_x - 4, drop_y + 14);
+            context.stroke();
+        }
     } else if (scene_name === 'ward_stars') {
         const random = make_seeded_random(3);
         for (let index = 0; index < 46; index++) {

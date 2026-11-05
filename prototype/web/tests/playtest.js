@@ -26,6 +26,19 @@ const slowest_allowed_frame_ms = 16;  // Average work per frame must leave room 
 //   ['wait_prompt', 'text']   wait until the on-screen prompt contains this text
 //   ['shot', 'name']   save a screenshot
 const playthroughs = [
+    [['wait', 1.5], ['shot', 'coming_home_film'], ['wait_for', 'arrival_done'], ['shot', 'coming_home_garden'],
+        ['wait_prompt', 'Towel'], ['act'], ['wait_for', 'ball_fetched'],
+        ['call'], ['walk', 848], ['wait_prompt', 'front door'], ['act'], ['wait_for', 'front_door_opened'],
+        ['walk', 1560], ['wait_prompt', 'Mark'], ['act'], ['walk', 1900], ['wait_prompt', 'bag'], ['act'],
+        ['walk', 2120], ['wait_prompt', 'bowl'], ['act'], ['wait_for', 'first_meal'], ['shot', 'coming_home_meal'],
+        ['walk', 2620], ['wait_prompt', 'bath'], ['act'], ['walk', 3160], ['wait_prompt', 'photograph'], ['act'],
+        ['walk', 3450], ['wait_prompt', 'basket'], ['act'], ['walk', 3870], ['wait_prompt', 'Go to bed'], ['act'],
+        ['wait_for', 'puppy_cried'], ['walk', 3990], ['wait_for', 'on_the_bed'], ['shot', 'coming_home_bed']],
+    [['wait', 1.5], ['shot', 'storm_film'], ['wait_for', 'storm_done'], ['shot', 'storm_separated'],
+        ['walk', 250], ['wait_prompt', 'sheets'], ['act'], ['wait_for', 'sheets_taken'], ['call'], ['wait_for', 'dog_climbing'],
+        ['walk', 1640], ['wait_for', 'pair_met_at_landing'], ['shot', 'storm_shelf'], ['walk', 1385], ['wait_prompt', 'Lower'], ['act'], ['wait_for', 'sheets_lowered'],
+        ['switch'], ['wait_prompt', 'Grab'], ['act'], ['wait_for', 'sheet_grabbed'], ['wait', 1.5],
+        ['wait_prompt', 'Kneel'], ['low'], ['wait_prompt', 'Hold'], ['act'], ['wait_for', 'reunion_complete'], ['walk', 90], ['wait_for', 'reached_window']],
     [['shot', 'prologue_start'], ['walk', 760], ['act'], ['act'], ['wait', 4], ['walk', 330], ['act'], ['wait_for', 'photo_taken'],
         ['walk', 150], ['act'], ['shot', 'prologue_flat'], ['walk', 2500], ['wait_for', 'set_out'], ['shot', 'prologue_street']],
     [['shot', 'station_start'], ['walk', 1200], ['wait_for', 'walkway_collapsed'], ['wait', 0.6], ['shot', 'station_collapse'],
@@ -50,8 +63,9 @@ const playthroughs = [
         ['walk', 3050], ['wait_for', 'pair_met_at_fence'], ['walk', 3016], ['act'], ['wait_for', 'fence_touched'], ['walk', 3150], ['act'],
         ['shot', 'river_fence'], ['walk', 3320], ['act'], ['switch'], ['walk', 2945], ['act'], ['wait_for', 'post_dug'], ['wait', 1.5],
         ['wait_prompt', 'Kneel'], ['low'], ['wait_prompt', 'Hold'], ['act'], ['wait', 2.5], ['shot', 'river_reunion'], ['wait_for', 'reunion_complete']],
-    [['shot', 'home_start'], ['walk', 1460], ['wait_for', 'saw_house'], ['walk', 2030], ['act'], ['walk', 2148], ['act'], ['wait', 2], ['shot', 'home_step'],
-        ['wait_for', 'dog_waits'], ['walk', 3300], ['wait_for', 'followed'], ['shot', 'home_end']],
+    [['shot', 'home_start'], ['walk', 1460], ['wait_for', 'saw_house'], ['walk', 2048], ['wait_prompt', 'green door'], ['act'], ['wait_for', 'home_door_opened'],
+        ['walk', 2900], ['wait_prompt', 'Mark'], ['act'], ['walk', 3300], ['wait_prompt', 'bowl'], ['act'], ['walk', 3600], ['wait_prompt', 'dry'], ['act'],
+        ['walk', 3870], ['wait_prompt', 'Tuck'], ['act'], ['wait_for', 'tucked_in'], ['shot', 'home_tucked_in'], ['wait_for', 'lay_down']],
 ];
 
 // Waits until the game's state passes a check, or gives up after a time limit.
@@ -68,10 +82,18 @@ async function wait_until(page, check, limit_seconds, description) {
     throw new Error('Timed out waiting for ' + description + '. State: ' + JSON.stringify(state));
 }
 
+// Chapters that set how Bodhi starts (care_start) are played with those needs, since their
+// story is about looking after her. Every other chapter starts with her fed and clean, so a
+// "Feed" or "Towel" prompt never takes the place of a step the robot is about to press.
+const chapters_with_their_own_care = new Set([0, 7]);
+
 // Plays one chapter's steps. Returns the frame timings measured during it.
 async function play_chapter(page, chapter_index, steps) {
     await page.evaluate((index) => window.until_we_find_home_debug.start_level(index), chapter_index);
     await page.evaluate(() => window.until_we_find_home_debug.skip_card());
+    if (!chapters_with_their_own_care.has(chapter_index)) {
+        await page.evaluate(() => window.until_we_find_home_debug.set_care({ hunger: 0, dirt: 0 }));
+    }
     await page.waitForTimeout(400);
     await page.evaluate(() => window.until_we_find_home_debug.frame_costs());
     for (const step of steps) {

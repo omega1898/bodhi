@@ -13,6 +13,7 @@ const care_rates = {
 };
 const hungry_from = 0.7;         // From here she slows a little, whines and noses the bag.
 const feed_from = 0.25;          // She'll eat once she's at least this hungry.
+const offer_food_from = 0.45;    // "Feed" is offered from here, so it doesn't nag after every snack.
 const dirty_from = 0.55;         // From here her paws and legs show the mud.
 const clean_from = 0.2;          // Towelling her only does something above this.
 const largest_food_carried = 9;  // Meals the bag holds.
@@ -82,7 +83,7 @@ function update_care(delta_seconds) {
         world.hungry_whine_timer = hungry_whine_seconds;
         play_sound('whine', distance_factor(dog), screen_pan(dog));
         if (!world.happened.has('dog_hungry')) {
-            queue_lines([care.food > 0 ? '{dog} keeps nosing at the bag. Hungry.' : "{dog} is hungry, and the bag is empty. That nose could find something."], 'her');
+            queue_lines([care.food > 0 ? '{dog} keeps nosing at the bag. Hungry.' : '{dog} is hungry, and the bag is empty. There must be food somewhere.'], 'her');
         }
         fire_event('dog_hungry');
     }
@@ -124,10 +125,10 @@ function find_care_prompt(character, dog, together) {
     if (!together || character.kind !== 'human' || game.world.reunion || game.world.cutscene) {
         return null;
     }
-    if (care.hunger >= feed_from && care.food > 0) {
+    if (care.hunger >= offer_food_from && care.food > 0) {
         return { x: center_x(dog), y: dog.y - 26, text: personalize('Feed {dog}'), control: 'act', action: 'feed' };
     }
-    if (care.dirt >= clean_from) {
+    if (care.dirt >= dirty_from) {  // Offered once the mud shows.
         return { x: center_x(dog), y: dog.y - 26, text: personalize('Towel {dog} clean'), control: 'act', action: 'clean' };
     }
     return null;

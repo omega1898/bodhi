@@ -92,6 +92,8 @@ const page = {
     pause_status: document.getElementById('pause_status'),
     pause_care: document.getElementById('pause_care'),
     pause_saved: document.getElementById('pause_saved'),
+    caption: document.getElementById('caption'),
+    skip_button: document.getElementById('skip_button'),
 };
 
 // ---------- Small helpers ----------
@@ -271,7 +273,9 @@ function build_world(level) {
         objective: '',
         scheduled: [],
         bond: Object.assign({ fear: 0.05, closeness: 0.3 }, level.bond || {}),
-        care: checked_care(game.care),  // A copy: restarting the chapter starts from the same needs.
+        // A copy: restarting the chapter starts from the same needs. A chapter can set how she
+        // starts it (`care_start`), for example the first, before there's food in the bag.
+        care: checked_care(Object.assign({}, game.care, level.care_start || {})),
         revealed: new Set(),
         reunion: null,
         ball: level.ball ? { x: level.ball[0], y: level.ball[1], velocity_x: 0, velocity_y: 0, held_by: null } : null,
@@ -294,8 +298,11 @@ function build_world(level) {
 
 // Starts a chapter: builds its world, paints its backdrop, and shows its title card.
 function start_level(level_index) {
+    document.body.classList.remove('cutscene');
+    show_caption('');
     game.level_index = level_index;
     game.level = levels[level_index];
+    use_dog_drawings(growth_stage_of(game.level).drawing);  // Paint this chapter's dog drawings; free the others.
     game.world = build_world(game.level);
     load_scenery_art(game.level);
     game.backdrop_layers = render_backdrop(game.level, game.pixel_scale, view_width, view_height);
@@ -510,9 +517,99 @@ function apply_effects(rule) {
     if (rule.reunion) {
         start_reunion();
     }
+    // Film scenes: the controls step aside while the story plays itself (see start_cutscene).
+    if (rule.cutscene !== undefined) {
+        if (rule.cutscene) {
+            start_cutscene(rule.cutscene);
+        } else {
+            end_cutscene();
+        }
+    }
+    if (rule.walk) {
+        if (rule.walk.human !== undefined) {
+            world.autopilot = { target_x: rule.walk.human };
+        }
+        if (rule.walk.dog !== undefined) {
+            world.dog_run_target = rule.walk.dog;
+        }
+    }
+    // Someone out of sight: for example she has got into bed, and the bed now shows her asleep.
+    for (const kind of Object.keys(rule.hide || {})) {
+        world.characters[kind].hidden = Boolean(rule.hide[kind]);
+    }
+    for (const kind of Object.keys(rule.face || {})) {
+        world.characters[kind].facing = rule.face[kind] < 0 ? -1 : 1;
+    }
+    if (rule.camera !== undefined) {
+        world.camera_hold = rule.camera;
+    }
+    // Night falling (or lamps going out): how dark the chapter is from now on, 0 to 1.
+    if (rule.darkness !== undefined) {
+        world.darkness = clamp_between(Number(rule.darkness) || 0, 0, 0.95);
+    }
+    // A soft cut, for example stepping through a door into another room.
+    if (rule.fade_in && !quiet) {
+        game.fade = 1;
+        game.fade_target = 0;
+    }
+    // A story moment that changes how Bodhi is (a roll in the flowerbed, a bag packed with food).
+    if (rule.care) {
+        world.care = checked_care(Object.assign({}, world.care, rule.care));
+    }
+    if (rule.caption !== undefined && !quiet) {
+        show_caption(rule.caption);
+    }
     if (rule.complete && !quiet) {
         finish_level();
     }
+}
+
+// ---------- Film scenes ----------
+
+// Starts a scripted scene: letterbox bars, no controls, a Skip button. The scene itself is a
+// chain of ordinary story rules on timers (walk here, say this, show that caption). `options`
+// may name `skip_to`: the event Skip fires, whose rule must leave everything as the end of the
+// scene would (where people stand, the scene ended).
+function start_cutscene(options) {
+    game.world.cutscene = { skip_to: options && typeof options === 'object' ? options.skip_to || null : null };
+    game.world.prompt = null;
+    document.body.classList.add('cutscene');
+}
+
+// Ends the scripted scene and gives the controls back.
+function end_cutscene() {
+    game.world.cutscene = null;
+    game.world.camera_hold = null;
+    document.body.classList.remove('cutscene');
+    show_caption('');
+}
+
+// Skip: drops the rest of the scene (its timers, its walks, its lines) and jumps to its end.
+function skip_cutscene() {
+    const world = game.world;
+    if (!world || !world.cutscene) {
+        return;
+    }
+    const skip_to = world.cutscene.skip_to;
+    world.scheduled = [];
+    world.subtitle_queue = [];
+    world.subtitle_seconds = 0;
+    page.subtitle.classList.remove('shown');
+    world.autopilot = null;
+    world.dog_run_target = null;
+    fire_event('cutscene_skipped');
+    if (skip_to) {
+        fire_event(skip_to);
+    }
+    if (world.cutscene) {
+        end_cutscene();  // In case the end of the scene forgot to.
+    }
+}
+
+// Shows a large caption in the middle of the screen ("Spring."), or hides it with ''.
+function show_caption(text) {
+    page.caption.textContent = text ? personalize(text) : '';
+    page.caption.classList.toggle('shown', Boolean(text));
 }
 
 // Opens or closes a gate, collapses a walkway, or adds a plank.
@@ -902,7 +999,7 @@ function update_companion(companion, leader, delta_seconds) {
             companion.pose_override = { pose: 'sit', seconds: 2 };
             companion.facing = Math.sign(center_x(leader) - center_x(companion)) || companion.facing;
         }
-    } else if (companion.kind === 'dog' && ball && world.fetch_enabled && ball.held_by !== 'human') {
+    } else if (companion.kind === 'dog' && ball && world.fetch_enabled && ball.held_by !== 'human' && !ball.waiting_for_throw) {
         if (ball.held_by === 'dog') {
             target_x = center_x(leader);
             stop_distance = 34;
@@ -1013,6 +1110,9 @@ function drop_ball_for(human, dog) {
     ball.y = human.y + human.height - 6;
     ball.velocity_x = 0;
     ball.velocity_y = 0;
+    // Having brought it back, she waits for it to be thrown again. Without this a small dog,
+    // standing close enough to the dropped ball, picked it straight back up, forever.
+    ball.waiting_for_throw = true;
     dog.carrying = null;
     dog.pose_override = { pose: 'sit', seconds: 1.6 };
     dog.wag = 1;
@@ -1186,8 +1286,9 @@ function interactable_available(item, character) {
     if (item.hidden && !world.revealed.has(reveal_name(item))) {
         return false;
     }
-    // Some things need the dog right there: a bath, a bowl, her bed.
-    if (item.needs_dog && !dog_is_near(item.x, 120)) {
+    // Some things need the dog right there: a bath, a bowl, her bed. "Right there" is wider than
+    // the gap she follows at (up to about 120 when she settles), so a following dog always counts.
+    if (item.needs_dog && !dog_is_near(item.x, 150)) {
         return false;
     }
     if ((item.requires || []).some(function missing(name) { return !world.happened.has(name); })) {
@@ -1243,15 +1344,15 @@ function find_current_prompt() {
     if (nearest) {
         return { x: nearest.x, y: nearest.y - 84, text: personalize(nearest.label), control: 'act', item: nearest };
     }
-    // Looking after her comes before the ball and petting: feeding when she's hungry,
-    // towelling when she's muddy.
+    if (character.kind === 'human' && ball && !ball.held_by && Math.abs(ball.x - center_x(character)) < 40 && Math.abs(ball.y - (character.y + character.height)) < 40) {
+        return { x: ball.x, y: ball.y - 40, text: 'Pick up the ball', control: 'act', action: 'pick_up' };
+    }
+    // Looking after her comes before petting: feeding when she's hungry, towelling when the mud
+    // shows. (After the ball, so it never interrupts a game of fetch.)
     const together = Math.abs(center_x(other) - center_x(character)) < 70 && Math.abs((other.y + other.height) - (character.y + character.height)) < 30;
     const care_prompt = find_care_prompt(character, world.characters.dog, together);
     if (care_prompt) {
         return care_prompt;
-    }
-    if (character.kind === 'human' && ball && !ball.held_by && Math.abs(ball.x - center_x(character)) < 40 && Math.abs(ball.y - (character.y + character.height)) < 40) {
-        return { x: ball.x, y: ball.y - 40, text: 'Pick up the ball', control: 'act', action: 'pick_up' };
     }
     if (together && character.kind === 'human') {
         return { x: center_x(other), y: other.y - 26, text: personalize('Pet {dog}'), control: 'act', action: 'pet' };
@@ -1280,6 +1381,7 @@ function use_action() {
     if (prompt.action === 'throw') {
         const ball = world.ball;
         ball.held_by = null;
+        ball.waiting_for_throw = false;
         ball.velocity_x = character.facing * 520;
         ball.velocity_y = -380;
         world.characters.dog.ear_lift = 1;
@@ -1433,15 +1535,16 @@ function update_world(delta_seconds) {
     const companion = companion_character();
     const embracing = world.reunion && world.reunion.stage === 'embrace';
 
-    // Player input.
+    // Player input. During a film scene the controls do nothing; scripted walks still move her.
+    const filming = Boolean(world.cutscene);
     if (!embracing) {
-        let direction = (input.right ? 1 : 0) - (input.left ? 1 : 0);
+        let direction = filming ? 0 : (input.right ? 1 : 0) - (input.left ? 1 : 0);
         // Jump buffering: a jump pressed just before landing still happens on landing.
         if (input.jump_pressed) {
             world.jump_buffer_seconds = 0.13;
         }
         world.jump_buffer_seconds = Math.max(0, (world.jump_buffer_seconds || 0) - delta_seconds);
-        let wants_jump = world.jump_buffer_seconds > 0;
+        let wants_jump = !filming && world.jump_buffer_seconds > 0;
         if (world.autopilot) {
             const distance = world.autopilot.target_x - center_x(player);
             direction = Math.abs(distance) > 10 ? Math.sign(distance) : 0;
@@ -1477,18 +1580,18 @@ function update_world(delta_seconds) {
         if (player.velocity_y >= 0) {
             player.jump_cut_allowed = false;
         }
-        if (input.call_pressed) {
+        if (input.call_pressed && !filming) {
             call_out(player);
         }
-        if (input.low_pressed) {
+        if (input.low_pressed && !filming) {
             low_action();
         }
-        if (input.switch_pressed && world.switching_allowed) {
+        if (input.switch_pressed && world.switching_allowed && !filming) {
             take_control(companion.kind);
             play_sound('pickup', 0.4, 0);
         }
-        world.prompt = find_current_prompt();
-        if (input.act_pressed) {
+        world.prompt = filming ? null : find_current_prompt();
+        if (input.act_pressed && !filming) {
             use_action();
         }
         update_companion(world.characters[world.controlled === 'human' ? 'dog' : 'human'], controlled_character(), delta_seconds);
@@ -1684,6 +1787,13 @@ function update_camera(delta_seconds) {
         focus_y = player.y + player.height * 0.55;
         target_zoom = camera.close_zoom * 1.3;
     }
+    // A film scene can hold the camera on a spot, closer or wider than usual.
+    const hold = world.camera_hold;
+    if (hold && Number.isFinite(hold.x)) {
+        focus_x = hold.x;
+        focus_y = Number.isFinite(hold.y) ? hold.y : focus_y;
+        target_zoom = clamp_between(camera.close_zoom * (Number(hold.zoom) || 1), camera.wide_zoom * 0.6, camera.close_zoom * 2);
+    }
     // Zoom glides rather than snaps.
     camera.zoom = smooth_follow(camera.zoom, target_zoom, camera, 'zoom_velocity', 0.7, delta_seconds);
     const visible_width = view_width / camera.zoom;
@@ -1823,7 +1933,7 @@ function render(delta_seconds) {
     const right_edge = camera_left + visible_width + 260;
 
     for (const prop of level.props) {
-        if (!prop.front && prop.x < right_edge && prop.x + (prop.w || 450) > left_edge) {
+        if (!prop.front && prop_showing(prop) && prop.x < right_edge && prop.x + (prop.w || 450) > left_edge) {
             draw_prop(context, prop, scenery, time_seconds);
         }
     }
@@ -1844,6 +1954,9 @@ function render(delta_seconds) {
         draw_ball(context, world.ball);
     }
     for (const character of [companion, player]) {
+        if (character.hidden) {
+            continue;
+        }
         // Blend between physics steps for drawing only, then put the true position back.
         const true_x = character.x;
         const true_y = character.y;
@@ -1873,7 +1986,7 @@ function render(delta_seconds) {
     draw_light_shafts(context, level.props, time_seconds, left_edge, right_edge);
     draw_light_effects(context, level.props, time_seconds, (scenery.rain || 0) > 0.3 || scenery.wet, left_edge, right_edge);
     for (const prop of level.props) {
-        if (prop.front && prop.x < right_edge && prop.x + (prop.w || 450) > left_edge) {
+        if (prop.front && prop_showing(prop) && prop.x < right_edge && prop.x + (prop.w || 450) > left_edge) {
             draw_prop(context, prop, scenery, time_seconds);
         }
     }
@@ -1882,14 +1995,23 @@ function render(delta_seconds) {
     context.restore();
 
     const vignette_strength = world.reunion && world.reunion.stage === 'embrace' ? 0.8 : 0.55;
-    draw_lighting(context, light_canvas, collect_lights(), world.lightning_seconds > 0 ? 0 : scenery.darkness, scenery.darkness_color || 'rgb(6,9,16)', view_width, vignette_strength);
+    const darkness = world.darkness !== undefined ? world.darkness : scenery.darkness;
+    draw_lighting(context, light_canvas, collect_lights(), world.lightning_seconds > 0 ? 0 : darkness, scenery.darkness_color || 'rgb(6,9,16)', view_width, vignette_strength);
     if (scenery.mist) {
         draw_mist(context, view_width, camera_left, time_seconds, scenery.mist);
     }
     if (scenery.rain) {
         update_and_draw_rain(context, game.near_rain_drops, view_width, scenery.rain, scenery.wind_slant || -0.25, delta_seconds, is_sheltered_on_screen, true);
     }
-    draw_foreground(context, scenery.foreground, view_width, camera_left * camera.zoom, time_seconds, scenery.foreground_color, world_to_screen(center_x(player), 0)[0]);
+    // The outdoor foreground (grass, reeds) fades away indoors, under a roof.
+    const indoors = game.shelters.some(function covers(shelter) { return draw_center_x >= shelter.x && draw_center_x <= shelter.x + shelter.w && shelter.y + shelter.h >= game.level.height - 120; });
+    game.foreground_alpha = move_toward(game.foreground_alpha === undefined ? 1 : game.foreground_alpha, indoors ? 0 : 1, delta_seconds * 2);
+    if (game.foreground_alpha > 0.01) {
+        context.save();
+        context.globalAlpha = game.foreground_alpha;
+        draw_foreground(context, scenery.foreground, view_width, camera_left * camera.zoom, time_seconds, scenery.foreground_color, world_to_screen(center_x(player), 0)[0]);
+        context.restore();
+    }
     // The prompt is drawn last, above the darkness, so it's always readable.
     context.save();
     context.translate(view_width / 2, view_height / 2);
@@ -1906,6 +2028,15 @@ function render(delta_seconds) {
         context.fillStyle = 'rgba(13,17,24,' + game.fade.toFixed(3) + ')';
         context.fillRect(0, 0, view_width, view_height);
     }
+}
+
+// True when a prop should be drawn now. A prop can appear `after` a story event (a new pencil
+// mark on the doorframe) or disappear once one has happened (`until`: the stairs, once they fall;
+// a list means any of those events).
+function prop_showing(prop) {
+    const happened = game.world.happened;
+    const gone = [].concat(prop.until || []).some(function has_happened(name) { return happened.has(name); });
+    return (!prop.after || happened.has(prop.after)) && !gone;
 }
 
 // The top of the nearest floor under a character in mid-air, for its shadow.
@@ -2149,6 +2280,9 @@ function hide_screen(element) {
 // Shows the title screen with the chapter list.
 function show_title() {
     game.screen = 'title';
+    use_dog_drawings('bodhi');  // The title scene shows her grown.
+    document.body.classList.remove('cutscene');
+    show_caption('');
     document.body.classList.remove('playing');
     load_progress();
     load_keepsakes();
@@ -2300,6 +2434,12 @@ function connect_controls() {
             set_paused(!game.paused);
             return;
         }
+        // In a film scene, Enter or E skips it.
+        if (game.world && game.world.cutscene && (event.code === 'Enter' || event.code === 'KeyE') && game.screen === 'play' && !game.paused) {
+            event.preventDefault();
+            skip_cutscene();
+            return;
+        }
         const control = key_controls[event.code];
         if (!control || game.screen !== 'play') {
             return;
@@ -2371,6 +2511,7 @@ function connect_controls() {
         }
     });
     page.new_game_button.addEventListener('click', new_game);
+    page.skip_button.addEventListener('click', skip_cutscene);
     document.getElementById('chapters_button').addEventListener('click', function toggle_chapters() {
         page.chapter_list.hidden = !page.chapter_list.hidden;
     });
@@ -2464,6 +2605,7 @@ window.until_we_find_home_debug = {
     save_now: function debug_save_now() { return save_checkpoint(); },
     solid_active: function debug_solid_active(id) { const solid = game.world.solids.find(function named(candidate) { return candidate.id === id; }); return solid ? solid.active : null; },
     finish_chapter: function debug_finish_chapter() { finish_level(); },
+    skip_cutscene: function debug_skip_cutscene() { skip_cutscene(); },
     read_save: function debug_read_save(text) { return read_save(text); },
     continue_save: function debug_continue_save() { const save = read_save(); if (save) { continue_from_save(save); } return Boolean(save); },
     refused_saves: function debug_refused_saves() { return { count: game.refused_saves || 0, last: game.last_refusal || null }; },
@@ -2492,6 +2634,7 @@ window.until_we_find_home_debug = {
             dog_x: Math.round(center_x(world.characters.dog)), dog_feet: Math.round(world.characters.dog.y + world.characters.dog.height),
             walking: Boolean(world.autopilot), prompt: world.prompt ? world.prompt.text : null,
             happened: Array.from(world.happened), complete: world.complete, reunion: world.reunion ? world.reunion.stage : null,
+            cutscene: Boolean(world.cutscene), caption: page.caption.textContent,
             switching: world.switching_allowed,
             keepsakes_found: Array.from(game.found_keepsakes),
             care: Object.assign({}, world.care),

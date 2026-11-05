@@ -12,6 +12,8 @@ const { chromium } = require('playwright');
 
 const page_path = 'file://' + path.resolve(__dirname, '..', 'index.html');
 const results = [];
+const station_chapter = 3;   // "The Other Side": no opening film, a clear spot to stand, a dog section.
+const puppy_chapter = 2;     // "The Last Morning": Bodhi at five months, no opening film.
 
 // Records one check's outcome.
 function check(name, passed, detail) {
@@ -83,7 +85,7 @@ async function check_care(page) {
     // A hungry, muddy dog right beside her: feed first, then towel. She walks away from the
     // chapter's first keepsake (things in the world come before looking after the dog), and the
     // dog follows.
-    await start_chapter(page, 1);
+    await start_chapter(page, station_chapter);
     await page.evaluate(() => window.until_we_find_home_debug.walk_to(740));
     await page.waitForTimeout(2500);
     // The dog waits a little way behind her; walk over to her, as a player would.
@@ -119,7 +121,7 @@ async function check_care(page) {
     check('break it: pressing "use" 40 times feeds once and never goes below an empty bag', state.care.food === 0 && Number.isFinite(state.care.hunger), JSON.stringify(state.care));
 
     // Time passing makes her hungry again, faster for a puppy than a grown dog.
-    const appetite = await page.evaluate(() => {
+    const appetite = await page.evaluate(({ chapter_indexes }) => {
         const debug = window.until_we_find_home_debug;
         const rise_in = function rise_in(chapter_index) {
             debug.start_level(chapter_index);
@@ -128,8 +130,8 @@ async function check_care(page) {
             debug.step(60 * 30);  // Thirty seconds of play, stepped directly.
             return debug.state().care.hunger;
         };
-        return { puppy: rise_in(0), grown: rise_in(levels.length - 1) };
-    });
+        return { puppy: rise_in(chapter_indexes.puppy), grown: rise_in(levels.length - 1) };
+    }, { chapter_indexes: { puppy: puppy_chapter } });
     check('she gets hungry as time passes, a puppy faster than a grown dog', appetite.puppy > appetite.grown && appetite.grown > 0, JSON.stringify(appetite));
 }
 
@@ -149,7 +151,7 @@ async function check_saving(page) {
     };
     // Play chapter one up to the dog's section: the walkway collapses, she restores the power.
     await page.evaluate(() => { localStorage.clear(); window.until_we_find_home_debug.set_speed(3); });
-    await start_chapter(page, 1);
+    await start_chapter(page, station_chapter);
     await page.evaluate(() => window.until_we_find_home_debug.walk_to(1200));
     await wait_for_event('separation_scene_finished');
     await page.evaluate(() => window.until_we_find_home_debug.walk_to(220));
@@ -158,7 +160,22 @@ async function check_saving(page) {
     await wait_for_event('power_restored');
     await page.waitForTimeout(400);
     await page.evaluate(() => window.until_we_find_home_debug.set_care({ hunger: 0.6, dirt: 0.4, food: 4 }));
-    const saved = await page.evaluate(() => window.until_we_find_home_debug.save_now());
+    // Save at the next safe moment (nobody in mid-air), and pause in the same instant, so no
+    // autosave can replace this save before the page is closed.
+    let saved = false;
+    for (let tries = 0; tries < 60 && !saved; tries++) {
+        saved = await page.evaluate(() => {
+            const debug = window.until_we_find_home_debug;
+            const made = debug.save_now();
+            if (made) {
+                debug.set_paused(true);
+            }
+            return made;
+        });
+        if (!saved) {
+            await page.waitForTimeout(100);
+        }
+    }
     const before = await debug_state();
     const saved_file = await page.evaluate(() => JSON.parse(localStorage.getItem('until_we_find_home_save')));
     check('a save is made mid-chapter', saved && before.controlled === 'dog', before.controlled);
@@ -186,12 +203,12 @@ async function check_saving(page) {
     await page.evaluate(() => { const debug = window.until_we_find_home_debug; debug.walk_to(1700); });
     await page.waitForTimeout(1500);
     const paused_save = await page.evaluate(() => { const debug = window.until_we_find_home_debug; debug.set_paused(true); const save = debug.read_save(); debug.set_paused(false); return save; });
-    check('pausing saves the game', paused_save && paused_save.level_index === 1 && !paused_save.at_start);
+    check('pausing saves the game', paused_save && paused_save.level_index === station_chapter && !paused_save.at_start);
 
     // Finishing a chapter moves the save to the start of the next one.
     await page.evaluate(() => window.until_we_find_home_debug.finish_chapter());
     const next_save = await page.evaluate(() => window.until_we_find_home_debug.read_save());
-    check('finishing a chapter saves the start of the next', next_save && next_save.level_index === 2 && next_save.at_start, JSON.stringify(next_save && { level_index: next_save.level_index, at_start: next_save.at_start }));
+    check('finishing a chapter saves the start of the next', next_save && next_save.level_index === station_chapter + 1 && next_save.at_start, JSON.stringify(next_save && { level_index: next_save.level_index, at_start: next_save.at_start }));
 
     // Break it: tampered and broken saves.
     const verdicts = await page.evaluate(() => {
@@ -246,6 +263,38 @@ async function check_saving(page) {
     await page.evaluate(() => { localStorage.clear(); window.until_we_find_home_debug.set_speed(1); });
 }
 
+// Film scenes: the controls do nothing while one plays, Skip lands in the same state as the
+// end of the film, and no save is made mid-film.
+async function check_films(page) {
+    await start_chapter(page, 0);
+    const during = await page.evaluate(() => {
+        const debug = window.until_we_find_home_debug;
+        const start_x = debug.state().human_x;
+        debug.hold('left', true);
+        for (const control of ['call', 'act', 'jump', 'switch', 'low']) {
+            debug.press(control);
+        }
+        debug.step(30);
+        debug.hold('left', false);
+        const state = debug.state();
+        return { cutscene: state.cutscene, called: state.happened.includes('human_called'), moved_left: state.human_x < start_x - 2, saved: debug.save_now() };
+    });
+    check('a film plays with the controls set aside', during.cutscene);
+    check('break it: buttons pressed during a film do nothing', !during.called && !during.moved_left, JSON.stringify(during));
+    check('break it: no save is made in the middle of a film', during.saved === false);
+    const skipped = await page.evaluate(() => {
+        const debug = window.until_we_find_home_debug;
+        debug.skip_cutscene();
+        debug.skip_cutscene();  // Twice: the second must do nothing.
+        debug.step(60 * 20);    // Twenty seconds: no leftover film timer may fire.
+        return debug.state();
+    });
+    check('Skip ends the film where the film would have ended', !skipped.cutscene && skipped.happened.includes('arrival_done') && skipped.caption === '',
+        JSON.stringify({ cutscene: skipped.cutscene, caption: skipped.caption }));
+    check('break it: after Skip, no leftover step of the film plays', !skipped.happened.includes('intro_3') && !skipped.happened.includes('intro_5'),
+        skipped.happened.join(', '));
+}
+
 async function main() {
     const browser = await chromium.launch();
     const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
@@ -256,6 +305,7 @@ async function main() {
     await check_growth(page);
     await check_care(page);
     await check_saving(page);
+    await check_films(page);
     check('the page logged no errors', page_errors.length === 0, page_errors.join(' | '));
     await browser.close();
     const failed = results.filter(function did_fail(result) { return !result.passed; });

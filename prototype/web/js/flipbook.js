@@ -9,10 +9,13 @@ const flipbook = {
     sheets: {},           // Loaded sheet images: flipbook.sheets.her.walk
     frames: {},           // Sheets painted at screen resolution: flipbook.frames.her.walk
     sheets_expected: 0,   // How many sheets frames_atlas.js lists.
-    sheets_cut: 0,        // How many have been painted at least once.
     cut_queue: [],        // Sheets waiting to be painted; one per drawn frame, so the game never stalls.
     pixels_per_unit: 0,   // The resolution sheets are painted at.
-    ready: false,
+    // Only the drawings in use are painted: hers, and the dog's set for this chapter (the puppy's
+    // or the grown dog's). The other dog set is let go, which halves the dog's memory on a phone.
+    dog_set: 'bodhi',
+    set_ready: {},        // Per set: true once every one of its sheets is painted.
+    ready: false,         // True once every set in use is painted.
 };
 
 // How each animation plays when it isn't driven by distance or by jumping speed.
@@ -87,7 +90,9 @@ function load_flipbook_sheets() {
             let attempt = 0;
             image.onload = function sheet_loaded() {
                 flipbook.sheets[character_name][animation_name] = image;
-                flipbook.cut_queue.push([character_name, animation_name]);
+                if (flipbook_set_in_use(character_name)) {
+                    flipbook.cut_queue.push([character_name, animation_name]);
+                }
             };
             image.onerror = function sheet_failed() {
                 // If no path works, the flipbook never becomes ready and the puppets stay on.
@@ -101,8 +106,47 @@ function load_flipbook_sheets() {
     }
 }
 
-// Called once per drawn frame. Paints at most one waiting sheet, and queues every sheet again
-// if the screen's resolution has changed a lot (after a resize or the camera zooming in).
+// True for the drawing sets in use: hers, and this chapter's dog set.
+function flipbook_set_in_use(character_name) {
+    return character_name === 'her' || character_name === flipbook.dog_set;
+}
+
+// Notes which sets have every sheet painted. A set is drawn only once it is complete; until then
+// its character shows as the cut-out puppet.
+function update_flipbook_readiness() {
+    for (const [character_name, character] of Object.entries(frames_atlas)) {
+        flipbook.set_ready[character_name] = Object.keys(character.animations).every(function painted(animation_name) {
+            return Boolean(flipbook.frames[character_name] && flipbook.frames[character_name][animation_name]);
+        });
+    }
+    flipbook.ready = Boolean(flipbook.set_ready.her && flipbook.set_ready[flipbook.dog_set]);
+}
+
+// Switches which dog drawings are in use (at the start of a chapter). The new set's sheets are
+// queued for painting, and the other set's paintings are let go to free memory.
+function use_dog_drawings(set_name) {
+    if (typeof frames_atlas === 'undefined' || !frames_atlas[set_name] || set_name === flipbook.dog_set) {
+        return;
+    }
+    flipbook.dog_set = set_name;
+    for (const character_name of Object.keys(frames_atlas)) {
+        if (!flipbook_set_in_use(character_name)) {
+            flipbook.frames[character_name] = {};
+        }
+    }
+    for (const animation_name of Object.keys(flipbook.sheets[set_name] || {})) {
+        flipbook.cut_queue.push([set_name, animation_name]);
+    }
+    update_flipbook_readiness();
+}
+
+// True when a set's drawings can be shown.
+function flipbook_set_ready(character_name) {
+    return Boolean(flipbook.set_ready[character_name]);
+}
+
+// Called once per drawn frame. Paints at most one waiting sheet, and queues every sheet in use
+// again if the screen's resolution has changed a lot (after a resize or the camera zooming in).
 function update_flipbook() {
     if (flipbook.sheets_expected === 0) {
         return;
@@ -115,17 +159,22 @@ function update_flipbook() {
     if (flipbook.ready && flipbook.cut_queue.length === 0 && Math.abs(wanted - flipbook.pixels_per_unit) / wanted > 0.15) {
         flipbook.pixels_per_unit = wanted;
         for (const [character_name, sheets] of Object.entries(flipbook.sheets)) {
+            if (!flipbook_set_in_use(character_name)) {
+                continue;
+            }
             for (const animation_name of Object.keys(sheets)) {
                 flipbook.cut_queue.push([character_name, animation_name]);
             }
         }
     }
-    const next = flipbook.cut_queue.shift();
+    // Skip anything queued for a set that has since gone out of use.
+    let next = flipbook.cut_queue.shift();
+    while (next && !flipbook_set_in_use(next[0])) {
+        next = flipbook.cut_queue.shift();
+    }
     if (next) {
-        const first_time = !flipbook.frames[next[0]][next[1]];
         paint_flipbook_sheet(next[0], next[1]);
-        flipbook.sheets_cut += first_time ? 1 : 0;
-        flipbook.ready = flipbook.sheets_cut === flipbook.sheets_expected;
+        update_flipbook_readiness();
     }
 }
 
