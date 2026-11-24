@@ -111,6 +111,9 @@ namespace Bodhi.Rules
         public string title = "";
         public string eyebrow = "";                            // The small line above the title.
         public string place = "";
+        public string dog_age = "";                            // How old Bodhi is, e.g. "four_months".
+        public double dog_size = 1.0;                          // His size against a grown dog (1.0).
+        public double dog_jump = 1.0;                          // His jump against a grown dog's.
         public double start_fear = 0.05;                       // How he feels as it starts.
         public double start_closeness = 0.3;
         public double? start_hunger = null;                    // Care to start from; null carries on from before.
