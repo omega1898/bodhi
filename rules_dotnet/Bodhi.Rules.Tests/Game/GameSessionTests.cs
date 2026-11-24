@@ -392,5 +392,31 @@ namespace Bodhi.Rules.Tests
             }
             Assert.That(session.chapter_saves_written, Is.GreaterThan(saves_before));
         }
+
+        // The title's memory box reads the saved year without starting or changing anything.
+        [Test]
+        public void the_saved_year_is_read_without_starting_a_chapter()
+        {
+            var session = new_session();
+            session.new_game();
+            play_until(session, run => run.is_complete);
+            var title_screen = new_session();
+            var year = title_screen.saved_year();
+            Assert.That(year.current_chapter.id, Is.EqualTo("the_storm"));
+            Assert.That(year.keepsakes_found, Is.EqualTo(session.campaign.keepsakes_found));
+            Assert.That(title_screen.run, Is.Null, "reading the year starts no chapter");
+        }
+
+        // Break it: with no save, or a damaged one, it's a new year, and nothing is counted or written.
+        [Test]
+        public void break_it_a_missing_or_damaged_year_reads_as_a_new_one()
+        {
+            var session = new_session();
+            Assert.That(session.saved_year().chapter_number, Is.EqualTo(1));
+            new SaveFiles(folder).write("campaign", "nonsense\nchapter 999");
+            Assert.That(session.saved_year().chapter_number, Is.EqualTo(1));
+            Assert.That(session.refused_saves, Is.EqualTo(0), "looking isn't loading");
+            Assert.That(new SaveFiles(folder).read("campaign"), Is.EqualTo("nonsense\nchapter 999"), "nothing is written");
+        }
     }
 }

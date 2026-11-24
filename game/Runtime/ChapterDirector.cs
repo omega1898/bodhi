@@ -27,6 +27,7 @@ namespace Bodhi.Game
         GameSession session;
         PlayerControls controls;
         GameHud hud;
+        TitleScreens titles;                         // The opening, the back story and the memory box.
         CameraRig camera_rig;
         GameAudio game_audio;
         bool started = false;                        // Past the title screen.
@@ -55,6 +56,7 @@ namespace Bodhi.Game
             controls = new PlayerControls();
             camera_rig = new CameraRig(transform);
             hud = new GameHud(transform, controls);
+            titles = new TitleScreens(transform);
             game_audio = gameObject.AddComponent<GameAudio>();
             session = new GameSession(new SaveFiles(Path.Combine(Application.persistentDataPath, "saves")), dog_name);
             show_title();
@@ -75,10 +77,22 @@ namespace Bodhi.Game
             }
         }
 
-        // The title screen: New Game, or Continue when there's a save.
+        // The opening: the house, the door, the two of them, then New Game, Continue and the memory box.
         void show_title()
         {
-            hud.show_title(session.has_save, () => begin(false), () => begin(true));
+            titles.show_opening(session.has_save, start_new_year, () => begin(true), show_memory_box);
+        }
+
+        // New Game tells the back story first, then starts the first chapter.
+        void start_new_year()
+        {
+            titles.show_back_story(dog_name, () => begin(false));
+        }
+
+        // The memory box from the title: what the saved year holds, then back to the title.
+        void show_memory_box()
+        {
+            titles.show_memory_box(MemoryBox.build(session.saved_year(), dog_name), show_title);
         }
 
         // Leaves the title for the game.
@@ -92,6 +106,7 @@ namespace Bodhi.Game
             {
                 session.new_game();
             }
+            titles.hide();
             hud.hide_screens();
             started = true;
         }
@@ -101,6 +116,7 @@ namespace Bodhi.Game
         {
             float delta_seconds = Mathf.Min(Time.deltaTime, longest_frame_seconds);
             hud.update(delta_seconds);
+            titles.update(delta_seconds);
             if (!started)
             {
                 controls.end_frame();

@@ -17,6 +17,7 @@ namespace UnityEngine
         public static Vector2 operator +(Vector2 a, Vector2 b) => new Vector2(a.x + b.x, a.y + b.y);
         public static Vector2 operator *(Vector2 a, float scale) => new Vector2(a.x * scale, a.y * scale);
         public static implicit operator Vector3(Vector2 v) => new Vector3(v.x, v.y, 0);
+        public static float Distance(Vector2 a, Vector2 b) => 0;
     }
 
     public struct Vector3
@@ -25,6 +26,7 @@ namespace UnityEngine
         public Vector3(float x, float y, float z) { this.x = x; this.y = y; this.z = z; }
         public static Vector3 zero => new Vector3(0, 0, 0);
         public static Vector3 operator +(Vector3 a, Vector3 b) => new Vector3(a.x + b.x, a.y + b.y, a.z + b.z);
+        public static implicit operator Vector2(Vector3 v) => new Vector2(v.x, v.y);
         public static Vector3 SmoothDamp(Vector3 current, Vector3 target, ref Vector3 velocity, float smooth_time) => target;
     }
 
@@ -41,7 +43,14 @@ namespace UnityEngine
 
     public struct Rect
     {
-        public Rect(float x, float y, float width, float height) { }
+        public Rect(float x, float y, float width, float height) { this.width = width; this.height = height; }
+        public float width { get; }
+        public float height { get; }
+    }
+
+    public struct Bounds
+    {
+        public Vector3 size => Vector3.zero;
     }
 
     public static class Mathf
@@ -121,6 +130,7 @@ namespace UnityEngine
         public T AddComponent<T>() where T : Component => null;
         public T GetComponent<T>() where T : Component => null;
         public void SetActive(bool active) { }
+        public bool activeSelf => false;
     }
 
     public class Transform : Component
@@ -141,6 +151,7 @@ namespace UnityEngine
         public Vector2 offsetMax { get; set; }
         public Vector2 sizeDelta { get; set; }
         public Vector2 anchoredPosition { get; set; }
+        public Vector2 pivot { get; set; }
     }
 
     public enum CameraClearFlags { Skybox, SolidColor }
@@ -191,9 +202,12 @@ namespace UnityEngine
 
     public enum FilterMode { Point, Bilinear }
 
+    public enum TextureFormat { RGBA32 }
+
     public class Texture2D : Object
     {
         public Texture2D(int width, int height) { }
+        public Texture2D(int width, int height, TextureFormat format, bool mip_chain) { }
         public FilterMode filterMode { get; set; }
         public void SetPixel(int x, int y, Color color) { }
         public void Apply() { }
@@ -203,6 +217,10 @@ namespace UnityEngine
 
     public class Sprite : Object
     {
+        public Bounds bounds => default;
+        public Vector2 pivot => Vector2.zero;
+        public Rect rect => default;
+        public static Sprite Create(Texture2D texture, Rect rect, Vector2 pivot) => null;
         public static Sprite Create(Texture2D texture, Rect rect, Vector2 pivot, float pixels_per_unit) => null;
         public static Sprite Create(Texture2D texture, Rect rect, Vector2 pivot, float pixels_per_unit, uint extrude, SpriteMeshType mesh_type) => null;
     }
@@ -242,6 +260,14 @@ namespace UnityEngine
     {
         public RenderMode renderMode { get; set; }
         public int sortingOrder { get; set; }
+    }
+
+    // Fades a group of UI pieces together and turns their taps on or off.
+    public class CanvasGroup : Behaviour
+    {
+        public float alpha { get; set; } = 1f;
+        public bool interactable { get; set; } = true;
+        public bool blocksRaycasts { get; set; } = true;
     }
 
     public enum HorizontalWrapMode { Wrap, Overflow }
@@ -285,7 +311,15 @@ namespace UnityEngine.UI
         public RectTransform rectTransform => null;
     }
 
-    public class Image : Graphic { }
+    public class Image : Graphic
+    {
+        public enum Type { Simple, Sliced, Tiled, Filled }
+        public enum FillMethod { Horizontal, Vertical, Radial90, Radial180, Radial360 }
+        public Sprite sprite { get; set; }
+        public Type type { get; set; }
+        public FillMethod fillMethod { get; set; }
+        public float fillAmount { get; set; }
+    }
 
     public class Text : Graphic
     {
@@ -337,6 +371,22 @@ namespace UnityEngine.InputSystem
     public class Touchscreen
     {
         public static Touchscreen current => null;
+    }
+
+    // A mouse, pen or finger: whichever the player last used.
+    public class Pointer
+    {
+        public static Pointer current => null;
+        public Controls.ButtonControl press => null;
+    }
+}
+
+namespace UnityEngine.InputSystem.Controls
+{
+    public class ButtonControl
+    {
+        public bool isPressed => false;
+        public bool wasPressedThisFrame => false;
     }
 }
 
