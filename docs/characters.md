@@ -2,7 +2,7 @@
 
 The iOS game is built around two real characters, the owner's partner and their dog, and released publicly on the App Store.
 
-- **The human:** blonde hair, blue eyes.
+- **The human:** Em (`StoryText.her_name` in `rules/Runtime/ChapterScript.cs`, `her_name` in `prototype/web/js/levels.js`), blonde hair, blue eyes.
 - **The dog:** Bodhi, a male goldendoodle (he/him). In the game he grows from an eight-week-old puppy to one year old (`dog_growth` in `prototype/web/js/levels.js`).
 
 **Invented supporting characters** (not based on real people): Mina Osei (10) and her mother Ama, the neighbours two doors down, and their old dog Biscuit (13, grey). See "The thread" in `docs/story.md`.
@@ -34,7 +34,7 @@ On iPhone, Epic's own limits for MetaHuman characters are hair drawn as flat car
   - favorite toy
   - three signature habits (for example: greeting, head tilt, leaning in when scared)
 - Her:
-  - in-game name
+  - in-game name: **Em**
   - hair length and style
   - everyday clothes
   - how she calls the dog: a word, a phrase or a whistle. This should become the game's call mechanic.

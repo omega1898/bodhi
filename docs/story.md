@@ -15,7 +15,7 @@
 - The dog's lines are present-tense sensations in small capitals, with no "I": "Her smell. Rain and soap. That way."
 - Written notes appear in a plain typeface.
 
-**Names:** the dog is **Bodhi**, a male goldendoodle (`story_config` in `prototype/web/js/levels.js`, pronouns him/his). The woman has no name in the text yet; fill it in from `docs/characters.md` if she should have one.
+**Names:** the dog is **Bodhi**, a male goldendoodle (`story_config` in `prototype/web/js/levels.js`, pronouns him/his). She is **Em** (`her_name`, filled into `{her}`). The story is told in her voice, so her name only appears when someone speaks to her, as Ama does at High Farm, and on the year-end screen.
 
 ## The thread: Mina, Biscuit and the hearts
 

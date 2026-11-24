@@ -11,6 +11,7 @@
 // and every line of the story updates. Pronouns: use "her"/"her", "him"/"his" or "them"/"their".
 const story_config = {
     dog_name: 'Bodhi',
+    her_name: 'Em',   // Blonde, blue eyes. Filled into {her}; see docs/characters.md.
     dog_object_pronoun: 'him',
     dog_possessive_pronoun: 'his',
 };
@@ -1229,7 +1230,7 @@ const levels = [
         aftermath: {
             scene: 'farm_fire', mood: 'tender', rain: 0,
             lines: ['Mina slept with her arms round Biscuit. Biscuit slept with his nose on her shoe.',
-                "In the morning, Ama found me. 'The roads west are open. We're going home,' she said. 'Same street. Two doors down.'",
+                "In the morning, Ama found me. 'The roads west are open, {her}. We're going home,' she said. 'Same street. Two doors down.'",
                 "'Go on ahead. We'll be right behind you.'"],
         },
     },

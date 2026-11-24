@@ -129,14 +129,19 @@ namespace Bodhi.Rules
     // Fills the placeholders in a story line. Bodhi is he: {them} is "him", {their} is "his".
     public static class StoryText
     {
-        // Returns the line with {dog}, {them} and {their} filled in. Missing text gives "".
+        // Her name: blonde, blue eyes, the one who brings Bodhi home (docs/characters.md). The game
+        // is made for these two, so it is fixed rather than chosen by the player.
+        public const string her_name = "Em";
+
+        // Returns the line with {dog}, {them} and {their} filled in, and {her} with her name.
+        // Missing text gives "".
         public static string personalize(string text, string dog_name)
         {
             if (string.IsNullOrEmpty(text))
             {
                 return "";
             }
-            return text.Replace("{dog}", dog_name ?? "").Replace("{them}", "him").Replace("{their}", "his");
+            return text.Replace("{her}", her_name).Replace("{dog}", dog_name ?? "").Replace("{them}", "him").Replace("{their}", "his");
         }
     }
 }

@@ -98,9 +98,11 @@ const page = {
 
 // ---------- Small helpers ----------
 
-// Replaces {dog}, {them} and {their} in story text with the dog's name and pronouns.
+// Replaces {dog}, {them} and {their} in story text with the dog's name and pronouns, and {her}
+// with her name.
 function personalize(text) {
     return text
+        .split('{her}').join(story_config.her_name)
         .split('{dog}').join(story_config.dog_name)
         .split('{them}').join(story_config.dog_object_pronoun)
         .split('{their}').join(story_config.dog_possessive_pronoun);

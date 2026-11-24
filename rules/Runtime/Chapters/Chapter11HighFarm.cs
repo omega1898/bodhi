@@ -56,7 +56,7 @@ namespace Bodhi.Rules
                     new StoryRule { on = "reunited", lines = new string[] { "Mina was on her knees in the mud with her arms round him.", "Nobody at that fire said anything for a long time." }, schedule_seconds = 8, schedule_event = "chapter_done" },
                     new StoryRule { on = "chapter_done", complete = true },
                 },
-                aftermath = new string[] { "Mina slept with her arms round Biscuit. Biscuit slept with his nose on her shoe.", "In the morning, Ama found me. 'The roads west are open. We're going home,' she said. 'Same street. Two doors down.'", "'Go on ahead. We'll be right behind you.'" },
+                aftermath = new string[] { "Mina slept with her arms round Biscuit. Biscuit slept with his nose on her shoe.", "In the morning, Ama found me. 'The roads west are open, {her}. We're going home,' she said. 'Same street. Two doors down.'", "'Go on ahead. We'll be right behind you.'" },
             };
         }
     }
