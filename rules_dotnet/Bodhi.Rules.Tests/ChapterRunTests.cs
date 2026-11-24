@@ -253,8 +253,12 @@ namespace Bodhi.Rules.Tests
             Assert.That(run.can_use("keepsake_lead", false), Is.False);  // Still hidden.
             Assert.That(run.sniff(2000, 520), Is.True);                   // Too far away.
             Assert.That(run.can_use("keepsake_lead", false), Is.False);
+            Assert.That(run.is_revealed("lead"), Is.False);
+            Assert.That(run.is_revealed(null), Is.False, "break it: no name, nothing found");
             Assert.That(run.has_happened("dog_sniffed_during_dog_section"), Is.True);
             run.sniff(2800, 520);
+            Assert.That(run.is_revealed("lead"), Is.True, "its keepsake name, not its event");
+            Assert.That(run.is_revealed("keepsake_lead"), Is.False);
             Assert.That(run.can_use("keepsake_lead", false), Is.True);
             run.take_lines();
             Assert.That(run.use("keepsake_lead", false), Is.True);

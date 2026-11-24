@@ -18,7 +18,8 @@ The Unity side of the game: everything between the rules (`rules/`, which decide
   - `StageLook`: reads the chapters' colours, says which floors, walls and props show right now, and the rough box each prop fills (for the grey-box scene).
   - `BallFlight`: the ball in the fetch chapters: thrown, bouncing, rolling, carried and dropped at her feet.
   - `StageTracker`: keeps the scene in step with the story (darkness, floods, the camera, who's hidden), including after Continue.
-- Coming next: the scripts that sit on objects in the scenes and connect them to the rules.
+  - `CharacterMover`: moves her or Bodhi through a chapter and keeps them out of walls and floors (steps, ceilings, the chapter's ends, falling out of the world). Unity's own physics isn't used for them, so the game feels the same on every phone.
+- Coming next: the Unity scripts that build a chapter and play it.
 
 ## Adding it to the Unity project
 
