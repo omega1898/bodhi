@@ -264,10 +264,22 @@ function draw_her(pose) {
         }
         text += '<path d="' + sleeve + '" fill="' + (near ? 'url(#sleeve_lit)' : '#23514f') + '" stroke="#0f2a29" stroke-width="4" stroke-linejoin="round"/>';
         const cuff_direction = normalized(subtract(wrist, elbow));
-        const cuff = to_pixels(subtract(wrist, scale(cuff_direction, 1.2)));
-        text += '<circle cx="' + number_text(cuff[0]) + '" cy="' + number_text(cuff[1]) + '" r="21" fill="#1f4c4b"/>';
-        const hand_point = to_pixels(add(wrist, scale(cuff_direction, 1.6)));
-        text += '<ellipse cx="' + number_text(hand_point[0]) + '" cy="' + number_text(hand_point[1]) + '" rx="17" ry="20" fill="url(#skin)"/>';
+        // Close up, the sleeve ended in a flat dark disc with an oval for a hand. Now the cuff
+        // is a turned-back band with the dark opening of the sleeve inside it, and the hand
+        // comes out of that opening: palm, fingers curled loosely as a resting hand's are, the
+        // thumb in front, and a crease where the fingers fold.
+        const cuff = to_pixels(subtract(wrist, scale(cuff_direction, 0.4)));
+        const turn = number_text(degrees(Math.atan2(cuff_direction[1], cuff_direction[0])) - 90);
+        const at_cuff = 'translate(' + number_text(cuff[0]) + ',' + number_text(cuff[1]) + ') rotate(' + turn + ')';
+        text += '<g transform="' + at_cuff + '">' +
+            '<ellipse cx="0" cy="2" rx="21" ry="8" fill="#0c2322"/>' +
+            '<path d="M -14,0 C -17,14 -16,28 -12,38 C -10,43 -6,46 -1,46 C 2,48 6,47 8,44 C 12,42 14,36 12,30 C 13,27 13,25 12,24 C 16,22 19,17 18,11 C 17,6 15,2 14,0 Z" fill="url(#skin)" stroke="#b9836a" stroke-width="1.6" stroke-linejoin="round"/>' +
+            '<path d="M 10,7 C 18,10 21,20 16,27 C 14,28 12,27 11,25 C 12,20 11,15 9,12 Z" fill="#edc4aa" stroke="#b9836a" stroke-width="1.4" stroke-linejoin="round"/>' +
+            '<path d="M -9,30 C -6,37 0,41 7,40 M -4,34 C -2,40 2,44 5,45 M -12,22 C -11,26 -10,29 -8,31" fill="none" stroke="#c48d72" stroke-width="1.8" stroke-linecap="round" opacity="0.8"/>' +
+            '<path d="M -13,6 C -15,16 -14,26 -11,34" fill="none" stroke="#b07d64" stroke-width="2.5" stroke-linecap="round" opacity="0.35"/>' +
+            '<path d="M -22,-6 C -22,4 22,4 22,-6 L 21,-12 C 21,-4 -21,-4 -21,-12 Z" fill="#1f4c4b"/>' +
+            '<path d="M -20,-4 C -10,1 10,1 20,-4" fill="none" stroke="#5aa59f" stroke-width="2" stroke-linecap="round" opacity="0.5"/>' +
+            '</g>';
         return near ? text : '<g filter="url(#far_side)">' + text + '</g>';
     };
 
@@ -556,8 +568,23 @@ function draw_dog(adult_pose, build) {
         const paw_width = 58 * build.leg_width;
         const paw_height = 32 * build.leg_width;
         // The paw stays level with the floor, whatever angle the body is at.
-        return '<path d="' + tube_path(points, fluffy_widths) + '" fill="' + color + '"/>' +
-            '<ellipse cx="' + number_text(paw_pixels[0]) + '" cy="' + number_text(paw_pixels[1]) + '" rx="' + number_text(paw_width) + '" ry="' + number_text(paw_height) + '" fill="' + color + '" transform="rotate(' + number_text(-degrees(body_angle)) + ' ' + number_text(paw_pixels[0]) + ' ' + number_text(paw_pixels[1]) + ')"/>';
+        const level = ' transform="rotate(' + number_text(-degrees(body_angle)) + ' ' + number_text(paw_pixels[0]) + ' ' + number_text(paw_pixels[1]) + ')"';
+        const tube = tube_path(points, fluffy_widths);
+        const paw_shape = '<ellipse cx="' + number_text(paw_pixels[0]) + '" cy="' + number_text(paw_pixels[1]) + '" rx="' + number_text(paw_width) + '" ry="' + number_text(paw_height) + '"';
+        // Close up, the legs were flat colour while the body was curly. The same ringlets now
+        // cover the legs and paws, a shadow falls on the paw's underside, and three tufts of
+        // fur part over the toes, so a paw reads as a paw rather than a round blob.
+        const toes = [-0.45, 0, 0.45].map(function toe(across) {
+            const x = paw_pixels[0] + across * paw_width * 0.9;
+            const y = paw_pixels[1] - paw_height * 0.15;
+            return 'M ' + number_text(x) + ',' + number_text(y - paw_height * 0.55) + ' C ' + number_text(x - 4) + ',' + number_text(y - paw_height * 0.1) + ' ' + number_text(x - 3) + ',' + number_text(y + paw_height * 0.35) + ' ' + number_text(x + 1) + ',' + number_text(y + paw_height * 0.6);
+        }).join(' ');
+        return '<path d="' + tube + '" fill="' + color + '"/>' +
+            '<path d="' + tube + '" fill="url(#curls)"/>' +
+            paw_shape + ' fill="' + color + '"' + level + '/>' +
+            paw_shape + ' fill="url(#curls)"' + level + '/>' +
+            '<g' + level + '><ellipse cx="' + number_text(paw_pixels[0]) + '" cy="' + number_text(paw_pixels[1] + paw_height * 0.55) + '" rx="' + number_text(paw_width * 0.9) + '" ry="' + number_text(paw_height * 0.4) + '" fill="#6e4220" opacity="0.28"/>' +
+            '<path d="' + toes + '" fill="none" stroke="#6e4220" stroke-width="3" stroke-linecap="round" opacity="0.4"/></g>';
     };
     const front_top_near = body_point(withers, axis, 2, -3);
     const front_top_far = body_point(withers, axis, 0, -3);
@@ -927,11 +954,13 @@ const biscuit_changes = [
     ['#fae2b6', '#f1efea'], ['#e3ae70', '#cfcac1'],
     ['#c88746', '#857d70'], ['#7c4a24', '#4f4940'],
     // Muzzle, beard, moustache, brow, curl shading, the closed-eye lid.
-    ['#f1cd96', '#ece9e2'], ['#dba86c', '#d3cfc7'], ['#cf9a5e', '#c4bfb6'], ['#f4d6a6', '#f2f0ea'], ['#b07a46', '#8a8478'], ['#9a6233', '#6f6a62'], ['#f0d0a0', '#e8e5de'],
+    ['#f1cd96', '#ece9e2'], ['#dba86c', '#d3cfc7'], ['#cf9a5e', '#c4bfb6'], ['#f4d6a6', '#f2f0ea'], ['#b07a46', '#8a8478'], ['#8a5528', '#6f6a62'], ['#6e4220', '#5a554e'], ['#f0d0a0', '#e8e5de'],
     // A blue collar instead of Bodhi's red.
     ['#9a2f2a', '#2f4f8a'], ['#c45a50', '#5a78b8'],
+    // The lower eyelid's warm edge.
+    ['#c99a62', '#a8a399'],
     // A smoother coat.
-    ['scale="22"', 'scale="9"'], ['opacity="0.42"', 'opacity="0.16"'],
+    ['scale="22"', 'scale="9"'], ['opacity="0.31"', 'opacity="0.12"'],
 ];
 function biscuit_look(markup) {
     let result = markup;
@@ -1001,4 +1030,13 @@ function main() {
     console.log('drew ' + total + ' frames into ' + path.relative(repository_root, output_folder) + ' and wrote ' + path.relative(repository_root, atlas_path));
 }
 
-main();
+// Run as a command, it draws everything. Loaded by a test (require), it only hands over its
+// pieces, so the test can check them without rewriting the art.
+if (require.main === module) {
+    main();
+} else {
+    module.exports = {
+        her_animations, dog_animations, cells, cycle_lengths, dog_builds, built_dog_pose, key_points,
+        puppy_definitions, biscuit_look, check_biscuit_look, extract_definitions, dog_sheet, hand_over_gap, largest_smooth_gap,
+    };
+}
