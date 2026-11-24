@@ -1,0 +1,308 @@
+// Purpose: everything drawn on top of the game: the story lines (subtitles), the current goal,
+// the words over the "use" button, a film's big caption, the night's darkness, fades and
+// lightning, the touch buttons on a phone, and the title, pause, after-chapter and end-of-year
+// screens. It is built in code with Unity's UI (uGUI) and its built-in font, so it needs no
+// imported assets; an artist's fonts and panels replace the plain ones later.
+//
+// It shows what it's told and reports button presses; ChapterDirector decides everything else.
+using System;
+using Bodhi.Rules;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.UI;
+using UnityEngine.UI;
+
+namespace Bodhi.Game
+{
+    public class GameHud
+    {
+        public const float fade_seconds = 1.2f;
+        public const float flash_seconds = 0.25f;
+
+        static readonly Color her_color = new Color(0.98f, 0.95f, 0.88f);
+        static readonly Color dog_color = new Color(1f, 0.85f, 0.55f);
+        static readonly Color note_color = new Color(0.8f, 0.88f, 0.95f);
+
+        readonly PlayerControls controls;
+        readonly Font font;
+        readonly RectTransform canvas;
+        readonly Text subtitle, objective, prompt, caption;
+        readonly Image darkness, fade, flash;
+        readonly GameObject touch_buttons;
+        readonly GameObject title_screen, pause_screen, aftermath_screen, year_end_screen;
+        readonly Button continue_button;
+        readonly Text aftermath_text, year_end_text;
+        Action on_new_game, on_continue, on_resume, on_next;
+        float fade_left, flash_left;
+
+        // Builds the whole overlay and the EventSystem that lets taps and clicks reach it.
+        public GameHud(Transform parent, PlayerControls controls)
+        {
+            this.controls = controls;
+            font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            var holder = new GameObject("HUD", typeof(RectTransform));
+            holder.transform.SetParent(parent, false);
+            var canvas_part = holder.AddComponent<Canvas>();
+            canvas_part.renderMode = RenderMode.ScreenSpaceOverlay;
+            canvas_part.sortingOrder = 100;
+            var scaler = holder.AddComponent<CanvasScaler>();
+            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            scaler.referenceResolution = new Vector2(1280, 720);  // Sizes below are for this screen; it scales.
+            scaler.matchWidthOrHeight = 0.5f;
+            holder.AddComponent<GraphicRaycaster>();
+            canvas = holder.GetComponent<RectTransform>();
+            make_event_system(parent);
+
+            darkness = make_image(canvas, "darkness", Color.clear, 0, 0, 1, 1);
+            darkness.raycastTarget = false;
+            caption = make_text(canvas, "caption", 46, TextAnchor.MiddleCenter, 0.1f, 0.6f, 0.9f, 0.8f);
+            objective = make_text(canvas, "objective", 20, TextAnchor.UpperLeft, 0.02f, 0.86f, 0.6f, 0.97f);
+            subtitle = make_text(canvas, "subtitle", 28, TextAnchor.LowerCenter, 0.12f, 0.14f, 0.88f, 0.3f);
+            prompt = make_text(canvas, "prompt", 22, TextAnchor.MiddleCenter, 0.5f, 0.5f, 0.5f, 0.5f);
+            prompt.rectTransform.sizeDelta = new Vector2(360, 40);
+            add_shadow(subtitle);
+            add_shadow(prompt);
+            add_shadow(caption);
+
+            touch_buttons = build_touch_buttons();
+            touch_buttons.SetActive(Touchscreen.current != null || Application.isMobilePlatform);
+
+            title_screen = make_screen("title", new Color(0.06f, 0.06f, 0.08f, 1f));
+            make_text(title_screen.transform, "name", 72, TextAnchor.MiddleCenter, 0.1f, 0.6f, 0.9f, 0.85f).text = "Bodhi";
+            make_button(title_screen.transform, "New Game", 0.5f, 0.42f, () => on_new_game?.Invoke());
+            continue_button = make_button(title_screen.transform, "Continue", 0.5f, 0.3f, () => on_continue?.Invoke());
+
+            pause_screen = make_screen("pause", new Color(0, 0, 0, 0.7f));
+            make_text(pause_screen.transform, "paused", 48, TextAnchor.MiddleCenter, 0.1f, 0.55f, 0.9f, 0.75f).text = "Paused";
+            make_button(pause_screen.transform, "Carry on", 0.5f, 0.4f, () => on_resume?.Invoke());
+
+            aftermath_screen = make_screen("aftermath", new Color(0.05f, 0.05f, 0.07f, 0.94f));
+            aftermath_text = make_text(aftermath_screen.transform, "lines", 26, TextAnchor.MiddleCenter, 0.12f, 0.3f, 0.88f, 0.85f);
+            make_button(aftermath_screen.transform, "Next", 0.5f, 0.18f, () => on_next?.Invoke());
+
+            year_end_screen = make_screen("year end", new Color(0.05f, 0.05f, 0.07f, 1f));
+            year_end_text = make_text(year_end_screen.transform, "lines", 30, TextAnchor.MiddleCenter, 0.12f, 0.25f, 0.88f, 0.8f);
+
+            fade = make_image(canvas, "fade", Color.clear, 0, 0, 1, 1);
+            fade.raycastTarget = false;
+            flash = make_image(canvas, "flash", Color.clear, 0, 0, 1, 1);
+            flash.raycastTarget = false;
+            title_screen.transform.SetAsLastSibling();
+            hide_screens();
+        }
+
+        // The title: New Game, and Continue only when there's a save.
+        public void show_title(bool has_save, Action new_game, Action continue_game)
+        {
+            hide_screens();
+            on_new_game = new_game;
+            on_continue = continue_game;
+            continue_button.gameObject.SetActive(has_save);
+            title_screen.SetActive(true);
+        }
+
+        // The pause panel, or none.
+        public void show_pause(bool paused, Action resume)
+        {
+            on_resume = resume;
+            pause_screen.SetActive(paused);
+        }
+
+        // The quiet screen after a chapter: its lines, then Next.
+        public void show_aftermath(string text, Action next)
+        {
+            hide_screens();
+            on_next = next;
+            aftermath_text.text = text ?? "";
+            aftermath_screen.SetActive(true);
+        }
+
+        // The end of the year.
+        public void show_year_end(string text)
+        {
+            hide_screens();
+            year_end_text.text = text ?? "";
+            year_end_screen.SetActive(true);
+        }
+
+        // Hides the title, pause, after-chapter and end-of-year screens.
+        public void hide_screens()
+        {
+            title_screen.SetActive(false);
+            pause_screen.SetActive(false);
+            aftermath_screen.SetActive(false);
+            year_end_screen.SetActive(false);
+        }
+
+        // The story line on screen, coloured by who says it.
+        public void set_subtitle(bool showing, string text, StoryVoice voice)
+        {
+            subtitle.text = showing ? text ?? "" : "";
+            subtitle.color = voice == StoryVoice.dog ? dog_color : voice == StoryVoice.note ? note_color : her_color;
+            subtitle.fontStyle = voice == StoryVoice.dog ? FontStyle.Italic : FontStyle.Normal;
+        }
+
+        // The current goal, top left ("" for none).
+        public void set_objective(string text)
+        {
+            objective.text = text ?? "";
+        }
+
+        // A film's big caption ("" clears it).
+        public void set_caption(string text)
+        {
+            caption.text = text ?? "";
+        }
+
+        // What the "use" button offers, floating over the spot in the world it's about.
+        public void set_prompt(string text, Vector3 world_spot, Camera camera)
+        {
+            prompt.text = text ?? "";
+            if (string.IsNullOrEmpty(text) || camera == null)
+            {
+                return;
+            }
+            var screen = camera.WorldToScreenPoint(world_spot);
+            var scale = canvas.lossyScale.x > 0 ? canvas.lossyScale.x : 1;
+            prompt.rectTransform.anchorMin = prompt.rectTransform.anchorMax = Vector2.zero;
+            prompt.rectTransform.anchoredPosition = new Vector2(screen.x / scale, screen.y / scale);
+        }
+
+        // How dark the night is (0 none to just under 1), in the chapter's own darkness colour.
+        public void set_darkness(double amount, Color tint)
+        {
+            tint.a = Mathf.Clamp01((float)amount);
+            darkness.color = tint;
+        }
+
+        // A soft cut from black.
+        public void fade_from_black()
+        {
+            fade_left = fade_seconds;
+        }
+
+        // A lightning flash.
+        public void lightning()
+        {
+            flash_left = flash_seconds;
+        }
+
+        // Each frame: the fade and the flash wear off.
+        public void update(float delta_seconds)
+        {
+            fade_left = Mathf.Max(0, fade_left - delta_seconds);
+            flash_left = Mathf.Max(0, flash_left - delta_seconds);
+            fade.color = new Color(0, 0, 0, fade_left / fade_seconds);
+            flash.color = new Color(1, 1, 1, 0.8f * flash_left / flash_seconds);
+        }
+
+        // The on-screen buttons for a phone: walk left and right on the left, the rest on the right.
+        GameObject build_touch_buttons()
+        {
+            var holder = new GameObject("touch buttons", typeof(RectTransform));
+            holder.transform.SetParent(canvas, false);
+            stretch(holder.GetComponent<RectTransform>(), 0, 0, 1, 1);
+            make_touch(holder.transform, "<", GameButton.left, 0.07f, 0.12f);
+            make_touch(holder.transform, ">", GameButton.right, 0.19f, 0.12f);
+            make_touch(holder.transform, "Jump", GameButton.jump, 0.9f, 0.12f);
+            make_touch(holder.transform, "Use", GameButton.use, 0.79f, 0.2f);
+            make_touch(holder.transform, "Low", GameButton.low, 0.9f, 0.3f);
+            make_touch(holder.transform, "Call", GameButton.call, 0.68f, 0.12f);
+            make_touch(holder.transform, "Swap", GameButton.switch_character, 0.9f, 0.88f);
+            make_touch(holder.transform, "Skip", GameButton.skip, 0.79f, 0.88f);
+            make_touch(holder.transform, "II", GameButton.pause, 0.04f, 0.92f);
+            return holder;
+        }
+
+        // One touch button: presses the game button while a finger is on it.
+        void make_touch(Transform parent, string label, GameButton which, float x, float y)
+        {
+            var image = make_image(parent, "touch " + label, new Color(1, 1, 1, 0.18f), x, y, x, y);
+            image.rectTransform.sizeDelta = new Vector2(96, 96);
+            var words = make_text(image.transform, "label", 24, TextAnchor.MiddleCenter, 0, 0, 1, 1);
+            words.text = label;
+            words.raycastTarget = false;
+            var touch = image.gameObject.AddComponent<TouchButton>();
+            touch.controls = controls;
+            touch.button = which;
+        }
+
+        // A full-screen panel for a menu.
+        GameObject make_screen(string name, Color color)
+        {
+            return make_image(canvas, name, color, 0, 0, 1, 1).gameObject;
+        }
+
+        // A tappable button with words on it.
+        Button make_button(Transform parent, string label, float x, float y, Action on_click)
+        {
+            var image = make_image(parent, label, new Color(1, 1, 1, 0.12f), x, y, x, y);
+            image.rectTransform.sizeDelta = new Vector2(300, 64);
+            var button = image.gameObject.AddComponent<Button>();
+            button.onClick.AddListener(() => on_click());
+            var words = make_text(image.transform, "label", 30, TextAnchor.MiddleCenter, 0, 0, 1, 1);
+            words.text = label;
+            words.raycastTarget = false;
+            return button;
+        }
+
+        // A coloured rectangle stretched between two corners given as shares of its parent (0 to 1).
+        static Image make_image(Transform parent, string name, Color color, float left, float bottom, float right, float top)
+        {
+            var holder = new GameObject(name, typeof(RectTransform));
+            holder.transform.SetParent(parent, false);
+            var image = holder.AddComponent<Image>();
+            image.color = color;
+            stretch(image.rectTransform, left, bottom, right, top);
+            return image;
+        }
+
+        // Words in the built-in font, stretched between two corners like make_image.
+        Text make_text(Transform parent, string name, int size, TextAnchor anchor, float left, float bottom, float right, float top)
+        {
+            var holder = new GameObject(name, typeof(RectTransform));
+            holder.transform.SetParent(parent, false);
+            var text = holder.AddComponent<Text>();
+            text.font = font;
+            text.fontSize = size;
+            text.alignment = anchor;
+            text.color = her_color;
+            text.horizontalOverflow = HorizontalWrapMode.Wrap;
+            text.verticalOverflow = VerticalWrapMode.Overflow;
+            text.raycastTarget = false;
+            stretch(text.rectTransform, left, bottom, right, top);
+            return text;
+        }
+
+        // A soft dark outline so words read over a bright sky.
+        static void add_shadow(Text text)
+        {
+            var shadow = text.gameObject.AddComponent<Shadow>();
+            shadow.effectColor = new Color(0, 0, 0, 0.75f);
+            shadow.effectDistance = new Vector2(2, -2);
+        }
+
+        // Pins a rectangle's corners to shares of its parent, with no extra size.
+        static void stretch(RectTransform rect, float left, float bottom, float right, float top)
+        {
+            rect.anchorMin = new Vector2(left, bottom);
+            rect.anchorMax = new Vector2(right, top);
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+        }
+
+        // Unity's UI needs one EventSystem to pass taps and clicks on; this one reads the Input System.
+        static void make_event_system(Transform parent)
+        {
+            if (UnityEngine.Object.FindAnyObjectByType<EventSystem>() != null)
+            {
+                return;
+            }
+            var holder = new GameObject("EventSystem");
+            holder.transform.SetParent(parent, false);
+            holder.AddComponent<EventSystem>();
+            holder.AddComponent<InputSystemUIInputModule>();
+        }
+    }
+}
