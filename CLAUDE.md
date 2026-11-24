@@ -17,6 +17,7 @@ The owner is learning programming from zero. Every change must be readable by a 
 - `ios/`: the iOS app. `project.yml` (turned into an Xcode project on the Mac by XcodeGen), two Swift files, the app icon, and `bundle_game.sh`, which copies the game in. Cloud sessions can't build it; the Mac does.
 - `art/`: the game's art as editable SVG files: painted character parts, frame-by-frame animations (`art/animations/`, drawn by `art/tools/draw_frames.js`), scenery layers. See `art/README.md`. Check frames with `node prototype/web/tests/frames_check.js`.
 - `rules/`: the Unity version's game rules in plain C# (no Unity code), as a Unity package. Tested anywhere with `dotnet test rules_dotnet/Bodhi.Rules.Tests`; see `rules/README.md` and `docs/unity_rebuild_spec.md`.
+- `game/`: the Unity version's game scripts, as a Unity package beside `rules/`. Its `Logic/` folder is plain C# tested with the rules; see `game/README.md`.
 - `docs/`: design, story, art and production, architecture, cloud session guide.
 
 ## Hard rules for `core/`

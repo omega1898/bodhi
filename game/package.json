@@ -1,0 +1,10 @@
+{
+  "name": "com.bodhi.game",
+  "version": "0.1.0",
+  "displayName": "Bodhi Game",
+  "description": "The Unity side of Bodhi: plain C# helpers in Logic (tested outside Unity with dotnet test) and, later, the scripts that connect the rules to the scenes.",
+  "unity": "6000.3",
+  "dependencies": {
+    "com.bodhi.rules": "0.1.0"
+  }
+}
