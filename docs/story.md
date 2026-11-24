@@ -17,6 +17,24 @@
 
 **Names:** the dog is **Bodhi**, a male goldendoodle (`story_config` in `prototype/web/js/levels.js`, pronouns him/his). She is **Em** (`her_name`, filled into `{her}`). The story is told in her voice, so her name only appears when someone speaks to her, as Ama does at High Farm, and on the year-end screen.
 
+## Back story
+
+Told on New Game, before Coming Home starts, as caption cards in her voice (`game/Logic/BackStory.cs`). A tap moves on; holding a finger down skips them all. Each card names a picture for the scene to show behind it.
+
+| # | Card | Picture |
+|---|---|---|
+| 1 | Our town sat low beside a wide, slow river. | `river` |
+| 2 | My house was the one with the green door. | `green_door` |
+| 3 | I had wanted a dog for as long as I could remember. | `empty_bowl` |
+| 4 | Then a photograph came. A small, curly face. | `photo` |
+| 5 | I already had his name: {dog}. | `photo` |
+| 6 | On the first of May, I drove out to fetch him. | `road` |
+| 7 | He fell asleep before we reached the end of the road. | `asleep` |
+
+It stays with the game world: the river, the house, the wanting, the drive. Nothing about her own life beyond that, since she is based on a real person (`docs/characters.md`).
+
+Before the title, the start-up animation (`game/Logic/OpeningTitle.cs`): a dusk sky over the house with the green door, a trail of paw prints, Bodhi trotting in to sit by the door, the door opening on her kneeling, the hug, then the name and "Until We Find Home".
+
 ## The thread: Mina, Biscuit and the hearts
 
 The journey home is driven by a second, smaller story the player pieces together: a lost dog.
