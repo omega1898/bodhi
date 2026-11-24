@@ -20,6 +20,7 @@ The Unity project will show the rules on screen. It reads them, and never the ot
 - `HintCoach`: after 3 minutes without progress, a gentle hint, then a plain one, always toward a step that really leads to the goal.
 - `ChapterScript`, `ChapterRun`: any chapter written as data (things to use, zones, story rules), and the one engine that plays it: rules, timers, film scenes, calls, sniffing, the reunion.
 - `Chapters/`: all twelve chapters as data, generated from the browser game by `rules_dotnet/tools/export_chapters.js`. Don't edit them by hand.
+- `Campaign`, `ChapterMemories`: the whole year in order, carrying Bodhi's care, keepsakes and story memory from chapter to chapter, saved between chapters.
 
 ## Why it is a package and not a folder inside the Unity project
 
