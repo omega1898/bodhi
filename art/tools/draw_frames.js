@@ -456,7 +456,7 @@ function body_point(base, axis, along, up) {
 
 // How the dog is built at each drawn age. Goldendoodle puppies have a big head, big paws,
 // short legs, large ears for their size and a short plume of a tail; the adult drawings take
-// over from about six months, drawn smaller while she is still growing (see dog_growth in
+// over from about six months, drawn smaller while he is still growing (see dog_growth in
 // prototype/web/js/levels.js).
 //   head, ear, tail: how big each is compared with the adult.
 //   leg_width: how thick the legs and paws are.  leg_bone: how long each leg bone is.

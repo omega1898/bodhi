@@ -11,18 +11,18 @@
 // and every line of the story updates. Pronouns: use "her"/"her", "him"/"his" or "them"/"their".
 const story_config = {
     dog_name: 'Bodhi',
-    dog_object_pronoun: 'her',
-    dog_possessive_pronoun: 'her',
+    dog_object_pronoun: 'him',
+    dog_possessive_pronoun: 'his',
 };
 
 // How Bodhi grows through the story, one stage per chapter (a chapter names its stage with
 // `dog_age`). Goldendoodles grow fast: about full height at a year.
 //   label: shown on the chapter card.
-//   size: her height compared with a grown goldendoodle (1). Her collision box and drawing
+//   size: his height compared with a grown goldendoodle (1). His collision box and drawing
 //     both scale by it, so a puppy fits through gaps a grown dog can't.
-//   drawing: which set of hand-drawn frames shows her: 'bodhi_puppy' (big head, short legs)
-//     until about six months, then 'bodhi' (the grown build, drawn smaller while she grows).
-//   jump: how high she jumps compared with a grown dog.
+//   drawing: which set of hand-drawn frames shows him: 'bodhi_puppy' (big head, short legs)
+//     until about six months, then 'bodhi' (the grown build, drawn smaller while he grows).
+//   jump: how high he jumps compared with a grown dog.
 const dog_growth = {
     eight_weeks: { label: '8 weeks old', size: 0.46, drawing: 'bodhi_puppy', jump: 0.8 },
     four_months: { label: '4 months old', size: 0.6, drawing: 'bodhi_puppy', jump: 0.88 },
@@ -111,17 +111,17 @@ const levels = [
             { who: 'human', x: 848, y: 520, label: 'Open the front door', event: 'front_door_opened', requires: ['ball_fetched'], needs_dog: true, sound: 'gate' },
             { who: 'human', x: 1560, y: 520, label: 'Mark how tall {dog} is', event: 'height_marked', requires: ['front_door_opened'], needs_dog: true, sprite: 'doorframe' },
             { who: 'human', x: 1900, y: 520, label: 'Open the bag of puppy food', event: 'food_bag_opened', requires: ['height_marked'], sprite: 'food_bag', sound: 'pickup' },
-            { who: 'human', x: 2120, y: 520, label: 'Fill her bowl', event: 'first_meal', requires: ['food_bag_opened'], needs_dog: true, sprite: 'bowl', care: 'meal' },
+            { who: 'human', x: 2120, y: 520, label: 'Fill his bowl', event: 'first_meal', requires: ['food_bag_opened'], needs_dog: true, sprite: 'bowl', care: 'meal' },
             { who: 'human', x: 2620, y: 520, label: 'Give {dog} a bath', event: 'first_bath', requires: ['first_meal'], needs_dog: true },
             { who: 'human', x: 3160, y: 520, label: 'Take a photograph of {dog}', event: 'photo_taken', requires: ['first_bath'], needs_dog: true, sound: 'chime' },
-            { who: 'human', x: 3450, y: 520, label: 'Put {dog} in her basket', event: 'put_in_basket', requires: ['photo_taken'], needs_dog: true },
+            { who: 'human', x: 3450, y: 520, label: 'Put {dog} in his basket', event: 'put_in_basket', requires: ['photo_taken'], needs_dog: true },
             { who: 'human', x: 3870, y: 520, label: 'Go to bed', event: 'went_to_bed', requires: ['put_in_basket'] },
             { who: 'dog', x: 3020, y: 520, label: 'Chew the slipper', event: 'keepsake_first_slipper', sprite: 'keepsake', keepsake: 'first_slipper', hidden: true,
-              memory: "Her first crime: my slipper, under the sofa. I never found the other one." },
+              memory: "His first crime: my slipper, under the sofa. I never found the other one." },
             { who: 'human', x: 960, y: 520, label: 'Read the card in the letterbox', event: 'keepsake_welcome_card', sprite: 'keepsake', keepsake: 'welcome_card',
               memory: "'Welcome to the street! From Mina (10) and Biscuit (13). He's deaf in one ear but he LOVES puppies. Two doors down, the blue door.'" },
             { who: 'human', x: 300, y: 520, label: 'Pick up the receipt', event: 'keepsake_adoption_receipt', sprite: 'keepsake', keepsake: 'adoption_receipt',
-              memory: "'One goldendoodle puppy, female. Name: ______.' I wrote it in at the traffic lights." },
+              memory: "'One goldendoodle puppy, male. Name: ______.' I wrote it in at the traffic lights." },
             { who: 'human', x: 2300, y: 520, label: 'Read the list on the fridge', event: 'keepsake_puppy_list', sprite: 'keepsake', keepsake: 'puppy_list',
               memory: "My list: 'bowl, bed, lead, patience.' Patience is underlined twice." },
         ],
@@ -133,40 +133,40 @@ const levels = [
             { on: 'level_started', cutscene: { skip_to: 'arrival_done' }, follow: false, fetch: false, camera: { x: 330, y: 430, zoom: 0.95 },
               caption: 'The first of May', pose: { dog: ['sit', 30] }, walk: { human: 360 }, schedule: { seconds: 4.5, event: 'intro_1' } },
             { on: 'intro_1', caption: '', pose: { human: ['kneel', 4] }, face: { human: 1 },
-              say: ['Eight weeks old. Ten pounds of curls.', 'She slept the whole drive.'], schedule: { seconds: 4.5, event: 'intro_2' } },
+              say: ['Eight weeks old. Ten pounds of curls.', 'He slept the whole drive.'], schedule: { seconds: 4.5, event: 'intro_2' } },
             { on: 'intro_2', sound: 'gate', pose: { dog: ['stand', 0.1] }, walk: { dog: 560 }, voice: 'dog',
               say: ['Light. Grass. So many smells.'], schedule: { seconds: 3, event: 'intro_3' } },
             { on: 'intro_3', pose: { dog: ['sniff', 2.5] }, care: { dirt: 0.8 }, say: ['Straight into the flowerbed, of course.'], schedule: { seconds: 3, event: 'intro_4' } },
-            { on: 'intro_4', walk: { dog: 395 }, face: { human: 1 }, pose: { human: ['kneel', 5] }, say: ['Then she found me.'], schedule: { seconds: 2.5, event: 'intro_5' } },
+            { on: 'intro_4', walk: { dog: 395 }, face: { human: 1 }, pose: { human: ['kneel', 5] }, say: ['Then he found me.'], schedule: { seconds: 2.5, event: 'intro_5' } },
             { on: 'intro_5', pose: { dog: ['lean', 3] }, sound: 'chime', caption: 'Until We Find Home', say: ['Hello, {dog}. Welcome home.'], schedule: { seconds: 4.5, event: 'arrival_done' } },
             { on: 'arrival_done', cutscene: false, caption: '', follow: true, fetch: true, place: { human: [360, 520], dog: [420, 520] }, care: { dirt: 0.8 },
               objective: 'Throw the ball for {dog}.', schedule: { seconds: 5, event: 'biscuit_hello' } },
             { on: 'biscuit_hello', pose: { guest: ['bark', 0.8] }, sound: 'bark',
               say: ['Next door, over the low fence: an old grey dog with a white muzzle.', 'Biscuit. He barked once, very politely. {dog} squeaked back.'] },
-            { on: 'ball_fetched', say: ['She brought it back. Then she sat on it.'], objective: 'Whistle for {dog}, then open the front door.' },
-            { on: 'human_called', say: ['One whistle, and she came. The first time of thousands.'] },
+            { on: 'ball_fetched', say: ['He brought it back. Then he sat on it.'], objective: 'Whistle for {dog}, then open the front door.' },
+            { on: 'human_called', say: ['One whistle, and he came. The first time of thousands.'] },
             { on: 'front_door_opened', place: { human: [1380, 520], dog: [1440, 520] }, fade_in: true, mood: 'calm', fetch: false,
-              say: ['Our house. Her house now.'], objective: 'Mark how tall {dog} is, on the doorframe.' },
-            { on: 'height_marked', say: ["'{dog}, 8 weeks.' Barely past my ankle."], objective: 'Feed her. The food is in the kitchen.' },
-            { on: 'food_bag_opened', say: ['A bag of puppy food, nearly as big as she is.'], objective: 'Fill her bowl.' },
-            { on: 'first_meal', care: { food: 3 }, say: ['Gone in a minute. Then she pushed the bowl across the floor.', 'I packed the rest in my bag. She has never let me forget where it is.'],
-              objective: 'She is still muddy from the garden. Give her a bath.' },
-            { on: 'first_bath', care: { dirt: 0 }, say: ['She hated the bath for exactly four seconds.', 'Then she loved it.'], objective: 'Take a photograph of {dog}.' },
+              say: ['Our house. His house now.'], objective: 'Mark how tall {dog} is, on the doorframe.' },
+            { on: 'height_marked', say: ["'{dog}, 8 weeks.' Barely past my ankle."], objective: 'Feed him. The food is in the kitchen.' },
+            { on: 'food_bag_opened', say: ['A bag of puppy food, nearly as big as he is.'], objective: 'Fill her bowl.' },
+            { on: 'first_meal', care: { food: 3 }, say: ['Gone in a minute. Then he pushed the bowl across the floor.', 'I packed the rest in my bag. He has never let me forget where it is.'],
+              objective: 'He is still muddy from the garden. Give him a bath.' },
+            { on: 'first_bath', care: { dirt: 0 }, say: ['He hated the bath for exactly four seconds.', 'Then he loved it.'], objective: 'Take a photograph of {dog}.' },
             { on: 'photo_taken', mood: 'tender', darkness: 0.35,
-              say: ['{dog} on the sofa she was not allowed on. The first photograph.', 'I carried it in my coat for a year.'], objective: 'Put {dog} to bed in her basket.' },
+              say: ['{dog} on the sofa he was not allowed on. The first photograph.', 'I carried it in my coat for a year.'], objective: 'Put {dog} to bed in his basket.' },
             { on: 'put_in_basket', follow: false, place: { dog: [3450, 520] }, pose: { dog: ['sleep', 9999] }, darkness: 0.55,
-              say: ['Her own bed. Her own blanket.', 'Goodnight, {dog}.'], objective: 'Go to bed.' },
+              say: ['His own bed. His own blanket.', 'Goodnight, {dog}.'], objective: 'Go to bed.' },
             { on: 'went_to_bed', darkness: 0.8, mood: 'quiet', hide: { human: true }, objective: '',
               say: ['The house went very quiet.', 'Too quiet, for someone eight weeks old.'], schedule: { seconds: 4, event: 'puppy_cried' } },
             { on: 'puppy_cried', control: 'dog', beat: 'dog_section', pose: { dog: ['stand', 0.1] }, scent: [3960, 470], voice: 'dog',
               say: ['Dark. Big. Alone.', 'Her smell. That way.'], objective: 'Find her.' },
             { on: 'on_the_bed', voice: 'dog', pose: { dog: ['sleep', 9999] }, say: ['Her. Warm.'], schedule: { seconds: 2.5, event: 'found_her_in_bed' } },
-            { on: 'found_her_in_bed', say: ['A small weight landed on my feet.', 'I should have put her back in the basket.', 'I did not.'], schedule: { seconds: 7, event: 'chapter_done' } },
+            { on: 'found_her_in_bed', say: ['A small weight landed on my feet.', 'I should have put him back in the basket.', 'I did not.'], schedule: { seconds: 7, event: 'chapter_done' } },
             { on: 'chapter_done', complete: true },
         ],
         aftermath: {
             scene: 'first_night', mood: 'quiet', rain: 0,
-            lines: ['She slept on my feet all night.', 'She never slept in the basket again.', 'Four months later, the river came.'],
+            lines: ['He slept on my feet all night.', 'He never slept in the basket again.', 'Four months later, the river came.'],
         },
     },
 
@@ -200,7 +200,7 @@ const levels = [
             { id: 'stair_2', kind: 'plank', x: 1460, y: 410, w: 60, h: 12 },
             { id: 'stair_3', kind: 'plank', x: 1520, y: 465, w: 60, h: 12 },
             floor_block(1000, 520, 2600),
-            // What a puppy can climb as the water rises, each step within her jump: the sofa
+            // What a puppy can climb as the water rises, each step within his jump: the sofa
             // (46 high), the kitchen counter (the same), the fridge (74 above the counter), then the
             // high shelf. From the shelf, the landing is 110 up and 200 across: out of reach.
             { kind: 'invisible', x: 2160, y: 474, w: 160, h: 46 },
@@ -231,11 +231,11 @@ const levels = [
             { who: 'human', x: 1385, y: 300, label: 'Lower the knotted sheets', event: 'sheets_lowered', requires: ['pair_met_at_landing'], sound: 'pickup' },
             { who: 'dog', x: 1640, y: 410, label: 'Grab the sheet', event: 'sheet_grabbed', requires: ['sheets_lowered'] },
             { who: 'human', x: 620, y: 300, label: 'Pick up the photograph', event: 'keepsake_frame', sprite: 'keepsake', keepsake: 'frame',
-              memory: "The photograph from her first day, in its frame. I took it out and put it in my coat." },
+              memory: "The photograph from his first day, in its frame. I took it out and put it in my coat." },
             { who: 'dog', x: 2550, y: 520, label: 'Nose the basket', event: 'keepsake_basket_toy', sprite: 'keepsake', keepsake: 'basket_toy', hidden: true,
-              memory: 'Her rope toy, floating out of the basket she never slept in.' },
+              memory: 'His rope toy, floating out of the basket he never slept in.' },
             { who: 'dog', x: 2900, y: 520, label: 'Sniff the coat hooks', event: 'keepsake_lead', sprite: 'keepsake', keepsake: 'lead', hidden: true,
-              memory: 'Her lead, still on its hook by the door. Walks every morning at seven.' },
+              memory: 'His lead, still on its hook by the door. Walks every morning at seven.' },
         ],
         zones: [
             { x: 1360, y: 200, w: 340, h: 230, who: 'both', event: 'pair_met_at_landing', requires: ['dog_climbing'] },
@@ -250,22 +250,22 @@ const levels = [
             { on: 'storm_2', pose: { human: ['stand', 0.1] }, walk: { human: 1330 }, say: ['{dog}? {dog}, come back!', 'Next door, Biscuit was howling.'], schedule: { seconds: 3.5, event: 'storm_3' } },
             { on: 'storm_3', remove: ['stair_1', 'stair_2', 'stair_3'], effect: { kind: 'debris', x: 1490, y: 400, width: 200 }, shake: 1.4, sound: 'collapse',
               water: [{ id: 'flood', top: 498 }], beat: 'separation', mood: 'tense', bond: { fear: 0.6, closeness: 0.3 }, place: { dog: [2420, 520] },
-              say: ['The stairs went, under the water.', 'The water swept {dog} into the front room. I can hear her crying.'], schedule: { seconds: 4, event: 'storm_done' } },
+              say: ['The stairs went, under the water.', 'The water swept {dog} into the front room. I can hear him crying.'], schedule: { seconds: 4, event: 'storm_done' } },
             // The end of the film; Skip comes straight here, so it sets everything the film leaves behind.
             { on: 'storm_done', cutscene: false, remove: ['stair_1', 'stair_2', 'stair_3'], water: [{ id: 'flood', top: 498 }], beat: 'human_section', mood: 'tense',
-              place: { human: [1330, 300], dog: [2420, 520] }, objective: 'The water is rising. Find something to pull her up with.' },
+              place: { human: [1330, 300], dog: [2420, 520] }, objective: 'The water is rising. Find something to pull him up with.' },
             { on: 'human_called_during_human_section', say: ['A thin bark, down in the dark. Hold on.'] },
-            { on: 'sheets_taken', say: ['Sheets. Knotted together, they might reach.'], objective: 'Whistle for {dog}. Let her know where you are.' },
+            { on: 'sheets_taken', say: ['Sheets. Knotted together, they might reach.'], objective: 'Whistle for {dog}. Let him know where you are.' },
             { when_all: ['sheets_taken', 'human_called_during_human_section'], control: 'dog', follow: true, beat: 'dog_section', scent: [1385, 280], voice: 'dog',
               say: ['Her whistle. Up. Far up.', 'Water to my chest. Cold. Climb.'], objective: 'Climb out of the water. Get up to her.', schedule: { seconds: 0.1, event: 'dog_climbing' } },
             { on: 'pair_met_at_landing', control: 'human', beat: 'near_contact', scent: null, follow: false,
               say: ['There. On the high shelf, shaking. Too far down to reach.'], objective: 'Lower the knotted sheets.' },
             { on: 'sheets_lowered', beat: 'final_obstacle', switching: true, say: ['Come on, {dog}. Hold on to it.'], objective: 'Switch to {dog}. Grab the sheet.' },
             { when_all: ['sheets_lowered', 'sheet_grabbed'], place: { dog: [1320, 300] }, sound: 'pickup', reunion: true,
-              say: ['I pulled. She held on with her teeth.'] },
+              say: ['I pulled. He held on with his teeth.'] },
             { on: 'reunion_embrace', say: ['I have you.', "I'm not letting go."] },
             { on: 'reunion_complete', water: [{ id: 'flood', top: 335 }], objective: 'The water is still coming. Out of the window, onto the porch roof.' },
-            { on: 'reached_window', cutscene: { skip_to: 'chapter_done' }, darkness: 0.75, say: ['We sat on the porch roof in the rain, her inside my coat.', 'At four in the morning, a light on the water.'],
+            { on: 'reached_window', cutscene: { skip_to: 'chapter_done' }, darkness: 0.75, say: ['We sat on the porch roof in the rain, him inside my coat.', 'At four in the morning, a light on the water.'],
               schedule: { seconds: 7, event: 'chapter_done' } },
             { on: 'chapter_done', complete: true },
         ],
@@ -318,7 +318,7 @@ const levels = [
         interactables: [
             { who: 'human', x: 330, y: 520, label: 'Take the photograph', event: 'photo_taken', sprite: 'photo', sound: 'pickup' },
             { who: 'human', x: 150, y: 520, label: 'Open the little box', event: 'keepsake_first_collar', sprite: 'keepsake', keepsake: 'first_collar',
-              memory: "{dog}'s first collar, from the day I brought her home. It wouldn't fit around her ear now." },
+              memory: "{dog}'s first collar, from the day I brought him home. It wouldn't fit around his ear now." },
             { who: 'dog', x: 900, y: 520, label: 'Dig under the bed', event: 'keepsake_stolen_sock', sprite: 'keepsake', keepsake: 'stolen_sock', hidden: true,
               memory: 'A sock {dog} stole on our first night here, kept under the bed like treasure.' },
             { who: 'human', x: 2060, y: 520, label: 'Look at the chalk heart', event: 'keepsake_chalk_heart', sprite: 'keepsake', keepsake: 'chalk_heart',
@@ -332,16 +332,16 @@ const levels = [
         rules: [
             { on: 'level_started', say: ['Two months in the emergency flat, on the wrong side of the city.', 'The water came up the stairs again last night. {dog} shook until morning.'],
               objective: 'Look around the flat. Take what matters.' },
-            { on: 'dog_petted', say: ['{dog} leans the whole warm weight of her into my hand. She always has.'] },
+            { on: 'dog_petted', say: ['{dog} leans the whole warm weight of him into my hand. He always has.'] },
             { on: 'human_called', say: ['One whistle, and {dog} comes. Every time.'] },
             { on: 'ball_fetched', say: ['Again. It is always again.'] },
             { on: 'door_tried', say: ['Not without the photograph.'] },
             { on: 'photo_taken', remove: ['flat_door'], sound: 'gate',
-              say: ['The photograph. {dog} on our sofa, eight weeks old. The green door behind her.', "Home is far. West, past the river. But it's ours."],
+              say: ['The photograph. {dog} on our sofa, eight weeks old. The green door behind him.', "Home is far. West, past the river. But it's ours."],
               objective: 'Leave the flat. Head west, home.' },
             { on: 'poster_read', voice: 'note', say: ["'LOST IN THE FLOOD: BISCUIT. Old and grey. Deaf in one ear. Answers to whistles.",
                 "My mum is a nurse at St Agnes Hospital, west. Please bring him. Mina, 10.'"], schedule: { seconds: 1, event: 'poster_recognised' } },
-            { on: 'poster_recognised', say: ['Mina, from next door. She had drawn him from memory: the white muzzle, the blue collar.', '{dog} pushed her nose against the paper and whined.'] },
+            { on: 'poster_recognised', say: ['Mina, from next door. She had drawn him from memory: the white muzzle, the blue collar.', '{dog} pushed his nose against the paper and whined.'] },
             { on: 'set_out', fetch: false, say: ['Nobody could tell us when the roads would open.', 'So we walked. A bag. A photograph. Each other.'], schedule: { seconds: 6, event: 'chapter_done' } },
             { on: 'chapter_done', complete: true },
         ],
@@ -475,8 +475,8 @@ const levels = [
 
     // ------------------------------------------------------------------ Chapter four
     // The motorway west: a mile of cars where the water stopped them, a chalk heart on every
-    // door. The bridge deck drops away under Bodhi; she swims, finds Biscuit's scent under a car,
-    // and barks her person down the slip road.
+    // door. The bridge deck drops away under Bodhi; he swims, finds Biscuit's scent under a car,
+    // and barks his person down the slip road.
     {
         id: 'motorway',
         dog_age: 'six_and_a_half_months',
@@ -499,9 +499,9 @@ const levels = [
             { id: 'deck_gap', kind: 'plank', x: 1300, y: 300, w: 300, h: 12 },
             { id: 'edge_rail', kind: 'invisible', blocks: 'human', x: 1294, y: 120, w: 6, h: 180, hidden: true },
             { id: 'ladder_bridge', kind: 'plank', x: 1300, y: 300, w: 300, h: 10, hidden: true },
-            // The deck beyond the gap. At its end she slides down the embankment to the road,
+            // The deck beyond the gap. At its end he slides down the embankment to the road,
             // landing just past the barrier. (Steps here would hang over that bit of road, too
-            // low for her to walk under.)
+            // low for him to walk under.)
             slab(1600, 1450),
             floor_block(700, 520, 3500),  // The flooded road under the bridge.
             // Abandoned cars on the road below: a dog can jump onto their bonnets.
@@ -553,7 +553,7 @@ const levels = [
         zones: [
             { x: 1380, y: 0, w: 100, h: 320, who: 'human', event: 'deck_cracked' },
             { x: 2560, y: 330, w: 200, h: 230, who: 'dog', event: 'biscuit_scent', requires: ['ladder_laid'] },
-            // Only at road level: from the bridge above, she can see her but not reach her.
+            // Only at road level: from the bridge above, she can see him but not reach him.
             { x: 2940, y: 380, w: 420, h: 180, who: 'both', event: 'pair_met_at_gate', requires: ['dog_barked'] },
             { x: 3850, y: 0, w: 350, h: 600, who: 'human', event: 'left_motorway', requires: ['reunion_complete'] },
         ],
@@ -564,7 +564,7 @@ const levels = [
               effect: { kind: 'debris', x: 1450, y: 300, width: 300 }, shake: 1.2, sound: 'collapse', mood: 'tense', beat: 'separation',
               bond: { fear: 0.5, closeness: 0.3 }, objective: '', say: ['The bridge deck just dropped away.', '{dog} went down with it, into the water.'],
               schedule: { seconds: 3.5, event: 'separation_scene_finished' } },
-            { on: 'separation_scene_finished', beat: 'human_section', say: ["She's swimming. She's all right. She's swimming.", 'That breakdown van. Breakdown vans carry ladders.'],
+            { on: 'separation_scene_finished', beat: 'human_section', say: ["He's swimming. He's all right. He's swimming.", 'That breakdown van. Breakdown vans carry ladders.'],
               objective: 'Find something to bridge the gap.' },
             { on: 'ladder_taken', say: ['An aluminium ladder. Long enough. Just.'], objective: 'Lay the ladder across the gap.' },
             { on: 'ladder_laid', add: ['ladder_bridge'], remove: ['edge_rail'], control: 'dog', beat: 'dog_section', scent: [2960, 500], voice: 'dog',
@@ -574,16 +574,16 @@ const levels = [
               objective: 'Bark. Let her know where you are.' },
             { on: 'mina_note', voice: 'note', say: ["'BISCUIT: if anyone finds my dog, he is old and grey and deaf in one ear. Mum is at St Agnes. I'm going there.",
                 "I drew hearts so he can follow me. Mina.'"] },
-            { on: 'dog_barked', control: 'human', beat: 'human_section', scent: null, say: ['A bark from below the end of the bridge.', 'She was waiting for me at the bottom of the embankment.'],
+            { on: 'dog_barked', control: 'human', beat: 'human_section', scent: null, say: ['A bark from below the end of the bridge.', 'He was waiting for me at the bottom of the embankment.'],
               objective: 'Get down the embankment at the end of the bridge.' },
             { on: 'pair_met_at_gate', beat: 'near_contact', say: ['{dog}, soaked to the ears, behind the barrier.'], objective: 'Reach through the barrier.' },
             { on: 'barrier_touched', beat: 'final_obstacle', switching: true, bond: { fear: -0.2 },
-              say: ['A cold nose. A warm tongue.', "The barrier's chained down. A crank on my side. Gravel piled against it on hers."],
+              say: ['A cold nose. A warm tongue.', "The barrier's chained down. A crank on my side. Gravel piled against it on his."],
               objective: 'Turn the crank. Then switch to {dog} and dig.' },
             { on: 'crank_turned', say: ['It ratchets up. Come on, {dog}.'] },
             { on: 'gravel_dug', voice: 'dog', say: ['Dig. Dig. Through.'] },
             { when_all: ['crank_turned', 'gravel_dug'], remove: ['slip_gate'], sound: 'gate', reunion: true },
-            { on: 'reunion_embrace', say: ['You swam. You actually swam.', 'Good girl. Good, good girl.'] },
+            { on: 'reunion_embrace', say: ['You swam. You actually swam.', 'Good boy. Good, good boy.'] },
             { on: 'reunion_complete', mood: 'calm', objective: 'Keep west.' },
             { on: 'left_motorway', say: ['By dark we were past the last car.'], schedule: { seconds: 4, event: 'chapter_done' } },
             { on: 'chapter_done', complete: true },
@@ -703,7 +703,7 @@ const levels = [
 
     // ------------------------------------------------------------------ Chapter six
     // An orchard gone wild, on the road north from the hospital. Bodhi smells Biscuit and is
-    // under the locked gate before anyone can stop her. The farmer's diary says the old dog slept
+    // under the locked gate before anyone can stop him. The farmer's diary says the old dog slept
     // in the barn last night; Bodhi finds the hollow he left in the hay.
     {
         id: 'orchard',
@@ -775,7 +775,7 @@ const levels = [
             { on: 'orchard_gate_found', dog_runs_to: 1900, follow: false, beat: 'separation', mood: 'tense', voice: 'dog',
               say: ['That smell. The fence-dog. HERE!'], schedule: { seconds: 3, event: 'separation_scene_finished' } },
             { on: 'separation_scene_finished', beat: 'human_section', mood: 'calm',
-              say: ['Under the orchard gate and gone, before I could grab her.', 'The gate is locked. The farmhouse, then.'],
+              say: ['Under the orchard gate and gone, before I could grab him.', 'The gate is locked. The farmhouse, then.'],
               objective: 'Find the key to the orchard gate. Try the farmhouse.' },
             { on: 'key_found', voice: 'note', say: ["A key on a nail, and a note pinned under it in the farmer's hand:",
                 "'The old grey dog came back tonight. Gave him milk. He slept in the barn. He won't stay. He's looking for someone.'"],
@@ -785,9 +785,9 @@ const levels = [
             { on: 'apple_eaten', voice: 'dog', say: ['Sweet. Crunch. Another.'] },
             { on: 'biscuit_bed', voice: 'dog', say: ['Here. He slept here. Still warm. This morning.'], objective: 'Bark from the hayloft door. Tell her.' },
             { on: 'dog_barked', control: 'human', beat: 'human_section', dog_runs_to: 1450, follow: false, scent: null,
-              say: ['A bark from high in the barn.', 'Then she came racing back through the trees to the gate, ears flying.'], objective: 'Unlock the orchard gate.' },
+              say: ['A bark from high in the barn.', 'Then he came racing back through the trees to the gate, ears flying.'], objective: 'Unlock the orchard gate.' },
             { on: 'pair_met_at_gate', beat: 'near_contact', say: ['Nose through the bars. Tail going round in circles.'], objective: 'Turn the key.' },
-            { on: 'key_turned', beat: 'final_obstacle', switching: true, say: ['The key turns. But the bolt on her side has rusted shut.'],
+            { on: 'key_turned', beat: 'final_obstacle', switching: true, say: ['The key turns. But the bolt on his side has rusted shut.'],
               objective: 'Switch to {dog}. Pull the bolt with your teeth.' },
             { on: 'bolt_pulled', voice: 'dog', say: ['Pull. Pull. Click!'] },
             { when_all: ['key_turned', 'bolt_pulled'], remove: ['orchard_gate'], sound: 'gate', reunion: true },
@@ -798,7 +798,7 @@ const levels = [
         ],
         aftermath: {
             scene: 'orchard_barn', mood: 'quiet', rain: 0,
-            lines: ['We slept in the hay where Biscuit had slept the night before.', "{dog} couldn't settle until she had sniffed every inch of it.",
+            lines: ['We slept in the hay where Biscuit had slept the night before.', "{dog} couldn't settle until he had sniffed every inch of it.",
                 'One day behind him now. Maybe less.'],
         },
     },
@@ -911,7 +911,7 @@ const levels = [
 
     // ------------------------------------------------------------------ Chapter eight
     // North over the moor to Northgate, in the first snow. The edge of the path gives way under
-    // Bodhi. Down in the gully she finds Biscuit's collar on a fence wire: he's lost it, and he's
+    // Bodhi. Down in the gully he finds Biscuit's collar on a fence wire: he's lost it, and he's
     // still going, alone.
     {
         id: 'first_snow',
@@ -934,7 +934,7 @@ const levels = [
             { id: 'cornice', kind: 'plank', x: 900, y: 300, w: 300, h: 12 },
             { id: 'edge_rail', kind: 'invisible', blocks: 'human', x: 894, y: 120, w: 6, h: 180, hidden: true },
             { id: 'hurdle_bridge', kind: 'plank', x: 900, y: 300, w: 300, h: 10, hidden: true },
-            // The path along the top of the gully. At its end she slides down the snow into the
+            // The path along the top of the gully. At its end he slides down the snow into the
             // gully, just past the sheepfold gate.
             slab(1200, 1650),
             floor_block(900, 520, 3300),  // The gully.
@@ -977,18 +977,18 @@ const levels = [
         ],
         zones: [
             { x: 980, y: 0, w: 100, h: 320, who: 'human', event: 'cornice_broke' },
-            // Only down in the gully: from the path above, she can see her but not reach her.
+            // Only down in the gully: from the path above, she can see him but not reach him.
             { x: 2740, y: 380, w: 410, h: 180, who: 'both', event: 'pair_met_at_fold', requires: ['dog_barked'] },
             { x: 3850, y: 0, w: 350, h: 600, who: 'human', event: 'top_of_pass', requires: ['reunion_complete'] },
         ],
         rules: [
-            { on: 'level_started', say: ['North, over the moor. The first snow came down like a held breath.', '{dog} had never seen snow. She bit it. She bit all of it.'],
+            { on: 'level_started', say: ['North, over the moor. The first snow came down like a held breath.', '{dog} had never seen snow. He bit it. He bit all of it.'],
               objective: 'Follow the road over the pass.' },
             { on: 'cornice_broke', remove: ['cornice'], add: ['edge_rail'], place: { dog: [1100, 520], human: [860, 300] },
               effect: { kind: 'debris', x: 1050, y: 300, width: 300 }, shake: 1, sound: 'collapse', beat: 'separation', mood: 'tense',
               bond: { fear: 0.5, closeness: 0.3 }, objective: '', say: ['The snow at the edge just went.', '{dog} slid with it, down into the gully.'],
               schedule: { seconds: 3.5, event: 'separation_scene_finished' } },
-            { on: 'separation_scene_finished', beat: 'human_section', say: ["She's up. She's shaking herself. She's all right.", "My hands won't work. The shepherd's hut, first."],
+            { on: 'separation_scene_finished', beat: 'human_section', say: ["He's up. He's shaking himself. He's all right.", "My hands won't work. The shepherd's hut, first."],
               objective: 'Light the stove in the hut.' },
             { on: 'stove_lit', say: ['Warmth. Fingers again.', 'Against the wall: a sheep hurdle. Long enough to bridge the gap.'], objective: 'Take the hurdle.' },
             { on: 'hurdle_taken', objective: 'Lay the hurdle across the gap.' },
@@ -996,11 +996,11 @@ const levels = [
               say: ['Cold. White. Her whistle, far above.', 'And him. The fence-dog. Here, in the snow.'], objective: 'Follow the gully. Find the way up to her.' },
             { on: 'collar_found', carry: { dog: 'collar' }, voice: 'dog', bond: { fear: 0.1 },
               say: ["His. The fence-dog's. Caught on the wire.", 'His smell going on. North. Alone. Still going.'], objective: 'Bark. Let her know where you are.' },
-            { on: 'dog_barked', control: 'human', beat: 'human_section', scent: null, say: ['A bark from the sheepfold down in the gully.', 'Something in her mouth. Something blue.'],
+            { on: 'dog_barked', control: 'human', beat: 'human_section', scent: null, say: ['A bark from the sheepfold down in the gully.', 'Something in his mouth. Something blue.'],
               objective: 'Slide down into the gully at the end of the path.' },
-            { on: 'pair_met_at_fold', beat: 'near_contact', say: ["Snow on her eyelashes. Biscuit's collar in her teeth."], objective: 'Reach over the gate.' },
+            { on: 'pair_met_at_fold', beat: 'near_contact', say: ["Snow on his eyelashes. Biscuit's collar in his teeth."], objective: 'Reach over the gate.' },
             { on: 'gate_touched', beat: 'final_obstacle', switching: true, bond: { fear: -0.2 },
-              say: ["The latch is frozen solid on my side. The gate's stuck in a drift on hers."], objective: 'Break the ice. Then switch to {dog} and pull the gate.' },
+              say: ["The latch is frozen solid on my side. The gate's stuck in a drift on his."], objective: 'Break the ice. Then switch to {dog} and pull the gate.' },
             { on: 'gate_pulled', voice: 'dog', say: ['Pull. Pull. It moves.'] },
             { when_all: ['ice_broken', 'gate_pulled'], remove: ['fold_gate'], sound: 'gate', reunion: true },
             { on: 'reunion_embrace', say: ["You're frozen. Come here, come here.", 'What have you got? Oh. Oh, Biscuit.'] },
@@ -1013,7 +1013,7 @@ const levels = [
         aftermath: {
             scene: 'snow_hut', mood: 'quiet', rain: 0,
             lines: ['We sheltered in a stone hut at the top of the pass, snow at the window.', "I held Biscuit's collar for a long time.",
-                '{dog} slept across my feet, the way she did the very first night.', 'Northgate was one more day.'],
+                '{dog} slept across my feet, the way he did the very first night.', 'Northgate was one more day.'],
         },
     },
 
@@ -1205,7 +1205,7 @@ const levels = [
             { on: 'intro_3', pose: { human: ['kneel', 3] }, say: ["I gave her his collar. I couldn't say anything at all."], schedule: { seconds: 5, event: 'arrival_done' } },
             { on: 'arrival_done', cutscene: false, camera: null, follow: true, place: { human: [600, 520], dog: [660, 520] },
               objective: 'Share the stew with {dog}.' },
-            { on: 'stew_shared', say: ['Somebody gave {dog} a bowl of stew. She would have died for them.'], schedule: { seconds: 5, event: 'scent_on_wind' } },
+            { on: 'stew_shared', say: ['Somebody gave {dog} a bowl of stew. He would have died for them.'], schedule: { seconds: 5, event: 'scent_on_wind' } },
             { on: 'scent_on_wind', control: 'dog', beat: 'dog_section', mood: 'tense', scent: [3120, 380], voice: 'dog',
               say: ['Wind off the hill.', 'HIM. The fence-dog. Up there. Alive!'], objective: 'Follow the scent up the hill.' },
             { on: 'found_biscuit', voice: 'dog', say: ['Him. Under the wood. Breathing. So tired.', 'Bark. Bring her!'], objective: 'Bark for help.' },
@@ -1218,7 +1218,7 @@ const levels = [
             { on: 'biscuit_dug', voice: 'dog', say: ['Dig. Dig. HIM.'] },
             { when_all: ['beam_levered', 'biscuit_dug'], remove: ['byre_beam'], guest: 'follow', pose: { guest: ['stand', 0.1] }, control: 'human', switching: false,
               beat: 'together', mood: 'tender', sound: 'chime',
-              say: ['He stood up. Slowly, the way old dogs do.', "Then he licked {dog}'s face, as if she were still eight weeks old."],
+              say: ['He stood up. Slowly, the way old dogs do.', "Then he licked {dog}'s face, as if he were still eight weeks old."],
               objective: 'Take him down to Mina.', schedule: { seconds: 0.1, event: 'biscuit_free' } },
             { on: 'back_at_fire', cutscene: { skip_to: 'chapter_done' }, guest: 'still', place: { guest: [900, 520] }, pose: { guest: ['lean', 9999] },
               say: ["Biscuit can't hear much any more. He didn't need to.", 'He saw her, and he ran like a puppy.'], schedule: { seconds: 6, event: 'reunited' } },
@@ -1236,7 +1236,7 @@ const levels = [
 
     // ------------------------------------------------------------------ Epilogue
     // Home, a year on. The house survived the flood: tiles gone, a waterline, but standing. The
-    // last things they do are the first things they did: a mark on the doorframe, her bowl, a
+    // last things they do are the first things they did: a mark on the doorframe, his bowl, a
     // towel, and bed.
     {
         id: 'home',
@@ -1287,7 +1287,7 @@ const levels = [
         interactables: [
             { who: 'human', x: 2048, y: 520, label: 'Open the green door', event: 'home_door_opened', requires: ['saw_house'], needs_dog: true, sound: 'gate' },
             { who: 'human', x: 2900, y: 520, label: 'Mark how tall {dog} is now', event: 'height_marked_again', requires: ['home_door_opened'], needs_dog: true, sprite: 'doorframe' },
-            { who: 'human', x: 3300, y: 520, label: 'Fill her bowl', event: 'last_meal', requires: ['height_marked_again'], needs_dog: true, sprite: 'bowl', care: 'meal' },
+            { who: 'human', x: 3300, y: 520, label: 'Fill his bowl', event: 'last_meal', requires: ['height_marked_again'], needs_dog: true, sprite: 'bowl', care: 'meal' },
             { who: 'human', x: 3600, y: 520, label: 'Towel {dog} dry', event: 'towelled_dry', requires: ['last_meal'], needs_dog: true, care: 'bath' },
             { who: 'human', x: 3870, y: 520, label: 'Tuck {dog} in', event: 'tucked_in', requires: ['towelled_dry'], needs_dog: true },
             { who: 'dog', x: 900, y: 520, label: 'Take the stick', event: 'keepsake_best_stick', sprite: 'keepsake', keepsake: 'best_stick', hidden: true,
@@ -1295,7 +1295,7 @@ const levels = [
             { who: 'human', x: 1800, y: 520, label: 'Pick an apple', event: 'keepsake_apple', sprite: 'keepsake', keepsake: 'apple',
               memory: 'An apple from our tree. Small and sour. I ate all of it.' },
             { who: 'dog', x: 3480, y: 520, label: 'Dig under the sofa', event: 'keepsake_other_slipper', sprite: 'keepsake', keepsake: 'other_slipper', hidden: true,
-              memory: 'Under the sofa, a year late: the other slipper. She brought it to me like a present.' },
+              memory: 'Under the sofa, a year late: the other slipper. He brought it to me like a present.' },
         ],
         zones: [
             { x: 1400, y: 0, w: 120, h: 600, who: 'human', event: 'saw_house' },
@@ -1305,13 +1305,13 @@ const levels = [
             { on: 'saw_house', objective: 'Go home.', say: ['And then, there it was.', 'The green door. Still green. Two doors down, the blue door, still shut. Not for long.'] },
             { on: 'home_door_opened', place: { human: [2680, 520], dog: [2740, 520] }, fade_in: true, mood: 'calm',
               say: ['A waterline on the walls, halfway up. Mud on everything.', 'But the roof held over the bedroom, and the bed was dry.'], objective: 'Mark how tall {dog} is now.' },
-            { on: 'height_marked_again', mood: 'tender', say: ["'{dog}, 8 weeks.' Down by my ankle.", "'{dog}, one year.' Up past my knee. My handwriting, both times."], objective: 'Feed her. Her bowl is where it always was.' },
-            { on: 'last_meal', say: ['She went straight to it. She remembered.'], objective: 'Six days of road on her. Towel her dry.' },
-            { on: 'towelled_dry', say: ['She shook herself all over me.', 'I laughed for the first time in a year.'], objective: 'Time for bed.' },
+            { on: 'height_marked_again', mood: 'tender', say: ["'{dog}, 8 weeks.' Down by my ankle.", "'{dog}, one year.' Up past my knee. My handwriting, both times."], objective: 'Feed him. His bowl is where it always was.' },
+            { on: 'last_meal', say: ['He went straight to it. He remembered.'], objective: 'Six days of road on him. Towel him dry.' },
+            { on: 'towelled_dry', say: ['He shook himself all over me.', 'I laughed for the first time in a year.'], objective: 'Time for bed.' },
             { on: 'tucked_in', follow: false, place: { dog: [3990, 480] }, face: { dog: -1 }, pose: { dog: ['sleep', 9999], human: ['kneel', 5] }, darkness: 0.45, objective: '',
-              say: ['I tucked the blanket round her, the way I did the first night.', 'She sighed the way dogs sigh when everything is right.'], schedule: { seconds: 6, event: 'lay_down' } },
+              say: ['I tucked the blanket round him, the way I did the first night.', 'He sighed the way dogs sigh when everything is right.'], schedule: { seconds: 6, event: 'lay_down' } },
             { on: 'lay_down', cutscene: { skip_to: 'chapter_done' }, hide: { human: true }, camera: { x: 3990, y: 440, zoom: 1.15 }, darkness: 0.7, mood: 'quiet',
-              say: ['Then I lay down beside her.', 'Our house. Our bed. Both of us, home.'],
+              say: ['Then I lay down beside him.', 'Our house. Our bed. Both of us, home.'],
               schedule: { seconds: 8, event: 'chapter_done' } },
             { on: 'chapter_done', complete: true },
         ],

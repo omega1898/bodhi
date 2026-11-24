@@ -6,7 +6,7 @@
 
 **The shape:** Bodhi's first year. She brings Bodhi home as an eight-week-old puppy. Four months later a flood takes their house and carries them far away. They spend the rest of the year walking home, and Bodhi grows up on the way. The game ends where it began: the house with the green door, a bowl, a towel, and bed.
 
-**The ending:** they get home. She tucks Bodhi in, the way she did the first night, and lies down beside her. Nobody dies; the payoff is survival, trust and reunion (see `docs/design.md`, "do not make the dog's death your default emotional payoff").
+**The ending:** they get home. She tucks Bodhi in, the way she did the first night, and lies down beside him. Nobody dies; the payoff is survival, trust and reunion (see `docs/design.md`, "do not make the dog's death your default emotional payoff").
 
 **Bookends:** the last chapter repeats the first day's small rituals, a year apart. Two pencil marks on the same doorframe ("8 weeks", "one year"), the same bowl, the same bed.
 
@@ -15,7 +15,7 @@
 - The dog's lines are present-tense sensations in small capitals, with no "I": "Her smell. Rain and soap. That way."
 - Written notes appear in a plain typeface.
 
-**Names:** the dog is **Bodhi**, a female goldendoodle (`story_config` in `prototype/web/js/levels.js`, pronouns her/her). She has no name in the text yet; fill it in from `docs/characters.md` if she should have one.
+**Names:** the dog is **Bodhi**, a male goldendoodle (`story_config` in `prototype/web/js/levels.js`, pronouns him/his). The woman has no name in the text yet; fill it in from `docs/characters.md` if she should have one.
 
 ## The thread: Mina, Biscuit and the hearts
 
@@ -43,7 +43,7 @@ The journey home is driven by a second, smaller story the player pieces together
 | The Motorway | A heart on every car door. Mina's note under a wiper: "I drew hearts so he can follow me." His scent under a car |
 | Visiting Hours | Biscuit visited the children's ward on Thursdays. Ama's letter to Mina: gone north to Northgate |
 | The Orchard | The farmer's note: an old grey dog slept in the barn, "looking for someone". The hollow he left in the hay, still warm |
-| Lessons | Bodhi bolts because she smells him. In the register: "MINA was here. BISCUIT, GO NORTH." |
+| Lessons | Bodhi bolts because he smells him. In the register: "MINA was here. BISCUIT, GO NORTH." |
 | First Snow | His collar, caught on a fence wire in the snow. "If found, call Ama." No one to call |
 | The Crossing | Ribbons tied at a dog's height, a ribbon every hundred steps |
 | High Farm | Mina asks, "Have you seen Biscuit?" Bodhi smells him on the wind, trapped in a byre on the hill. Freed, he runs to Mina |
@@ -51,7 +51,7 @@ The journey home is driven by a second, smaller story the player pieces together
 
 ## Chapters
 
-Each chapter names Bodhi's age (`dog_age`), which sets her size, her drawings and how high she jumps (`dog_growth` in `levels.js`). She is bigger in every chapter than the one before; a test checks it.
+Each chapter names Bodhi's age (`dog_age`), which sets his size, his drawings and how high he jumps (`dog_growth` in `levels.js`). He is bigger in every chapter than the one before; a test checks it.
 
 | # | Chapter | Bodhi | Place | What happens |
 |---|---|---|---|---|
@@ -66,11 +66,11 @@ Each chapter names Bodhi's age (`dog_age`), which sets her size, her drawings an
 | 8 | First Snow | 10 months | The pass over the moor | The snow edge gives way; the hut, the stove, a hurdle; the collar; a frozen gate |
 | 9 | The Crossing | 11 months | Northgate, the river in flood | The river takes the bridge and the dog; the photograph blows away |
 | 10 | High Farm | 11½ months | The fire on the hill | Mina; Biscuit found under a fallen beam; the two of them together again |
-| E | Home | one year | The road west, and the green door | A second mark beside the first, her bowl, a towel, and bed: she tucks Bodhi in and lies down beside her |
+| E | Home | one year | The road west, and the green door | A second mark beside the first, his bowl, a towel, and bed: she tucks Bodhi in and lies down beside him |
 
-## Looking after her
+## Looking after him
 
-She gets hungry and dirty as the story goes on (`prototype/web/js/care.js`). It never ends the game; a hungry dog is slower and noses the bag, and a muddy one has muddy paws. Feeding her and drying her are the "ordinary affection" the design asks for between frightening moments. Coming Home teaches both; Home repeats them.
+He gets hungry and dirty as the story goes on (`prototype/web/js/care.js`). It never ends the game; a hungry dog is slower and noses the bag, and a muddy one has muddy paws. Feeding him and drying him are the "ordinary affection" the design asks for between frightening moments. Coming Home teaches both; Home repeats them.
 
 ## Keepsakes (why players replay)
 

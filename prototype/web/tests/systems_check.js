@@ -1,5 +1,5 @@
 // Purpose: checks the game's systems in a real (headless) browser: Bodhi growing up chapter by
-// chapter, feeding and cleaning her, and saving and loading. Each check plays the game through
+// chapter, feeding and cleaning him, and saving and loading. Each check plays the game through
 // its own debug controls, and the "break it" checks feed in bad input on purpose (nonsense
 // numbers, tampered saves, a button pressed again and again) to prove nothing crashes or cheats.
 //
@@ -31,8 +31,8 @@ async function start_chapter(page, index) {
     await page.waitForTimeout(200);
 }
 
-// Bodhi grows: every chapter names a real stage, she's bigger in each chapter than the one
-// before, her collision box matches her size, and puppies use the puppy drawings.
+// Bodhi grows: every chapter names a real stage, he's bigger in each chapter than the one
+// before, his collision box matches his size, and puppies use the puppy drawings.
 async function check_growth(page) {
     const report = await page.evaluate(() => {
         const unknown_ages = levels.filter(function no_stage(level) { return !dog_growth[level.dog_age]; }).map(function id_of(level) { return level.id; });
@@ -57,11 +57,11 @@ async function check_growth(page) {
         const right_size = Math.abs(dog.width - expected_width) < 0.01;
         const right_drawing = dog.drawing === (puppy ? 'bodhi_puppy' : 'bodhi');
         if (!right_size || !right_drawing) {
-            check('chapter ' + index + ' draws Bodhi at her size', false, JSON.stringify(dog));
+            check('chapter ' + index + ' draws Bodhi at his size', false, JSON.stringify(dog));
             return;
         }
     }
-    check('in every chapter her collision box matches her size, and puppies use the puppy drawings', true);
+    check('in every chapter his collision box matches his size, and puppies use the puppy drawings', true);
 }
 
 // Feeding and cleaning: the prompts appear when they should, do what they say, and can't be
@@ -98,7 +98,7 @@ async function check_care(page) {
     await page.evaluate(() => window.until_we_find_home_debug.press('act'));
     await page.waitForTimeout(300);
     state = await page.evaluate(() => window.until_we_find_home_debug.state());
-    check('feeding empties her hunger and uses one meal', state.care.hunger < 0.05 && state.care.food === 0 && state.happened.includes('dog_fed'), JSON.stringify(state.care));
+    check('feeding empties his hunger and uses one meal', state.care.hunger < 0.05 && state.care.food === 0 && state.happened.includes('dog_fed'), JSON.stringify(state.care));
     await page.waitForTimeout(1200);
     state = await page.evaluate(() => window.until_we_find_home_debug.state());
     check('a muddy dog then offers "Towel"', (state.prompt || '').startsWith('Towel'), state.prompt);
@@ -120,7 +120,7 @@ async function check_care(page) {
     state = await page.evaluate(() => window.until_we_find_home_debug.state());
     check('break it: pressing "use" 40 times feeds once and never goes below an empty bag', state.care.food === 0 && Number.isFinite(state.care.hunger), JSON.stringify(state.care));
 
-    // Time passing makes her hungry again, faster for a puppy than a grown dog.
+    // Time passing makes him hungry again, faster for a puppy than a grown dog.
     const appetite = await page.evaluate(({ chapter_indexes }) => {
         const debug = window.until_we_find_home_debug;
         const rise_in = function rise_in(chapter_index) {
@@ -132,7 +132,7 @@ async function check_care(page) {
         };
         return { puppy: rise_in(chapter_indexes.puppy), grown: rise_in(levels.length - 1) };
     }, { chapter_indexes: { puppy: puppy_chapter } });
-    check('she gets hungry as time passes, a puppy faster than a grown dog', appetite.puppy > appetite.grown && appetite.grown > 0, JSON.stringify(appetite));
+    check('he gets hungry as time passes, a puppy faster than a grown dog', appetite.puppy > appetite.grown && appetite.grown > 0, JSON.stringify(appetite));
 }
 
 // Saving and continuing: a save made mid-chapter survives closing the page and puts the story,

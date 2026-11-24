@@ -111,7 +111,7 @@ function draw_dog(context, dog, time_seconds) {
     const size = dog.size_scale || 1;
     if (size !== 1) {
         // The drawings below (shown only while the frames load) are made for a grown dog: draw
-        // one standing on the same feet, scaled down to her size.
+        // one standing on the same feet, scaled down to his size.
         const feet_x = dog.x + dog.width / 2;
         const feet_y = dog.y + dog.height;
         context.save();
@@ -1747,7 +1747,7 @@ function draw_prop(context, prop, palette, time_seconds) {
             break;
         }
         case 'dog_basket': {
-            // A round wicker basket with a cushion: the bed she was meant to sleep in.
+            // A round wicker basket with a cushion: the bed he was meant to sleep in.
             context.fillStyle = '#9a7448';
             context.beginPath();
             context.ellipse(x, y - 8, 30, 10, 0, 0, Math.PI * 2);
@@ -1795,7 +1795,7 @@ function draw_prop(context, prop, palette, time_seconds) {
             break;
         }
         case 'tucked_blanket': {
-            // The blanket pulled up over Bodhi's back once she's tucked in; drawn in front of her.
+            // The blanket pulled up over Bodhi's back once he's tucked in; drawn in front of him.
             context.fillStyle = prop.blanket || '#7a5a8a';
             context.beginPath();
             context.moveTo(x + 104, y - 22);
@@ -2325,7 +2325,7 @@ function draw_interactable(context, item, time_seconds, in_reach, available) {
             break;
         }
         case 'bowl': {
-            // Her bowl at home, by the counter.
+            // His bowl at home, by the counter.
             context.fillStyle = '#7d8790';
             context.beginPath();
             context.moveTo(x - 9, y - 5);
@@ -2461,7 +2461,7 @@ function draw_particles(context, particles) {
             context.fillRect(-particle.width / 2, -particle.height / 2, particle.width, 3);
             context.restore();
         } else if (particle.kind === 'bowl') {
-            // A steel dog bowl on the floor, while she eats. Fades out at the end.
+            // A steel dog bowl on the floor, while he eats. Fades out at the end.
             context.save();
             context.translate(particle.x, particle.y);
             context.scale(particle.size, particle.size);
@@ -3009,8 +3009,8 @@ function draw_home_outside(context, x, y, weathered) {
 
 // Draws one of the still, slowly moving scenes shown after a chapter ends. The characters
 // are drawn large here: this is where the player gets to look at them properly.
-// `dog_look` is Bodhi's growth stage in that chapter ({ size, drawing }), so she is the size
-// she was in the chapter just played.
+// `dog_look` is Bodhi's growth stage in that chapter ({ size, drawing }), so he is the size
+// he was in the chapter just played.
 function draw_vignette_scene(context, scene_name, time_seconds, width, height, dog_look) {
     const dog_size = dog_look ? dog_look.size : 1;
     const dog_drawing = dog_look ? dog_look.drawing : 'bodhi';
@@ -3127,7 +3127,7 @@ function draw_vignette_scene(context, scene_name, time_seconds, width, height, d
         draw_her_asleep(context, 30, -46, time_seconds);
         context.restore();
         if (last) {
-            // Bodhi beside her, head on the pillow end, the blanket tucked over her back.
+            // Bodhi beside her, head on the pillow end, the blanket tucked over his back.
             draw_figure('dog', 'sleep', bed_x + 210, floor_y - 40 * 2.3 + 6, -1, {});
             context.save();
             context.translate(bed_x, floor_y);
