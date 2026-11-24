@@ -22,6 +22,8 @@ The Unity project will show the rules on screen. It reads them, and never the ot
 - `ChapterRunSave`: saving in the middle of a chapter and carrying on later. The save lists the events so far; resuming replays them quietly through the same rules, and a damaged save is refused whole.
 - `Chapters/`: all twelve chapters as data, generated from the browser game by `rules_dotnet/tools/export_chapters.js`. Don't edit them by hand.
 - `Campaign`, `ChapterMemories`: the whole year in order, carrying Bodhi's care, keepsakes and story memory from chapter to chapter, saved between chapters.
+- `BondJourney`: the bond across the whole year: points from ordinary care (less when repeated the same day), five named levels, and a trick unlocked at each.
+- `HomeDay`: three small things to do at home each day, the same for everyone on that date, with a gentle daily streak and the fetch record.
 
 ## Why it is a package and not a folder inside the Unity project
 

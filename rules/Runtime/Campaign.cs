@@ -1,7 +1,8 @@
 // Purpose: Bodhi's whole year, played chapter by chapter. Carries what should last from one
-// chapter to the next: his care (hunger, mud, meals in the bag), the keepsakes found, and his
-// story memory. How he feels (fear, closeness) starts fresh in each chapter, as in the browser
-// game. Saved as plain text between chapters; a damaged save is refused whole.
+// chapter to the next: his care (hunger, mud, meals in the bag), the keepsakes found, his
+// story memory, the year-long bond (BondJourney) and the things to do at home (HomeDay). How
+// he feels (fear, closeness) starts fresh in each chapter, as in the browser game. Saved as
+// plain text between chapters; a damaged save is refused whole.
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -21,6 +22,17 @@ namespace Bodhi.Rules
 
         public StoryMemory memory { get; private set; } = new StoryMemory();
         public CareState care { get; private set; } = new CareState();
+
+        // The bond across the whole year: points, level and tricks. The scene records care given
+        // in a chapter here (journey.record_care); finishing a chapter adds the story's share.
+        public BondJourney journey { get; private set; } = new BondJourney();
+
+        // The three things to do at home each day, the streak and the fetch record.
+        public HomeDay home { get; private set; } = new HomeDay();
+
+        // What the last finished chapter added to the bond (points, level up, new tricks), for
+        // the aftermath screen. Empty until a chapter is finished.
+        public BondChange last_chapter_bond { get; private set; } = new BondChange();
 
         // The chapter to play next, or null once the year is over.
         public ChapterScript current_chapter => is_finished ? null : chapters[chapter_index];
@@ -55,6 +67,13 @@ namespace Bodhi.Rules
         public bool has_keepsake(string chapter_id, string keepsake)
         {
             return keepsakes.Contains(chapter_id + ":" + keepsake);
+        }
+
+        // The game says what day it is (the phone's local date as a day count) at start-up, on
+        // coming back to the app, and now and then while open. Rolls the home tasks over.
+        public DayChange set_today(int day)
+        {
+            return home.change_day(day, journey);
         }
 
         // How Bodhi follows her now, from how he feels and what he remembers.
@@ -102,10 +121,32 @@ namespace Bodhi.Rules
             }
             string chapter_id = run.chapter.id;
             care = new CareState(run.care.hunger, run.care.dirt, run.care.food);
+            // The story's share of the bond is counted on the last day the game gave (0 if none).
+            // Story moments happen once each and never shrink, so the day only keeps the rules
+            // the same as for everything else.
+            int points_before = journey.points;
+            int level_before = journey.level_number;
+            var unlocks = new List<string>();
+            unlocks.AddRange(journey.record_care(BondCareKind.chapter_finished, home.day).new_unlocks);
             foreach (var keepsake in run.found_keepsakes)
             {
-                keepsakes.Add(chapter_id + ":" + keepsake);
+                if (keepsakes.Add(chapter_id + ":" + keepsake))
+                {
+                    unlocks.AddRange(journey.record_care(BondCareKind.keepsake_found, home.day).new_unlocks);
+                }
             }
+            if (run.has_happened("reunion_complete"))
+            {
+                unlocks.AddRange(journey.record_care(BondCareKind.reunion_made, home.day).new_unlocks);
+            }
+            last_chapter_bond = new BondChange
+            {
+                counted = true,
+                points_gained = journey.points - points_before,
+                level_before = level_before,
+                level_after = journey.level_number,
+                new_unlocks = unlocks.ToArray(),
+            };
             foreach (var moment in ChapterMemories.all)
             {
                 if (moment.chapter_id == chapter_id && run.has_happened(moment.event_name))
@@ -118,8 +159,11 @@ namespace Bodhi.Rules
             return true;
         }
 
-        // The save, as text: a format line, the next chapter, his care, then one line per
-        // keepsake and per fact. Numbers are written the same on every computer.
+        // The save, as text: a format line, the next chapter, his care, the bond's lines, the
+        // home days' lines, then one line per keepsake and per fact. Numbers are written the same
+        // on every computer. The bond and home lines were added later without a new format
+        // number: a save without them still loads (they start fresh), and an older game refuses
+        // a save with them whole rather than half-reading it.
         public string to_text()
         {
             var text = new StringBuilder();
@@ -129,6 +173,8 @@ namespace Bodhi.Rules
                 .Append(care.hunger.ToString("R", CultureInfo.InvariantCulture)).Append(' ')
                 .Append(care.dirt.ToString("R", CultureInfo.InvariantCulture)).Append(' ')
                 .Append(care.food.ToString(CultureInfo.InvariantCulture)).Append('\n');
+            text.Append(journey.to_text());
+            text.Append(home.to_text());
             foreach (var keepsake in keepsakes)
             {
                 text.Append("keepsake ").Append(keepsake).Append('\n');
@@ -160,6 +206,8 @@ namespace Bodhi.Rules
             var loaded_keepsakes = new SortedSet<string>(StringComparer.Ordinal);
             var loaded_memory = new StoryMemory();
             var fact_text = new StringBuilder();
+            var journey_text = new StringBuilder();
+            var home_text = new StringBuilder();
             for (int index = 3; index < lines.Length; index++)
             {
                 string line = lines[index];
@@ -175,6 +223,14 @@ namespace Bodhi.Rules
                 {
                     fact_text.Append(line.Substring("fact ".Length)).Append('\n');
                 }
+                else if (line.StartsWith("bond ", StringComparison.Ordinal) || line.StartsWith("trick ", StringComparison.Ordinal))
+                {
+                    journey_text.Append(line).Append('\n');  // Checked whole by BondJourney below.
+                }
+                else if (line.StartsWith("home ", StringComparison.Ordinal) || line.StartsWith("home_task ", StringComparison.Ordinal))
+                {
+                    home_text.Append(line).Append('\n');     // Checked whole by HomeDay below.
+                }
                 else
                 {
                     return false;
@@ -184,9 +240,19 @@ namespace Bodhi.Rules
             {
                 return false;
             }
+            var loaded_journey = new BondJourney();
+            var loaded_home = new HomeDay();
+            if ((journey_text.Length > 0 && !loaded_journey.load_text(journey_text.ToString()))
+                || (home_text.Length > 0 && !loaded_home.load_text(home_text.ToString())))
+            {
+                return false;
+            }
             chapter_index = loaded_index;
             care = loaded_care;
             memory = loaded_memory;
+            journey = loaded_journey;
+            home = loaded_home;
+            last_chapter_bond = new BondChange();
             keepsakes.Clear();
             keepsakes.UnionWith(loaded_keepsakes);
             current_run = null;

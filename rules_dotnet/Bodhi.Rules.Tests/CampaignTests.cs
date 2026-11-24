@@ -195,5 +195,111 @@ namespace Bodhi.Rules.Tests
             Assert.That(loaded.is_finished, Is.True);
             Assert.That(loaded.begin_chapter(), Is.Null);
         }
+
+        // Finishing a chapter grows the year-long bond: the chapter itself, each keepsake found
+        // in it, and the reunion if there was one. The change is kept for the aftermath screen.
+        [Test]
+        public void finishing_a_chapter_grows_the_bond()
+        {
+            var campaign = new Campaign();
+            Assert.That(campaign.journey.points, Is.EqualTo(0));
+            var run = play_current(campaign);
+            int expected = BondJourney.full_points_for(BondCareKind.chapter_finished)
+                + run.found_keepsakes.Count * BondJourney.full_points_for(BondCareKind.keepsake_found)
+                + (run.has_happened("reunion_complete") ? BondJourney.full_points_for(BondCareKind.reunion_made) : 0);
+            Assert.That(campaign.journey.points, Is.EqualTo(expected));
+            Assert.That(campaign.last_chapter_bond.points_gained, Is.EqualTo(expected));
+            while (!campaign.is_finished)
+            {
+                play_current(campaign);
+            }
+            Assert.That(campaign.journey.level_number, Is.GreaterThanOrEqualTo(4));  // A whole year together.
+        }
+
+        // The game tells the campaign the date; the home tasks follow it.
+        [Test]
+        public void the_campaign_keeps_the_home_days()
+        {
+            var campaign = new Campaign();
+            Assert.That(campaign.set_today(739000), Is.EqualTo(DayChange.new_day_started));
+            Assert.That(campaign.home.tasks_today.Count, Is.EqualTo(HomeDay.tasks_per_day));
+            Assert.That(campaign.set_today(738999), Is.EqualTo(DayChange.refused_went_backwards));
+            Assert.That(campaign.set_today(-1), Is.EqualTo(DayChange.refused_bad_day));
+        }
+
+        // The bond and the home days are saved with the year and load back the same.
+        [Test]
+        public void the_bond_and_home_days_survive_a_save()
+        {
+            var campaign = new Campaign();
+            campaign.set_today(739000);
+            play_current(campaign);
+            campaign.home.do_task(HomeTask.teach_new_trick, campaign.journey);
+            campaign.home.fetch_caught(campaign.journey);
+            string text = campaign.to_text();
+            Assert.That(text, Does.Contain("\nbond ").And.Contain("\ntrick sit\n").And.Contain("\nhome 739000 "));
+            var loaded = new Campaign();
+            Assert.That(loaded.load_text(text), Is.True);
+            Assert.That(loaded.to_text(), Is.EqualTo(text));
+            Assert.That(loaded.journey.points, Is.EqualTo(campaign.journey.points));
+            Assert.That(loaded.journey.knows_trick("sit"), Is.True);
+            Assert.That(loaded.home.tasks_today, Is.EqualTo(campaign.home.tasks_today));
+            Assert.That(loaded.home.fetch_best_ever, Is.EqualTo(1));
+        }
+
+        // A save from before the bond and home days existed still loads, starting both fresh.
+        [Test]
+        public void an_older_save_without_the_bond_still_loads()
+        {
+            var campaign = new Campaign();
+            campaign.set_today(739000);
+            campaign.home.do_task(HomeTask.brush, campaign.journey);
+            string old_save = "bodhi_campaign 1\nchapter 3\ncare 0.5 0.25 4\nkeepsake coming_home:" + first_keepsake("coming_home") + "\nfact met_biscuit\n";
+            Assert.That(campaign.load_text(old_save), Is.True);
+            Assert.That(campaign.chapter_number, Is.EqualTo(3));
+            Assert.That(campaign.journey.points, Is.EqualTo(0));
+            Assert.That(campaign.home.day, Is.EqualTo(0));
+        }
+
+        // The first keepsake of a chapter, for writing saves by hand.
+        static string first_keepsake(string chapter_id)
+        {
+            return StoryChapters.all().First(chapter => chapter.id == chapter_id).things.First(thing => !string.IsNullOrEmpty(thing.keepsake)).keepsake;
+        }
+
+        // Break it: a damaged bond or home line refuses the whole save and changes nothing.
+        [Test]
+        public void a_damaged_bond_or_home_line_is_refused_whole()
+        {
+            var good = new Campaign();
+            good.set_today(739000);
+            play_current(good);
+            good.home.do_task(HomeTask.teach_new_trick, good.journey);
+            string text = good.to_text();
+            string bond_line = text.Split('\n').First(line => line.StartsWith("bond "));
+            string home_line = text.Split('\n').First(line => line.StartsWith("home "));
+            string[] bad_texts =
+            {
+                text.Replace(bond_line, "bond -1 739000 0 0 0 0 0 0 0 0 0 0"),
+                text.Replace(bond_line, "bond NaN 739000 0 0 0 0 0 0 0 0 0 0"),
+                text.Replace(bond_line, bond_line + "\n" + bond_line),            // Repeated.
+                text.Replace("trick sit\n", "trick hug\n"),                      // Not unlocked yet.
+                text.Replace("trick sit\n", "trick sit\ntrick sit\n"),
+                text.Replace(home_line, "home 739000 5 1 739000 0 0"),             // Streak above the best.
+                text.Replace(home_line, home_line + "\n" + home_line),
+                text.Replace(home_line + "\n", ""),                                // Tasks with no day.
+                text + "home_task brush 0\n",                                     // A fourth task.
+                text.Replace(bond_line + "\n", "") + bond_line + "\n",            // Bond after its trick.
+            };
+            foreach (var bad in bad_texts)
+            {
+                var campaign = new Campaign();
+                campaign.set_today(739001);
+                play_current(campaign);
+                string before = campaign.to_text();
+                Assert.That(campaign.load_text(bad), Is.False, bad);
+                Assert.That(campaign.to_text(), Is.EqualTo(before));
+            }
+        }
     }
 }
