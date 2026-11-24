@@ -13,7 +13,7 @@ namespace Bodhi.Rules
         dog,    // Bodhi.
     }
 
-    public class RailwayChapter
+    public partial class RailwayChapter
     {
         // One story step: in this beat, this event moves the story to that beat.
         readonly struct BeatTrigger
