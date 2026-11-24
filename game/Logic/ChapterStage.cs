@@ -249,6 +249,7 @@ namespace Bodhi.Game
         public StageSetting[] scenery = Array.Empty<StageSetting>();  // Sky colours, rain, fog...
         public double human_start_x, human_start_feet_y;
         public double dog_start_x, dog_start_feet_y;
+        public double ball_x, ball_y;                   // Where the ball starts (its centre), if the chapter has one.
         public StageGuest guest = null;
         public StageSolid[] solids = Array.Empty<StageSolid>();
         public StageWater[] water = Array.Empty<StageWater>();
