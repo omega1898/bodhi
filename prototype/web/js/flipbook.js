@@ -364,7 +364,7 @@ function choose_flipbook_frame(character, character_name, time_seconds) {
         const frame_count = animations.jump.frames;
         const speeds = flipbook_jump_speeds[character_name];
         const velocity_y = character.velocity_y || 0;
-        // A puppy takes off slower (she jumps lower), so her arc starts from her own speed.
+        // A puppy takes off slower (he jumps lower), so his arc starts from his own speed.
         const rise = speeds.rise * (character.jump_scale || 1);
         const through_arc = velocity_y < 0 ? 1 + velocity_y / rise : 1 + velocity_y / speeds.fall;
         state.starting_stride = true;  // Landing into a run starts the stride from the feet.
@@ -401,7 +401,7 @@ function choose_flipbook_frame(character, character_name, time_seconds) {
         // Walk or run (trot or gallop for the dog), by speed. Two thresholds, so a speed near
         // the line doesn't flicker between the two.
         const slow_gait = character_name === 'her' ? 'walk' : 'trot';
-        // A smaller dog's stride is shorter in the world, so her cycle covers less ground.
+        // A smaller dog's stride is shorter in the world, so his cycle covers less ground.
         const size = character.size_scale || 1;
         const fast_gait = character_name === 'her' ? 'run' : 'gallop';
         const switch_speed = character_name === 'her' ? 125 : 150;
@@ -455,7 +455,7 @@ function draw_flipbook_character(context, character, character_name, time_second
     state.last_feet = points.feet.map(function on_screen(foot) { return [foot[0] * drawn_facing, foot[1]]; });
     context.save();
     context.translate(character.x + character.width / 2, character.y + character.height);
-    // Frames are drawn for a full-grown body; a growing dog is drawn smaller around her feet.
+    // Frames are drawn for a full-grown body; a growing dog is drawn smaller around his feet.
     const size = character.size_scale || 1;
     context.scale(drawn_facing * (character.squash_x || 1) * size, (character.squash_y || 1) * size);
     const column = frame_index % painted.columns;
