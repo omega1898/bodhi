@@ -366,7 +366,8 @@ function draw_her(pose) {
     const hem_skew = number_text(-degrees(pose.hem || 0));
     pieces.push(place_part(her_parts.torso, pose.hip, torso_angle, ' translate(0,-275) skewX(' + hem_skew + ') translate(0,275)'));
     pieces.push(place_part(her_parts.scarf_tail, add(pose.hip, rotate_point([-3.6, -26.4], torso_angle)), 0.25 + (pose.scarf || 0)));
-    pieces.push(place_part(her_parts.ponytail, add(pose.shoulder, rotate_point([-7.8, -14.8], head_angle)), 0.3 + (pose.hair || 0)));
+    // Her long hair, worn down: it hangs from the back of the crown over the coat's shoulders.
+    pieces.push(place_part(her_parts.ponytail, add(pose.shoulder, rotate_point([-7.2, -12.6], head_angle)), 0.14 + (pose.hair || 0)));
     let head = place_part(her_parts.head, pose.shoulder, head_angle);
     if (pose.eyes === 'closed') {
         // A closed eye: skin over the painted eye, and a soft lash line.
@@ -535,6 +536,11 @@ const her_animations = {
 
 // ---------- The dog ----------
 
+// His markings, matched to the real Bodhi: a cream-white blaze on his chest and paws paler
+// than his legs. Biscuit's look turns both grey-white.
+const blaze_color = '#f6ead8';
+const paw_color = '#f1dcc0';
+
 // A point on the dog's body: `along` the spine (positive toward the chest) and `up` from it,
 // measured from `base`. Using the body's own directions keeps shapes right when it rears up.
 function body_point(base, axis, along, up) {
@@ -627,6 +633,17 @@ function draw_dog(adult_pose, build) {
         body_point(pelvis, axis, -10.5, -5),
     ].map(to_body);
 
+    // The blaze on his chest, inside the outline: from under the beard, down the front of the
+    // chest, to between his front legs.
+    const blaze = [
+        add(head, [-1.5, 8.5]),
+        body_point(withers, axis, 10.2, -2.5),
+        body_point(withers, axis, 8, -10),
+        body_point(withers, axis, 2.5, -11.6),
+        body_point(withers, axis, 2.8, -4),
+        body_point(withers, axis, 5.5, 2),
+    ].map(to_body);
+
     // A leg: one furry tube from inside the body, through the joint, to the paw.
     const leg = function draw_leg(top, paw, widths, color) {
         // Bigger paws are lifted by as much as they grew, so they still stand on the floor.
@@ -657,10 +674,10 @@ function draw_dog(adult_pose, build) {
         }).join(' ');
         return '<path d="' + tube + '" fill="' + color + '"/>' +
             '<path d="' + tube + '" fill="url(#curls)"/>' +
-            paw_shape + ' fill="' + color + '"' + level + '/>' +
+            paw_shape + ' fill="' + paw_color + '"' + level + '/>' +
             paw_shape + ' fill="url(#curls)"' + level + '/>' +
-            '<g' + level + '><ellipse cx="' + number_text(paw_pixels[0]) + '" cy="' + number_text(paw_pixels[1] + paw_height * 0.55) + '" rx="' + number_text(paw_width * 0.9) + '" ry="' + number_text(paw_height * 0.4) + '" fill="#6e4220" opacity="0.28"/>' +
-            '<path d="' + toes + '" fill="none" stroke="#6e4220" stroke-width="3" stroke-linecap="round" opacity="0.4"/></g>';
+            '<g' + level + '><ellipse cx="' + number_text(paw_pixels[0]) + '" cy="' + number_text(paw_pixels[1] + paw_height * 0.55) + '" rx="' + number_text(paw_width * 0.9) + '" ry="' + number_text(paw_height * 0.4) + '" fill="#5e3218" opacity="0.28"/>' +
+            '<path d="' + toes + '" fill="none" stroke="#5e3218" stroke-width="3" stroke-linecap="round" opacity="0.4"/></g>';
     };
     const front_top_near = body_point(withers, axis, 2, -3);
     const front_top_far = body_point(withers, axis, 0, -3);
@@ -689,6 +706,9 @@ function draw_dog(adult_pose, build) {
         leg(back_top_near, pose.legs.near_back, [134, 86, 70], 'url(#coat)'),  // Hock and foot stay slim: sitting, they lie on the floor.
         '<path d="' + smooth_closed_path(outline) + '" fill="url(#coat)"/>',
         '<path d="' + smooth_closed_path(outline) + '" fill="url(#curls)"/>',
+        // His white blaze: the real Bodhi has a cream-white bib from his throat down his chest.
+        '<path d="' + smooth_closed_path(blaze) + '" fill="' + blaze_color + '"/>',
+        '<path d="' + smooth_closed_path(blaze) + '" fill="url(#curls)"/>',
         pose.reaching ? '<g transform="translate(0,8)" opacity="0.35">' + leg(front_top_near, pose.legs.near_front, [92, 74, 64], '#6b4320') + '</g>' + leg(front_top_near, pose.legs.near_front, [92, 74, 64], 'url(#coat_light)') : '',
     ];
     // Fur detail: a soft lighter band along the back where the light catches it. A wavy
@@ -697,7 +717,7 @@ function draw_dog(adult_pose, build) {
     let head_markup = place_part(dog_parts.head, head, pose.head_angle || 0, build.head === 1 ? '' : ' scale(' + build.head + ')');
     const overlays = [];
     if (pose.eyes === 'closed') {
-        overlays.push('<ellipse cx="44" cy="-22" rx="22" ry="24" fill="#f0d0a0"/><path d="M 26,-20 C 36,-8 54,-8 64,-20" fill="none" stroke="#3a2418" stroke-width="5" stroke-linecap="round"/>');
+        overlays.push('<ellipse cx="44" cy="-22" rx="22" ry="24" fill="#f3d2a8"/><path d="M 26,-20 C 36,-8 54,-8 64,-20" fill="none" stroke="#3a2418" stroke-width="5" stroke-linecap="round"/>');
     }
     if (pose.mouth === 'open') {
         overlays.push('<path d="M 82,60 C 100,92 136,90 148,62 C 130,74 102,74 82,60 Z" fill="#5a2a22"/><path d="M 96,72 C 108,84 126,84 136,72" fill="#c96a62"/>');
@@ -1011,15 +1031,15 @@ function write_animation(character, name, frames, definitions, draw) {
     return entry;
 }
 
-// The puppy's coat colours. Goldendoodles usually lighten as they grow, so the puppy is a
-// deeper apricot than the adult. Each adult colour in the painted sheet is swapped for its
+// The puppy's coat colours. The real Bodhi was a deep red-apricot as a puppy and is lightening
+// as he grows, as goldendoodles do, so the puppy is a deeper red than the adult. Each adult colour in the painted sheet is swapped for its
 // puppy shade; a colour missing from the sheet stops the tool, so a repaint can't silently
 // leave the puppy the adult's colour.
 const puppy_coat_colors = {
-    '#f6d39c': '#f0c286', '#e0a867': '#d6924c', '#ad773f': '#9c612d',
-    '#cf9558': '#c28046', '#8a5a30': '#7a4823',
-    '#fae2b6': '#f6d29c', '#e3ae70': '#d99a58',
-    '#c88746': '#b46f36', '#7c4a24': '#6a391b',
+    '#eebf8a': '#e6a870', '#d4925a': '#c67b40', '#a1612f': '#8e4d22',
+    '#c07a44': '#b0662f', '#7c4422': '#6a3519',
+    '#f6d3a6': '#efbf8a', '#dc9e64': '#cf8547',
+    '#b8692f': '#a65824', '#6e3518': '#5c2a12',
 };
 function puppy_definitions(definitions) {
     let result = definitions;
@@ -1037,16 +1057,18 @@ function puppy_definitions(definitions) {
 // older dog at a glance. Used on the sheet's definitions and on every drawn frame.
 const biscuit_changes = [
     // Coat, light coat, shadowed coat and ears.
-    ['#f6d39c', '#e4e0d8'], ['#e0a867', '#c2bdb3'], ['#ad773f', '#8e887d'],
-    ['#cf9558', '#aaa499'], ['#8a5a30', '#6d675d'],
-    ['#fae2b6', '#f1efea'], ['#e3ae70', '#cfcac1'],
-    ['#c88746', '#857d70'], ['#7c4a24', '#4f4940'],
+    ['#eebf8a', '#e4e0d8'], ['#d4925a', '#c2bdb3'], ['#a1612f', '#8e887d'],
+    ['#c07a44', '#aaa499'], ['#7c4422', '#6d675d'],
+    ['#f6d3a6', '#f1efea'], ['#dc9e64', '#cfcac1'],
+    ['#b8692f', '#857d70'], ['#6e3518', '#4f4940'],
     // Muzzle, beard, moustache, brow, curl shading, the closed-eye lid.
-    ['#f1cd96', '#ece9e2'], ['#dba86c', '#d3cfc7'], ['#cf9a5e', '#c4bfb6'], ['#f4d6a6', '#f2f0ea'], ['#b07a46', '#8a8478'], ['#8a5528', '#6f6a62'], ['#6e4220', '#5a554e'], ['#f0d0a0', '#e8e5de'],
+    ['#f7e7d0', '#ece9e2'], ['#efd9bb', '#d3cfc7'], ['#e0c3a0', '#c4bfb6'], ['#fbf0e0', '#f2f0ea'], ['#a35f2c', '#8a8478'], ['#7e4421', '#6f6a62'], ['#5e3218', '#5a554e'], ['#f3d2a8', '#e8e5de'],
     // A blue collar instead of Bodhi's red.
     ['#9a2f2a', '#2f4f8a'], ['#c45a50', '#5a78b8'],
     // The lower eyelid's warm edge.
-    ['#c99a62', '#a8a399'],
+    ['#c4895a', '#a8a399'],
+    // His chest blaze and paws, grey-white instead of Bodhi's cream.
+    ['#f6ead8', '#eeece6'], ['#f1dcc0', '#dcd8d0'],
     // A smoother coat.
     ['scale="22"', 'scale="9"'], ['opacity="0.31"', 'opacity="0.12"'],
 ];
