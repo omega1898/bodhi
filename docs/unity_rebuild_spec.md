@@ -45,7 +45,7 @@ Verification codes:
 | R2.4 | Ears, tail, hair, scarf and coat hem move on springs (secondary motion) in every pose. | T |
 | **N3** | **Adventure with depth, not breadth** | |
 | R3.1 | Every chapter has at least one moment whose outcome a later chapter remembers and responds to. | T |
-| R3.2 | Bodhi's behaviour changes with what happened: after a frightening separation she stays closer for a while, and she approaches water warily if she was swept away. | T |
+| R3.2 | Bodhi's behaviour changes with what happened: after a frightening separation he stays closer for a while, and he approaches water warily if he was swept away. | T |
 | R3.3 | Each chapter tells part of the Mina and Biscuit thread through things the player finds, not through long text. | I |
 | R3.4 | Measured first-time play is at least 20 minutes per chapter, with people choosing to keep playing. | D |
 | **N4** | **Care moments that build the bond** | |
@@ -60,7 +60,7 @@ Verification codes:
 | R6.1 | A computer search proves every puzzle is solvable and has no soft lock. A soft lock is a state the player can reach from which the solution is no longer reachable. | T |
 | R6.2 | Each chapter's main puzzle needs both characters, each using an ability only they have. | T |
 | R6.3 | Each main puzzle needs at least 6 actions to solve, and has at least one dead-end branch. | T |
-| R6.4 | Hints come from Bodhi's behaviour (she looks toward or sniffs at the next step) after 3 minutes without progress. The median solve time in playtests is 3 to 8 minutes. | T + D |
+| R6.4 | Hints come from Bodhi's behaviour (he looks toward or sniffs at the next step) after 3 minutes without progress. The median solve time in playtests is 3 to 8 minutes. | T + D |
 | **N7** | **A good App Store citizen** | |
 | R7.1 | Runs fully offline and collects no data. | T + I |
 | R7.2 | Sound plays with the silent switch on, mixed with the player's own music. | D |
@@ -82,14 +82,14 @@ flowchart TD
   D --> E[Near contact: the fence<br/>touch through the wire, gate jammed]
   E --> F[Main puzzle: both routes<br/>water level, floating platform, counterweight]
   F --> G[Reunion: approach, kneel, contact<br/>player controls the moment]
-  G --> H[Care moment: in the cabin<br/>towel her dry, then feed her]
+  G --> H[Care moment: in the cabin<br/>towel him dry, then feed him]
   H --> I[Quiet aftermath: rain, stove,<br/>the glove drying, bond remembered]
 ```
 
 A minute of play, as the player feels it:
 1. You hold right and she speeds up over a fifth of a second, scarf trailing on its spring. The camera eases ahead of her.
 2. A gate won't open from this side. Bodhi's portrait glows at the screen edge, because Bodhi can reach the far side. You tap it.
-3. The camera glides to Bodhi in under a second while she shakes water off.
+3. The camera glides to Bodhi in under a second while he shakes water off.
 4. You sniff, and a faint trail shows her scent going left.
 
 ## 3. Architecture
@@ -131,7 +131,7 @@ flowchart TB
 1. Bodhi's motor walks into the scent trigger.
 2. The world reports `glove_found` to the rules.
 3. The rules move the story to the next beat, add `glove_found` to chapter memory and raise trust.
-4. The game reads that new state and plays the glove close-up and her happy tail.
+4. The game reads that new state and plays the glove close-up and his happy tail.
 
 ### 3.3 Character switching
 
@@ -161,15 +161,15 @@ The game's objects only report actions. The rules decide what each action change
 ### 3.5 Bond and care
 
 Three numbers, carried over from `core/bond_state`, each between 0 and 1:
-- **trust:** how readily she follows calls.
-- **fear:** how frightened she is right now.
-- **closeness need:** how strongly she wants to stay near.
+- **trust:** how readily he follows calls.
+- **fear:** how frightened he is right now.
+- **closeness need:** how strongly he wants to stay near.
 
 The `care.js` numbers come across too: **hunger**, **dirt** and **food**.
 
 A care moment turns touch gestures into events:
 - **Drying:** rub circles over the wet areas until each is dry.
-- **Feeding:** drag the food into the bowl, then wait while she eats.
+- **Feeding:** drag the food into the bowl, then wait while he eats.
 - **Bathing:** scrub, rinse, then step back for the shake-off.
 - **Grooming:** brush along the coat direction to work out tangles.
 
@@ -178,7 +178,7 @@ Each gesture adds to trust, up to a cap per chapter, so repeating a moment can't
 ### 3.6 Story depth
 
 - Each chapter is a sequence of **beats** driven by named events, as decision 3 in `docs/architecture.md` already works.
-- A **story memory** (a set of facts like `swept_away_by_river`) travels between chapters. Later chapters read it to change Bodhi's behaviour, her lines and which details appear (R3.1, R3.2).
+- A **story memory** (a set of facts like `swept_away_by_river`) travels between chapters. Later chapters read it to change Bodhi's behaviour, his lines and which details appear (R3.1, R3.2).
 
 ### 3.7 Saves
 
@@ -202,7 +202,7 @@ flowchart LR
 - **Bones and meshes:** each character is one painting cut into parts on a skeleton. The engine bends the parts every frame, so motion is as smooth as the screen. This is what removes the flipbook stepping (R1.1).
 - **Blend tree:** a chart that mixes animations by a number, such as speed. Walking slowly mixes idle and walk; speeding up mixes walk into run.
 - **IK (inverse kinematics):** you give the foot's target and the code works out the knee and hip angles, so feet plant on steps.
-- **Normal maps:** a hidden second painting that tells the lighting which way each part of the surface faces, so a lamp lights the side of her coat that faces it.
+- **Normal maps:** a hidden second painting that tells the lighting which way each part of the surface faces, so a lamp lights the side of Bodhi's coat that faces it.
 
 [Recalled, to verify at setup: these package names and behaviours are as of Unity 6: 2D Animation, PSD Importer, Cinemachine, Input System, Universal Render Pipeline (URP) with its 2D renderer, and Unity Test Framework.]
 
