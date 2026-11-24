@@ -210,6 +210,8 @@ namespace Bodhi.Rules.Tests
         [Test]
         public void a_damaged_journey_save_is_refused_whole()
         {
+            // The good save the bad ones are made from loads, so each refusal is for its own damage.
+            Assert.That(new BondJourney().load_text("bond 10 5 0 0 0 0 0 0 0 0 0 0\ntrick sit\n"), Is.True);
             string[] bad_texts =
             {
                 null,
