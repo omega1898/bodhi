@@ -2,6 +2,10 @@
 // and press Play: it makes the camera, the on-screen text and buttons, shows the title, and then
 // plays every chapter in turn, building each one's place from its exported stage.
 //
+// Between and after chapters it shows home (HomeScreen), and it tells the session the date at
+// start-up, on Continue, when the phone shows the game again and once a minute, so the home
+// tasks roll over at midnight.
+//
 // It decides nothing about the story or about movement itself. Each frame it reads the buttons,
 // asks the tested Logic code (GameSession, ChapterRun, CharacterMover, CompanionSteering,
 // BallFlight, PromptPicker, StageTracker) what happens, and shows the answer. The order of a
@@ -19,6 +23,7 @@ namespace Bodhi.Game
         public const float longest_frame_seconds = 0.1f;  // A long hitch plays as a short one.
         public const double autopilot_arrived = 10;  // A story walk is over this close to its spot.
         public const double guest_set_off = 60, guest_stop = 24, guest_behind = 56, guest_speed_scale = 0.8;
+        public const float date_check_seconds = 60;   // How often the date is checked while the game is open.
 
         static readonly Color her_color = new Color(0.78f, 0.58f, 0.46f);
         static readonly Color his_color = new Color(0.86f, 0.66f, 0.32f);
@@ -28,6 +33,8 @@ namespace Bodhi.Game
         PlayerControls controls;
         GameHud hud;
         TitleScreens titles;                         // The opening, the back story and the memory box.
+        HomeScreen home_screen;                      // Home: the bond, the streak, today's tasks and fetch.
+        float seconds_until_date_check = date_check_seconds;
         CameraRig camera_rig;
         GameAudio game_audio;
         bool started = false;                        // Past the title screen.
@@ -59,6 +66,8 @@ namespace Bodhi.Game
             titles = new TitleScreens(transform);
             game_audio = gameObject.AddComponent<GameAudio>();
             session = new GameSession(new SaveFiles(Path.Combine(Application.persistentDataPath, "saves")), dog_name);
+            home_screen = new HomeScreen(transform, session, dog_name);
+            check_today();
             show_title();
         }
 
@@ -68,19 +77,86 @@ namespace Bodhi.Game
             controls?.dispose();
         }
 
-        // The phone hid the game: save now, if this is a moment that can be saved.
+        // The phone hid the game: save now, if this is a moment that can be saved. The phone
+        // showed it again: check the date, as a day may have passed.
         void OnApplicationPause(bool hiding)
         {
             if (hiding && session != null && her != null)
             {
                 session.save_now(places_now(), both_on_ground());
             }
+            if (!hiding)
+            {
+                check_today();
+            }
+        }
+
+        // The game came back to the front (on a computer, its window was clicked): check the date.
+        void OnApplicationFocus(bool has_focus)
+        {
+            if (has_focus)
+            {
+                check_today();
+            }
+        }
+
+        // Tells the session today's date (the phone's own local date). A new day brings new home
+        // tasks, so home is redrawn if it's showing.
+        void check_today()
+        {
+            if (session == null || home_screen == null)
+            {
+                return;  // Not made yet.
+            }
+            var change = session.set_today(GameSession.day_number(System.DateTime.Now));
+            if (change == DayChange.new_day_started && home_screen.showing)
+            {
+                home_screen.refresh();
+            }
         }
 
         // The opening: the house, the door, the two of them, then New Game, Continue and the memory box.
         void show_title()
         {
-            titles.show_opening(session.has_save, start_new_year, () => begin(true), show_memory_box);
+            titles.show_opening(session.has_save, start_new_year, () => begin(true), show_memory_box, go_home_from_title);
+        }
+
+        // Home from the title: opens the saved year without starting a chapter, with Bodhi as
+        // old as he is in the next chapter. Back returns to the title.
+        void go_home_from_title()
+        {
+            session.open_home();
+            var next = session.campaign.current_chapter;  // Null once the year is over: grown up.
+            string dog_set = FrameSheets.dog_set_for_age(next?.dog_age);
+            SpriteLibrary.prepare(new[] { "her", "bodhi", dog_set });  // Loaded now, before home shows.
+            titles.hide();
+            home_screen.show(dog_set, next != null ? next.dog_size : 1, "Back", () =>
+            {
+                home_screen.hide();
+                show_title();
+            });
+        }
+
+        // Home after a chapter's aftermath: Bodhi as he was in that chapter (already loaded), and
+        // a button on to the next chapter.
+        void go_home_after_chapter()
+        {
+            hud.hide_screens();
+            session.open_home();
+            var chapter = session.run.chapter;
+            string leave_text = session.campaign.is_finished ? "Carry on" : "Next chapter";
+            home_screen.show(FrameSheets.dog_set_for_age(chapter.dog_age), chapter.dog_size, leave_text, () =>
+            {
+                home_screen.hide();
+                session.next_chapter();
+            });
+        }
+
+        // Home after the year is over; Back goes to the title.
+        void go_home_after_year()
+        {
+            hud.hide_screens();
+            go_home_from_title();
         }
 
         // New Game tells the back story first, then starts the first chapter.
@@ -98,6 +174,7 @@ namespace Bodhi.Game
         // Leaves the title for the game.
         void begin(bool continuing)
         {
+            check_today();
             if (continuing)
             {
                 session.continue_game();
@@ -117,6 +194,18 @@ namespace Bodhi.Game
             float delta_seconds = Mathf.Min(Time.deltaTime, longest_frame_seconds);
             hud.update(delta_seconds);
             titles.update(delta_seconds);
+            home_screen.update(delta_seconds);
+            seconds_until_date_check -= delta_seconds;
+            if (seconds_until_date_check <= 0)
+            {
+                check_today();
+                seconds_until_date_check = date_check_seconds;
+            }
+            if (home_screen.showing)
+            {
+                controls.end_frame();  // Home has its own buttons; the chapter waits behind it.
+                return;
+            }
             if (!started)
             {
                 controls.end_frame();
@@ -271,6 +360,7 @@ namespace Bodhi.Game
                     if (PromptPicker.dog_is_near(prompt_view(), her.mover.center_x) && run.kneel(true))
                     {
                         him.strike_pose("lean", 1.4);
+                        show_bond(session.record_care(BondCareKind.pet));  // He leaned in: a cuddle.
                     }
                 }
             }
@@ -284,6 +374,10 @@ namespace Bodhi.Game
             if (!PromptPicker.act(run, prompt, view))
             {
                 return;
+            }
+            if (PromptPicker.bond_care_for(prompt.action, out BondCareKind care_kind))
+            {
+                show_bond(session.record_care(care_kind));
             }
             switch (prompt.action)
             {
@@ -606,9 +700,16 @@ namespace Bodhi.Game
             {
                 lines.Add(StoryText.personalize(line, dog_name));
             }
+            var bond = session.campaign.last_chapter_bond;  // What this chapter added to the bond.
+            if (BondFeedback.heart_pop(bond) != "")
+            {
+                lines.Add("");
+                lines.Add(BondFeedback.heart_pop(bond));
+                lines.AddRange(BondFeedback.lines_for(bond, dog_name));
+            }
             hud.set_subtitle(false, "", StoryVoice.her);
             hud.set_prompt("", Vector3.zero, null);
-            hud.show_aftermath(string.Join("\n", lines), () => session.next_chapter());
+            hud.show_aftermath(string.Join("\n", lines), () => session.next_chapter(), go_home_after_chapter);
             play_music(stage.aftermath.mood);
             game_audio.set_weather((float)stage.aftermath.rain, 0);
         }
@@ -620,8 +721,14 @@ namespace Bodhi.Game
             level = null;
             built_for = null;
             var campaign = session.campaign;
-            hud.show_year_end(StoryText.her_name + " and " + dog_name + "'s first year.\n\nKeepsakes found: " + campaign.keepsakes_found + " of " + campaign.keepsake_total);
+            hud.show_year_end(StoryText.her_name + " and " + dog_name + "'s first year.\n\nKeepsakes found: " + campaign.keepsakes_found + " of " + campaign.keepsake_total, go_home_after_year);
             started = false;
+        }
+
+        // The heart pop and any lines worth celebrating when care in a chapter grows the bond.
+        void show_bond(BondChange change)
+        {
+            hud.show_bond_note(BondFeedback.heart_pop(change), string.Join("\n", BondFeedback.lines_for(change, dog_name)));
         }
 
         // Where the two of them stand, for a save.
