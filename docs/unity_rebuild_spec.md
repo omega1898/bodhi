@@ -209,13 +209,16 @@ flowchart LR
 ### 3.9 Repository layout (new)
 
 ```
-unity/                      the Unity project (created on the Mac)
-  Assets/Bodhi/Rules/       plain C# rules, no Unity references (enforced by its assembly)
+rules/                      com.bodhi.rules: plain C# rules, no Unity references (its asmdef forbids them)
+look/                       com.bodhi.look: palette and motion maths, plain C# (docs/unity_art_bible.md)
+rules_dotnet/               builds rules/ and look/ with their tests (dotnet test), plus a
+                            Unity-compatibility build (.NET Standard 2.1, C# 9)
+unity/                      the Unity project (created on the Mac with Unity Hub)
   Assets/Bodhi/Game/        Unity scripts
-  Assets/Bodhi/Tests/EditMode/   rules tests; also run by dotnet in the cloud
   Assets/Bodhi/Tests/PlayMode/   feel, switch and frame-timing tests (need Unity)
-  dotnet/                   a project file that builds Rules and its tests with dotnet test
 ```
+
+Why `rules/` and `look/` sit outside `unity/`: only Unity Hub can create the Unity project, and it won't create one in a folder that already has files. Keeping the plain C# outside lets that work start now. The Unity project adds both as local packages (Package Manager, Install package from disk), and nothing collides.
 
 Hard rules, matching `CLAUDE.md`'s rule for Unreal files:
 - Scenes and prefabs are saved as text.
@@ -306,7 +309,7 @@ Hard rules, matching `CLAUDE.md`'s rule for Unreal files:
 | Step | What | Who |
 |---|---|---|
 | U0 | Install Unity Hub and the current Unity 6 LTS with the iOS module; create the project from the Universal 2D template in `unity/`; set text serialisation | Owner on the Mac, with steps written out |
-| U1 | `dotnet` project and `rules.yml` workflow; port the railway chapter's C++ tests to C#, then the rules to pass them | Cloud |
+| U1 | `dotnet` project and `rules.yml` workflow (pull request 14); port the railway chapter's C++ tests to C#, then the rules to pass them | Cloud |
 | U2 | Bond and care rules | Cloud |
 | U3 | Puzzle graph, solver and the slice's main puzzle as data | Cloud |
 | U4 | Control arbiter (switching) | Cloud |
