@@ -31,6 +31,22 @@ namespace Bodhi.Rules
         }
     }
 
+    // A story rule that has just been carried out, for the scene to stage (see take_applied_rules).
+    public readonly struct AppliedRule
+    {
+        public readonly int rule_number;   // Its place in ChapterScript.rules.
+        public readonly bool replayed;     // True while a save was being replayed (Continue).
+        public readonly int events_so_far; // Events that had happened when it ran, counting the one that set it off.
+
+        // Makes a record of one applied rule.
+        public AppliedRule(int rule_number, bool replayed, int events_so_far)
+        {
+            this.rule_number = rule_number;
+            this.replayed = replayed;
+            this.events_so_far = events_so_far;
+        }
+    }
+
     // "partial": this class is written across two files; saving and resuming are in ChapterRunSave.cs.
     public partial class ChapterRun
     {
@@ -65,6 +81,7 @@ namespace Bodhi.Rules
         readonly HashSet<string> keepsakes = new HashSet<string>(StringComparer.Ordinal);
         readonly Dictionary<string, bool> solid_changes = new Dictionary<string, bool>(StringComparer.Ordinal);
         readonly List<Timer> timers = new List<Timer>();
+        readonly List<AppliedRule> applied_rules = new List<AppliedRule>();
         readonly List<StoryLine> waiting_lines = new List<StoryLine>();
         string cutscene_skip_to = null;
         double embrace_seconds_so_far = 0;
@@ -131,6 +148,16 @@ namespace Bodhi.Rules
         public bool solid_is_added(string solid_id)
         {
             return solid_id != null && solid_changes.TryGetValue(solid_id, out bool active) && active;
+        }
+
+        // Hands over the rules carried out since the last call, oldest first, so the scene can
+        // stage them (dim the lights, raise a flood). Rules replayed from a save say so: the scene
+        // keeps their lasting changes but plays none of their sounds. Each rule is handed over once.
+        public List<AppliedRule> take_applied_rules()
+        {
+            var taken = new List<AppliedRule>(applied_rules);
+            applied_rules.Clear();
+            return taken;
         }
 
         // Hands over the story lines waiting to be shown, oldest first, and forgets them.
@@ -419,6 +446,7 @@ namespace Bodhi.Rules
                 fired_rules.Add(index);
                 if (!any_happened(rule.unless))
                 {
+                    applied_rules.Add(new AppliedRule(index, replaying, order_of_events.Count));
                     apply(rule);
                 }
                 if (is_complete)
