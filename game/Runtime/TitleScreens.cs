@@ -323,8 +323,8 @@ namespace Bodhi.Game
             return color;
         }
 
-        // A soft round dot, made once in code, for paw prints and the hold ring.
-        static Sprite round_sprite()
+        // A soft round dot, made in code, for paw prints, the hold ring and the ball at home.
+        public static Sprite round_sprite()
         {
             const int size = 32;
             var picture = new Texture2D(size, size, TextureFormat.RGBA32, false);

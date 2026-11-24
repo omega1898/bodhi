@@ -88,6 +88,13 @@ namespace Bodhi.Game
             return FetchResult.nothing;
         }
 
+        // The player left the game mid-throw: the ball is put away, counting as neither a catch
+        // nor a miss.
+        public void put_away()
+        {
+            ball_in_air = false;
+        }
+
         // The player taps: he jumps for the ball. A catch in the window, a miss before it, and
         // nothing at all with no ball in the air (so a stray tap never costs a run).
         public FetchResult tap()

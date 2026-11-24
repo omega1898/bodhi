@@ -151,6 +151,20 @@ namespace Bodhi.Rules.Tests
             Assert.That(game.refused_count, Is.EqualTo(3));
         }
 
+        // Leaving mid-throw puts the ball away: no catch, no miss, and a fresh throw after.
+        [Test]
+        public void a_ball_put_away_counts_as_nothing()
+        {
+            var game = new FetchGame();
+            game.throw_ball(0);
+            pass(game, game.flight_seconds - 0.05);
+            game.put_away();
+            Assert.That(game.ball_in_air, Is.False);
+            Assert.That(game.tap(), Is.EqualTo(FetchResult.nothing));
+            Assert.That(game.pass_time(5), Is.EqualTo(FetchResult.nothing));
+            Assert.That(game.throw_ball(0), Is.True);
+        }
+
         // Break it: one huge frame (the phone stalled) just lands the ball as a miss.
         [Test]
         public void a_huge_frame_lands_the_ball()

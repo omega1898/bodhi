@@ -240,7 +240,7 @@ namespace UnityEngine
 
     public class MeshRenderer : Renderer { }
 
-    public enum TextAnchor { UpperLeft, UpperCenter, MiddleCenter, LowerCenter }
+    public enum TextAnchor { UpperLeft, UpperCenter, UpperRight, MiddleLeft, MiddleCenter, MiddleRight, LowerLeft, LowerCenter, LowerRight }
 
     public enum FontStyle { Normal, Bold, Italic }
 
@@ -336,6 +336,7 @@ namespace UnityEngine.UI
     {
         public class ButtonClickedEvent : Events.UnityEvent { }
         public ButtonClickedEvent onClick { get; } = new ButtonClickedEvent();
+        public bool interactable { get; set; } = true;  // Unity's Selectable.interactable.
     }
 
     public class Shadow : MonoBehaviour

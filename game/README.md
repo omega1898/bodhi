@@ -33,6 +33,7 @@ The Unity side of the game: everything between the rules (`rules/`, which decide
   - `CharacterBody`: draws her, Bodhi or the visiting dog where `CharacterMover` says, with the hand-drawn animation frames.
   - `SpriteLibrary`: loads the animation pictures when a chapter loads (never mid-chapter) and lets go of the ones it doesn't need.
   - `CameraRig`: follows the player smoothly, a little ahead, inside the chapter; holds film shots; shakes.
+  - `HomeScreen`: home between and after chapters: Em and Bodhi, the bond's level and its bar, the streak, today's three tasks with a button each, and the fetch game.
   - `GameHud`, `TouchButton`: subtitles, the goal, the button prompt, captions, darkness, fades, touch buttons and the title, pause, after-chapter and end-of-year screens.
   - `PlayerControls`: keyboard, game controller and touch buttons, read the same way.
   - `GreyBox`: plain coloured boxes for everything not drawn yet (and for a character whose pictures are missing).
