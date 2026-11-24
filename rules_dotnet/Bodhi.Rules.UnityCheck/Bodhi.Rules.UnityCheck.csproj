@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <Compile Include="../../rules/Runtime/**/*.cs" Link="Rules/%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="../../look/Runtime/**/*.cs" Link="Look/%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 
 </Project>

@@ -19,6 +19,7 @@
     <!-- Compile every rules file straight from the Unity package, so the code tested here is
          exactly the code Unity runs. -->
     <Compile Include="../../rules/Runtime/**/*.cs" Link="Rules/%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="../../look/Runtime/**/*.cs" Link="Look/%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 
   <ItemGroup>

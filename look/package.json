@@ -1,0 +1,7 @@
+{
+  "name": "com.bodhi.look",
+  "version": "0.1.0",
+  "displayName": "Bodhi Look",
+  "description": "The game's palette and motion maths in plain C#, with no Unity code, from docs/unity_art_bible.md. Tested outside Unity with dotnet test.",
+  "unity": "6000.3"
+}
