@@ -41,9 +41,14 @@ namespace Bodhi.Rules.Tests
         {
             string[] her = { "idle", "walk", "run", "jump", "land", "turn", "stop", "skid", "kneel", "embrace", "sit" };
             string[] dog = { "idle", "walk", "trot", "gallop", "jump", "land", "turn", "skid", "stop", "sit", "sniff", "bark", "sleep", "lean", "embrace" };
-            Assert.That(FrameSheets.all.Select(set => set.name), Is.EquivalentTo(new[] { "her", "bodhi", "bodhi_puppy", "biscuit" }));
+            Assert.That(FrameSheets.all.Select(set => set.name), Is.EquivalentTo(new[] { "her", "bodhi", "bodhi_puppy", "biscuit", "her_close", "bodhi_close" }));
             foreach (var set in FrameSheets.all)
             {
+                // The close-up sets hold only a few animations; the next test checks those.
+                if (FrameSheets.is_close_up(set.name))
+                {
+                    continue;
+                }
                 var expected = set.name == "her" ? her : dog;
                 Assert.That(set.animations.Select(animation => animation.name), Is.EquivalentTo(expected), set.name);
                 foreach (var animation in set.animations)
@@ -62,6 +67,47 @@ namespace Bodhi.Rules.Tests
         }
 
         [Test]
+        public void every_close_up_matches_its_normal_drawings()
+        {
+            foreach (var close in FrameSheets.all.Where(set => FrameSheets.is_close_up(set.name)))
+            {
+                string base_name = close.name.Substring(0, close.name.Length - FrameSheets.close_up_ending.Length);
+                var normal = FrameSheets.set(base_name);
+                Assert.That(normal, Is.Not.Null, close.name + " has no normal set");
+                Assert.That(FrameSheets.close_up_name(base_name), Is.EqualTo(close.name));
+                Assert.That(close.pixels_per_unit, Is.GreaterThan(normal.pixels_per_unit), close.name + " should be sharper");
+                Assert.That(close.animations.Count(), Is.GreaterThan(0), close.name + " is empty");
+                foreach (var animation in close.animations)
+                {
+                    // Same drawings in the same order, so switching to the close-up mid-animation
+                    // never jumps; same number of feet, so it stands in the same place.
+                    var match = normal.animation(animation.name);
+                    string label = close.name + " " + animation.name;
+                    Assert.That(match, Is.Not.Null, label + " isn't in " + base_name);
+                    Assert.That(animation.count, Is.EqualTo(match.count), label + " drawing count");
+                    Assert.That(animation.cycle_length, Is.EqualTo(match.cycle_length), label + " cycle");
+                    for (int frame = 0; frame < animation.count; frame++)
+                    {
+                        Assert.That(animation.frames[frame].foot_count, Is.EqualTo(match.frames[frame].foot_count), label + " feet");
+                    }
+                }
+            }
+        }
+
+        [Test]
+        public void break_it_close_up_names_handle_nonsense()
+        {
+            Assert.That(FrameSheets.close_up_name(null), Is.Null);
+            Assert.That(FrameSheets.is_close_up(null), Is.False);
+            Assert.That(FrameSheets.is_close_up("her"), Is.False);
+            Assert.That(FrameSheets.is_close_up("her_close"), Is.True);
+            Assert.That(FrameSheets.largest_picture(null), Is.EqualTo(2048));
+            Assert.That(FrameSheets.largest_picture("bodhi_close"), Is.EqualTo(4096));
+            // A set with no close-up (the puppy) simply finds nothing.
+            Assert.That(FrameSheets.set(FrameSheets.close_up_name("bodhi_puppy")), Is.Null);
+        }
+
+        [Test]
         public void every_picture_exists_and_every_box_is_inside_it()
         {
             string folder = repository();
@@ -73,8 +119,9 @@ namespace Bodhi.Rules.Tests
                     string path = Path.Combine(folder, "game", "Resources", animation.picture + ".png");
                     Assert.That(File.Exists(path), label + ": " + path + " is missing");
                     Assert.That(png_size(path), Is.EqualTo((animation.picture_width, animation.picture_height)), label + " picture size");
-                    Assert.That(animation.picture_width, Is.LessThanOrEqualTo(2048), label + " is too wide for older iPhones");
-                    Assert.That(animation.picture_height, Is.LessThanOrEqualTo(2048), label + " is too tall for older iPhones");
+                    int largest = FrameSheets.largest_picture(set.name);
+                    Assert.That(animation.picture_width, Is.LessThanOrEqualTo(largest), label + " is too wide for older iPhones");
+                    Assert.That(animation.picture_height, Is.LessThanOrEqualTo(largest), label + " is too tall for older iPhones");
                     foreach (var drawing in animation.frames)
                     {
                         Assert.That(drawing.x >= 0 && drawing.y >= 0 && drawing.width > 0 && drawing.height > 0, label + " box");

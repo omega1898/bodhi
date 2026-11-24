@@ -22,6 +22,10 @@ namespace Bodhi.Game
             {
                 return;
             }
+            // A close-up picture (its name has "_close_" in it, like her_close_idle) may be up
+            // to 4096 pixels; the rest stay within 2048 (FrameSheets.largest_picture says the
+            // same; this Editor code can't see that class). Too small a limit would shrink it.
+            int largest = assetPath.Contains("_close_") ? 4096 : 2048;
             var importer = (TextureImporter)assetImporter;
             importer.textureType = TextureImporterType.Default;
             importer.npotScale = TextureImporterNPOTScale.None;    // Keep the exact size.
@@ -30,11 +34,11 @@ namespace Bodhi.Game
             importer.wrapMode = TextureWrapMode.Clamp;             // Never borrow pixels from the far edge.
             importer.filterMode = FilterMode.Bilinear;             // Smooth between pixels as it moves.
             importer.isReadable = false;                           // Only the graphics chip needs them.
-            importer.maxTextureSize = 2048;
+            importer.maxTextureSize = largest;
             importer.textureCompression = TextureImporterCompression.CompressedHQ;
             var iphone = importer.GetPlatformTextureSettings("iPhone");
             iphone.overridden = true;
-            iphone.maxTextureSize = 2048;
+            iphone.maxTextureSize = largest;
             iphone.format = iphone_format;
             importer.SetPlatformTextureSettings(iphone);
         }

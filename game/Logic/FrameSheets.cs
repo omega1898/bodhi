@@ -133,6 +133,30 @@ namespace Bodhi.Game
             return System.Array.IndexOf(puppy_ages, dog_age) >= 0 ? "bodhi_puppy" : "bodhi";
         }
 
+        // The close-up sets end with this: sharper drawings ("her_close", "bodhi_close") of a few
+        // animations, for when the camera is near (the opening's hug, the title screen).
+        public const string close_up_ending = "_close";
+
+        // The close-up set drawn from this set ("her" gives "her_close"), or null for no set.
+        public static string close_up_name(string set_name)
+        {
+            return set_name == null ? null : set_name + close_up_ending;
+        }
+
+        // True if this is a close-up set rather than a normal one.
+        public static bool is_close_up(string set_name)
+        {
+            return set_name != null && set_name.EndsWith(close_up_ending);
+        }
+
+        // The widest or tallest a set's pictures may be. Normal pictures stay within 2048 pixels,
+        // which every iPhone handles easily. Close-ups may reach 4096 (every iPhone that runs
+        // Metal can show that), because they're loaded only while a close-up is on screen.
+        public static int largest_picture(string set_name)
+        {
+            return is_close_up(set_name) ? 4096 : 2048;
+        }
+
         // The set with this name ("her", "bodhi", "bodhi_puppy", "biscuit"), or null.
         public static FrameSet set(string set_name)
         {
