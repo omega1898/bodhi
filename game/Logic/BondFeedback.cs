@@ -132,12 +132,13 @@ namespace Bodhi.Game
             return text;
         }
 
-        // The word on a task's button: what pressing it does, or "Done" once it's done.
+        // The word on a task's button: what pressing it does, or "Done" once it's done. Fetch can
+        // always be played again, for the records.
         public static string task_button(HomeDay home, HomeTask task)
         {
             if (home != null && home.is_done(task))
             {
-                return "Done";
+                return task == HomeTask.fetch_five_in_a_row ? "Play again" : "Done";
             }
             switch (task)
             {
@@ -152,6 +153,17 @@ namespace Bodhi.Game
                 case HomeTask.cuddle: return "Cuddle";
                 default: return "";
             }
+        }
+
+        // The heading over today's tasks: an invitation, or a goodbye once all three are done.
+        // "" before the game has said what day it is (no tasks yet).
+        public static string today_heading(HomeDay home, string dog_name)
+        {
+            if (home == null || home.tasks_today.Count == 0)
+            {
+                return "";
+            }
+            return home.all_done_today ? "All done today. " + dog_name + " will see you tomorrow." : "Today with " + dog_name;
         }
 
         // The streak in a few words, with the best ever when it's longer.

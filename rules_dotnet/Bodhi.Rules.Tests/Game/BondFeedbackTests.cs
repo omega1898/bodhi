@@ -81,6 +81,8 @@ namespace Bodhi.Rules.Tests
             home.do_task(other, journey);
             Assert.That(BondFeedback.task_label(home, other), Is.EqualTo(HomeDay.task_text(other) + " - done"));
             Assert.That(BondFeedback.task_button(home, other), Is.EqualTo("Done"));
+            for (int catches = 0; catches < HomeDay.fetch_catches_needed; catches++) home.fetch_caught(journey);
+            Assert.That(BondFeedback.task_button(home, HomeTask.fetch_five_in_a_row), Is.EqualTo("Play again"), "fetch stays playable");
         }
 
         // Finishing the last task gives a happy line, and the streak once there is one.
@@ -90,6 +92,7 @@ namespace Bodhi.Rules.Tests
             var home = new HomeDay();
             var journey = new BondJourney();
             Assert.That(BondFeedback.streak_text(home), Is.EqualTo("Do all three today to start a streak"));
+            Assert.That(BondFeedback.today_heading(home, "Bodhi"), Is.EqualTo(""), "no day yet");
             HomeResult last = null;
             for (int day = first_day; day < first_day + 2; day++)
             {
@@ -111,6 +114,9 @@ namespace Bodhi.Rules.Tests
             Assert.That(lines, Does.Contain("All three done. Bodhi's tail hasn't stopped."));
             Assert.That(lines, Does.Contain("That's 2 days in a row."));
             Assert.That(BondFeedback.streak_text(home), Is.EqualTo("2 days in a row"));
+            Assert.That(BondFeedback.today_heading(home, "Bodhi"), Is.EqualTo("All done today. Bodhi will see you tomorrow."));
+            home.change_day(first_day + 2, journey);
+            Assert.That(BondFeedback.today_heading(home, "Bodhi"), Is.EqualTo("Today with Bodhi"));
         }
 
         // The fetch record and what a throw did, in a few words.
@@ -155,6 +161,7 @@ namespace Bodhi.Rules.Tests
             Assert.That(BondFeedback.task_label(new HomeDay(), (HomeTask)99), Is.EqualTo(""));
             Assert.That(BondFeedback.task_button(new HomeDay(), (HomeTask)99), Is.EqualTo(""));
             Assert.That(BondFeedback.streak_text(null), Is.EqualTo(""));
+            Assert.That(BondFeedback.today_heading(null, "Bodhi"), Is.EqualTo(""));
             Assert.That(BondFeedback.fetch_text(null), Is.EqualTo(""));
             Assert.That(BondFeedback.next_level_text(null), Is.EqualTo(""));
             Assert.That(BondFeedback.tricks_text(null), Is.EqualTo(""));
