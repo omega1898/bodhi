@@ -8,7 +8,7 @@ The Unity side of the game: everything between the rules (`rules/`, which decide
   - `SubtitlePacer`: which story line is on screen and for how long, ported from the browser game.
   - `ZoneOccupancy`: who is standing in a story zone, counting each character's colliders.
   - `SaveFiles`: the saves on the phone, written so a phone dying mid-save never loses the last good one.
-  - `GameSession`: the one object the scene talks to: New Game, Continue, autosave and the next chapter.
+  - `GameSession`: the one object the scene talks to: New Game, Continue, autosave and the next chapter; also the date, opening home from the title, home tasks, fetch catches and care given in a chapter, each saved straight away.
   - `LayoutSpace`: chapter layout positions (the browser game's units, y down) as Unity metres (y up), and back.
   - `CharacterMotion`: how she and Bodhi walk, jog, turn, jump and fall, from the browser game's numbers.
   - `CompanionSteering`: where the one you aren't playing walks: beside you, to you in a reunion, where the story sends him, after the ball and back, or a little ahead.
