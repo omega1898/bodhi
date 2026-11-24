@@ -25,6 +25,7 @@ The Unity side of the game: everything between the rules (`rules/`, which decide
   - `OpeningTitle`: the start-up animation as a timeline: at any moment, how strongly the sky, house, door light, paw prints, name and buttons show, where Bodhi and Em stand and which drawing each shows, and the camera's zoom. A tap skips to the settled title.
   - `BackStory`: the caption cards in her voice told on New Game before Coming Home: tap to move on, hold to skip them all.
   - `MemoryBox`: the memory box screen: every chapter with its keepsakes (memories once found, hints while missing), totals for the year, and replaying a finished chapter without moving the year on.
+  - `FetchGame`: the fetch game at home as timing rules: the ball arcs from her to him, a tap while it's in his reach is a catch, too early or letting it land is a miss, and each catch in a row makes the next throw a little faster, up to a limit.
 - `Runtime/`: the Unity scripts. They decide nothing themselves; they ask `Logic/` and draw the answer.
   - `ChapterDirector`: the one script the scene needs. It makes everything else and plays every chapter in turn.
   - `ChapterLevel`: builds a chapter's place (sky, floors, water, props, markers) from its stage, and keeps it in step with the story.
