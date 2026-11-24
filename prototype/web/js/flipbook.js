@@ -17,6 +17,9 @@ const flipbook = {
     guest_set: null,      // A visiting dog's drawings (Biscuit), in chapters that have one.
     set_ready: {},        // Per set: true once every one of its sheets is painted.
     ready: false,         // True once every set in use is painted.
+    // False draws the cut-out puppets instead (puppets.js), which are posed fresh on every
+    // screen refresh. Switched from the pause menu ("Motion"), so the two can be compared.
+    enabled: true,
 };
 
 // How each animation plays when it isn't driven by distance or by jumping speed.
@@ -168,7 +171,7 @@ function use_guest_drawings(set_name) {
 
 // True when a set's drawings can be shown.
 function flipbook_set_ready(character_name) {
-    return Boolean(flipbook.set_ready[character_name]);
+    return flipbook.enabled && Boolean(flipbook.set_ready[character_name]);
 }
 
 // Called once per drawn frame. Paints at most one waiting sheet, and queues every sheet in use

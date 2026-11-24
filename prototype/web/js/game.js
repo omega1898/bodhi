@@ -22,6 +22,7 @@ const character_specs = {
 };
 const progress_storage_key = 'until_we_find_home_progress';
 const keepsake_storage_key = 'until_we_find_home_keepsakes';
+const look_storage_key = 'until_we_find_home_look';  // The pause menu's Motion and Sharpness choices.
 
 // ---------- Everything the running game remembers ----------
 
@@ -82,6 +83,8 @@ const page = {
     touch_low: document.getElementById('touch_low'),
     touch_act: document.getElementById('touch_act'),
     sound_button: document.getElementById('sound_button'),
+    motion_button: document.getElementById('motion_button'),
+    sharpness_button: document.getElementById('sharpness_button'),
     toast: document.getElementById('toast'),
     memory_box: document.getElementById('memory_box'),
     memory_list: document.getElementById('memory_list'),
@@ -114,6 +117,40 @@ function center_x(character) {
 // True when two boxes overlap. Boxes have x, y (top-left), and width/height or w/h.
 function boxes_overlap(a_x, a_y, a_width, a_height, b_x, b_y, b_width, b_height) {
     return a_x < b_x + b_width - 0.01 && a_x + a_width > b_x + 0.01 && a_y < b_y + b_height - 0.01 && a_y + a_height > b_y + 0.01;
+}
+
+// ---------- How the game looks (a test of two choices) ----------
+// Motion: "Drawn frames" plays the hand-drawn flipbook; "Rigged" poses the cut-out puppets
+// on every screen refresh. Sharpness: "Standard" caps phones at 1.5 canvas pixels per point;
+// "Full" uses every screen dot. Both are kept on the device, like progress.
+
+// Reads the saved choices. Anything unreadable leaves the defaults (drawn frames, standard).
+function load_look() {
+    try {
+        const saved = JSON.parse(window.localStorage.getItem(look_storage_key) || '{}');
+        flipbook.enabled = saved.motion !== 'rigged';
+        game.full_sharpness = saved.sharpness === 'full';
+    } catch (error) {
+        flipbook.enabled = true;
+        game.full_sharpness = false;
+    }
+    show_look();
+}
+
+// Saves the choices and updates the two pause-menu buttons to match.
+function save_look() {
+    try {
+        const look = { motion: flipbook.enabled ? 'frames' : 'rigged', sharpness: game.full_sharpness ? 'full' : 'standard' };
+        window.localStorage.setItem(look_storage_key, JSON.stringify(look));
+    } catch (error) {
+        // Storage blocked: the choice still holds until the game is closed.
+    }
+    show_look();
+}
+
+function show_look() {
+    page.motion_button.textContent = flipbook.enabled ? 'Motion: drawn frames' : 'Motion: rigged';
+    page.sharpness_button.textContent = game.full_sharpness ? 'Sharpness: full' : 'Sharpness: standard';
 }
 
 // Reads saved progress. Storage can be missing or blocked (private browsing), so failures
@@ -2448,7 +2485,9 @@ function resize_canvas() {
     const device_ratio = window.devicePixelRatio || 1;
     if (game.render_scale === undefined) {
         const is_phone = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
-        game.render_scale = Math.min(device_ratio, is_phone ? 1.5 : 2);
+        // "Full" sharpness draws one canvas pixel per screen dot (3 on recent iPhones).
+        const largest_scale = game.full_sharpness ? 3 : (is_phone ? 1.5 : 2);
+        game.render_scale = Math.min(device_ratio, largest_scale);
     }
     canvas.width = Math.round(window.innerWidth * game.render_scale);
     canvas.height = Math.round(window.innerHeight * game.render_scale);
@@ -2635,6 +2674,16 @@ function connect_controls() {
     page.sound_button.addEventListener('click', function sound() {
         page.sound_button.textContent = toggle_mute() ? 'Sound: off' : 'Sound: on';
     });
+    page.motion_button.addEventListener('click', function switch_motion() {
+        flipbook.enabled = !flipbook.enabled;
+        save_look();
+    });
+    page.sharpness_button.addEventListener('click', function switch_sharpness() {
+        game.full_sharpness = !game.full_sharpness;
+        game.render_scale = undefined;  // Undefined makes resize_canvas pick the scale afresh.
+        resize_canvas();
+        save_look();
+    });
     page.aftermath_continue.addEventListener('click', continue_from_aftermath);
 }
 
@@ -2734,6 +2783,7 @@ window.until_we_find_home_debug = {
     frame_costs: function debug_frame_costs() { const costs = game.frame_costs.slice(); game.frame_costs.length = 0; return costs; },
 };
 
+load_look();  // Before resize_canvas, so a saved "Sharpness: full" sets the first canvas size.
 resize_canvas();
 load_puppet_sheets();
 load_flipbook_sheets();
