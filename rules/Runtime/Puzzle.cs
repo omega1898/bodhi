@@ -302,6 +302,10 @@ namespace Bodhi.Rules
         // The current state in words.
         public string describe() => puzzle.describe(state);
 
+        // The puzzle being played, and a copy of the current state, for the hint rule.
+        internal Puzzle played_puzzle => puzzle;
+        internal int[] current_state() => (int[])state.Clone();
+
         // The scene reports that a character tried an action. Returns true if it happened.
         // Trying something whose conditions don't hold yet is normal play, not refused.
         public bool report_action(string action_name, Character who)

@@ -17,6 +17,7 @@ The Unity project will show the rules on screen. It reads them, and never the ot
 - `RailwaySave`: saving and loading the chapter, refusing damaged files whole.
 - `CompanionBehavior`: how far behind her Bodhi trails, how often he looks back, and whether he is wary of water.
 - `StoryMemory`: facts one chapter records for later ones, such as being swept away by the river.
+- `HintCoach`: after 3 minutes without progress, a gentle hint, then a plain one, always toward a step that really leads to the goal.
 
 ## Why it is a package and not a folder inside the Unity project
 
