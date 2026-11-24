@@ -25,10 +25,6 @@
    git clone https://github.com/omega1898/bodhi.git
    cd bodhi
    ```
-   Until the pull request with the iOS app is merged into `main`, also run:
-   ```
-   git checkout claude/eloquent-hopper-el57ed
-   ```
    Check: `ls ios` lists `project.yml`, `bundle_game.sh` and `UntilWeFindHome`.
 
 ## B. Run it on your iPhone (free)
@@ -46,6 +42,8 @@
 8. **Connect your iPhone** with the cable and tap **Trust** on the phone. The first time, the iPhone asks you to turn on **Developer Mode** (Settings, Privacy & Security, Developer Mode); it restarts.
 9. **Run it.** At the top of Xcode, choose your iPhone as the destination and press **▶**. The game opens on your phone.
    - Check that it fills the screen in landscape, plays sound after the first tap, and still works with Wi-Fi turned off.
+   - **Sound on silent:** start a podcast or music, then open the game. Switch the iPhone to silent (side switch or Action button) and tap. The game should still play sound, and your podcast or music should keep playing underneath (decision 10 in `docs/architecture.md`). If either fails, write down which.
+   - **Saves survive:** play part of a chapter, swipe the app away in the app switcher to close it fully, then reopen it. **Continue** and your unlocked chapters should still be there.
    - If Xcode shows a red error, copy its exact text into a cloud session. I can't build Swift in the cloud, so the first build on your Mac is its real test.
 
 ## C. Join the Apple Developer Program
