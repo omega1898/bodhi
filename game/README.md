@@ -14,6 +14,7 @@ The Unity side of the game: everything between the rules (`rules/`, which decide
   - `CompanionSteering`: where the one you aren't playing walks: beside you, to you in a reunion, or a little ahead.
   - `ChapterStage`: what a chapter looks like: its floors, water, props, where they start, and what each story rule does on screen.
   - `Chapters/`: the twelve chapters' stages, generated from `prototype/web/js/levels.js` by `node rules_dotnet/tools/export_chapters.js`. Don't edit them by hand.
+  - `PromptPicker`: what the "use" button offers right now (the reunion, the ball, the nearest thing, feeding, towelling, petting) and what pressing it does.
   - `StageTracker`: keeps the scene in step with the story (darkness, floods, the camera, who's hidden), including after Continue.
 - Coming next: the scripts that sit on objects in the scenes and connect them to the rules.
 
