@@ -1,0 +1,37 @@
+# Purpose: build and test the C# game rules (rules/Runtime) on every push and pull request,
+# without Unity, so a broken rule is caught before it is merged. Also checks the rules still
+# compile with the older .NET library Unity 6 uses.
+
+name: rules
+
+on:
+  push:
+  pull_request:
+
+# Read-only access: the job only downloads the code.
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: C# rules tests, and the Unity compatibility build
+    runs-on: ubuntu-latest
+    # Stop a stuck run (for example, a test caught in a loop) after 10 minutes.
+    timeout-minutes: 10
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v4
+
+      # Install the .NET 8 tools ("SDK"), which build C# and run its tests.
+      - name: Install .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      # Run every test. Any failing test, or any compiler warning, fails the job.
+      - name: Run the rules tests
+        run: dotnet test rules_dotnet/Bodhi.Rules.Tests --nologo
+
+      # Compile the rules alone the way Unity 6 would (.NET Standard 2.1, C# 9).
+      - name: Check the rules compile for Unity
+        run: dotnet build rules_dotnet/Bodhi.Rules.UnityCheck --nologo

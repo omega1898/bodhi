@@ -1,0 +1,17 @@
+<!-- Purpose: compiles the rules alone against .NET Standard 2.1 and C# 9, the library and
+     language version Unity 6 uses. The tests run on newer .NET, which has extra functions
+     Unity lacks; this build fails if the rules ever use one of them. -->
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+    <Nullable>disable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="../../rules/Runtime/**/*.cs" Link="Rules/%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+</Project>

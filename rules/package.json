@@ -1,0 +1,7 @@
+{
+  "name": "com.bodhi.rules",
+  "version": "0.1.0",
+  "displayName": "Bodhi Rules",
+  "description": "The game's rules in plain C#, with no Unity code: story, bond, care, puzzles, switching and saves. Tested outside Unity with dotnet test (see rules/README.md).",
+  "unity": "6000.3"
+}

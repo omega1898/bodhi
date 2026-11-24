@@ -1,0 +1,32 @@
+<!-- Purpose: builds the game rules in rules/Runtime together with their tests, so `dotnet test`
+     can check them on any computer, including GitHub's, without Unity installed. -->
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- The .NET version the tests run on. The rules themselves only use C# 9 features,
+         because that is the newest C# that Unity 6 compiles. -->
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+    <!-- Turn "this might be null" warnings off: Unity's compiler doesn't use them, and the
+         rules are written to Unity's rules. -->
+    <Nullable>disable</Nullable>
+    <IsPackable>false</IsPackable>
+    <!-- Any compiler warning fails the build, so problems can't pile up unnoticed. -->
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Compile every rules file straight from the Unity package, so the code tested here is
+         exactly the code Unity runs. -->
+    <Compile Include="../../rules/Runtime/**/*.cs" Link="Rules/%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- NUnit: the same testing library Unity's Test Runner uses, so these tests could run
+         inside Unity too. -->
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageReference Include="NUnit" Version="3.14.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.6.0" />
+  </ItemGroup>
+
+</Project>
