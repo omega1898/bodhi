@@ -18,15 +18,21 @@ The Unity side of the game: everything between the rules (`rules/`, which decide
   - `StageLook`: reads the chapters' colours, says which floors, walls and props show right now, and the rough box each prop fills (for the grey-box scene).
   - `BallFlight`: the ball in the fetch chapters: thrown, bouncing, rolling, carried and dropped at her feet.
   - `StageTracker`: keeps the scene in step with the story (darkness, floods, the camera, who's hidden), including after Continue.
+  - `FrameSheets`: every animation drawing in `Resources/Frames`: its box, where its feet are, and where a carried thing is held. The numbers are in `FrameSheets.Data.cs`, written by `art/tools/export_sprites.py`.
+  - `FlipbookChooser`: which drawing to show each frame, ported from the browser game: walking drawings move on by distance so feet stay planted; jumps follow the arc; landings, turns, stops, skids and getting up play over the rest.
+  - `FramePacing`: runs the game at the screen's own frame rate (120 on ProMotion iPhones).
   - `CharacterMover`: moves her or Bodhi through a chapter and keeps them out of walls and floors (steps, ceilings, the chapter's ends, falling out of the world). Unity's own physics isn't used for them, so the game feels the same on every phone.
 - `Runtime/`: the Unity scripts. They decide nothing themselves; they ask `Logic/` and draw the answer.
   - `ChapterDirector`: the one script the scene needs. It makes everything else and plays every chapter in turn.
   - `ChapterLevel`: builds a chapter's place (sky, floors, water, props, markers) from its stage, and keeps it in step with the story.
-  - `CharacterBody`: draws her, Bodhi or the visiting dog where `CharacterMover` says, with poses.
+  - `CharacterBody`: draws her, Bodhi or the visiting dog where `CharacterMover` says, with the hand-drawn animation frames.
+  - `SpriteLibrary`: loads the animation pictures when a chapter loads (never mid-chapter) and lets go of the ones it doesn't need.
   - `CameraRig`: follows the player smoothly, a little ahead, inside the chapter; holds film shots; shakes.
   - `GameHud`, `TouchButton`: subtitles, the goal, the button prompt, captions, darkness, fades, touch buttons and the title, pause, after-chapter and end-of-year screens.
   - `PlayerControls`: keyboard, game controller and touch buttons, read the same way.
-  - `GreyBox`: plain coloured boxes, until an artist's drawings replace them.
+  - `GreyBox`: plain coloured boxes for everything not drawn yet (and for a character whose pictures are missing).
+- `Editor/`: scripts that run only in the Unity Editor. `FrameImport` sets how the animation pictures are imported (exact size, no shrunken copies, iPhone ASTC squeeze); `HighFrameRateBuild` lets the iPhone build run at 120 frames a second on ProMotion screens.
+- `Resources/Frames/`: the animation pictures, made by `art/tools/export_sprites.py`. Don't edit them by hand.
 
 The scripts in `Runtime/` can only really be compiled by Unity. In the cloud, `dotnet build rules_dotnet/Bodhi.Game.RuntimeStubCheck` compiles them against stand-ins for Unity's types, which catches typos and wrong calls but isn't proof.
 

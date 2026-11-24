@@ -64,6 +64,26 @@ namespace UnityEngine
         public static float deltaTime => 0;
     }
 
+    public struct RefreshRate
+    {
+        public double value => 60;
+    }
+
+    public struct Resolution
+    {
+        public RefreshRate refreshRateRatio => new RefreshRate();
+    }
+
+    public static class Screen
+    {
+        public static Resolution currentResolution => new Resolution();
+    }
+
+    public static class Debug
+    {
+        public static void LogWarning(object message) { }
+    }
+
     public static class Application
     {
         public static int targetFrameRate { get; set; }
@@ -159,6 +179,7 @@ namespace UnityEngine
     {
         public static T Load<T>(string path) where T : Object => null;
         public static T GetBuiltinResource<T>(string path) where T : Object => null;
+        public static void UnloadAsset(Object asset) { }
     }
 
     public class Material : Object { }
@@ -178,9 +199,12 @@ namespace UnityEngine
         public void Apply() { }
     }
 
+    public enum SpriteMeshType { FullRect, Tight }
+
     public class Sprite : Object
     {
         public static Sprite Create(Texture2D texture, Rect rect, Vector2 pivot, float pixels_per_unit) => null;
+        public static Sprite Create(Texture2D texture, Rect rect, Vector2 pivot, float pixels_per_unit, uint extrude, SpriteMeshType mesh_type) => null;
     }
 
     public class Renderer : Component
