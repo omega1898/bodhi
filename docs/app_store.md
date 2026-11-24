@@ -76,7 +76,7 @@
 16. Fill in the following in App Store Connect:
     - **Screenshots:** App Store Connect lists the sizes it needs. Take them on your iPhone during play; the volume-up and side buttons together take one.
     - **Description and keywords.**
-    - **Support URL and privacy policy URL:** both are required. The privacy text is ready in `docs/privacy_policy.md`; it needs to be on a public web page. The simplest option is a free page on GitHub Pages or a site builder.
+    - **Support URL and privacy policy URL:** both are required. Both pages are ready in `site/` (`privacy.html` and `support.html`); they need to be on a public web address. See `site/README.md` for how to publish them.
     - **App Privacy:** answer **Data Not Collected**. The game keeps progress and keepsakes only on the phone and never uses the internet.
     - **Age rating:** answer Apple's questionnaire. It includes peril (a flood and a separation) but no violence.
     - **Price.**
