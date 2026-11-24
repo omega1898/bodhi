@@ -94,6 +94,18 @@ namespace Bodhi.Rules.Tests
             Assert.That(bathed.dirt, Is.EqualTo(0.0));
         }
 
+        // A found treat takes half his hunger away, and never below zero.
+        [Test]
+        public void a_treat_takes_half_the_hunger()
+        {
+            var hungry = new CareState(0.8, 0, 2);
+            hungry.eat_treat();
+            Assert.That(hungry.hunger, Is.EqualTo(0.3).Within(1e-9));
+            hungry.eat_treat();
+            Assert.That(hungry.hunger, Is.EqualTo(0.0));
+            Assert.That(hungry.food, Is.EqualTo(2));  // A treat doesn't come from the bag.
+        }
+
         // Feed is offered only when he's peckish and there's food; towelling once mud shows;
         // never when they're apart, during a scene, or when the player is Bodhi.
         [Test]
