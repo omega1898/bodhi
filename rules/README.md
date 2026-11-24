@@ -11,6 +11,12 @@ The Unity project will show the rules on screen. It reads them, and never the ot
 - `ChapterBeat`: a chapter's story stages and the order they may come in.
 - `TelemetryLog`: the playtest log, written as JSON Lines.
 - `RailwayChapter`: the station chapter's rules: story, who the player controls, and the final obstacle that needs both of them.
+- `CareState`, `BondEffects`, `CareMoment`: hunger, dirt, food, and the feeding, drying, bathing and grooming moments.
+- `Puzzle`, `PuzzleSolver`, `StationPuzzles`: puzzles as data, and a solver that proves each one can be finished and finds dead ends.
+- `ControlArbiter`: switching the player between Bodhi and her without lost or doubled button presses.
+- `RailwaySave`: saving and loading the chapter, refusing damaged files whole.
+- `CompanionBehavior`: how far behind her Bodhi trails, how often he looks back, and whether he is wary of water.
+- `StoryMemory`: facts one chapter records for later ones, such as being swept away by the river.
 
 ## Why it is a package and not a folder inside the Unity project
 
