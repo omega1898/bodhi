@@ -4,6 +4,14 @@ The game's rules in plain C#: what the story remembers, how Bodhi feels (the bon
 
 The Unity project will show the rules on screen. It reads them, and never the other way round (`docs/unity_rebuild_spec.md`, section 3).
 
+## What's in here
+
+- `EventBus`: passes named events ("walkway_collapsed") from the scene to the rules.
+- `BondState`: how Bodhi feels (fear, how much he wants to be near her, trust).
+- `ChapterBeat`: a chapter's story stages and the order they may come in.
+- `TelemetryLog`: the playtest log, written as JSON Lines.
+- `RailwayChapter`: the station chapter's rules: story, who the player controls, and the final obstacle that needs both of them.
+
 ## Why it is a package and not a folder inside the Unity project
 
 The Unity project doesn't exist yet. Only Unity Hub, on the Mac, can create it. Keeping the rules here means the work can go ahead now, and nothing collides when the project is created later. Unity reads a folder like this as a **package**: a bundle of code with a `package.json` that names it.
