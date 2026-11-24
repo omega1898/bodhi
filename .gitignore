@@ -30,3 +30,4 @@ references/
 rules_dotnet/**/bin/
 rules_dotnet/**/obj/
 rules_dotnet/**/TestResults/
+audio_preview/

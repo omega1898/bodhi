@@ -8,6 +8,7 @@
 // Positions are layout units with y pointing down, like the browser game (LayoutSpace turns them
 // into metres). A box's x and y are its top-left corner; a person's place is their feet.
 using System;
+using System.Linq;
 
 namespace Bodhi.Game
 {
@@ -262,6 +263,36 @@ namespace Bodhi.Game
         public StageSetting scenery_setting(string name)
         {
             return find_setting(scenery, name);
+        }
+
+        // Every music mood this chapter can play: its own, its story moments' and its aftermath's.
+        public string[] all_moods()
+        {
+            var found = new System.Collections.Generic.List<string> { mood, aftermath?.mood };
+            foreach (var rule in rules ?? Array.Empty<RuleStaging>())
+            {
+                found.Add(rule.mood);
+            }
+            found.RemoveAll(string.IsNullOrEmpty);
+            return found.Distinct().ToArray();
+        }
+
+        // How loud the rain sounds (the browser's rule: "rain_sound" if set, else the rain itself)
+        // and how hard the wind blows, each 0 for none.
+        public (double rain, double wind) weather_sound()
+        {
+            var rain_sound = scenery_setting("rain_sound");
+            var rain = scenery_setting("rain");
+            var wind = scenery_setting("wind");
+            double rain_level = rain_sound.kind == SettingKind.number ? rain_sound.number : rain.kind == SettingKind.number ? rain.number : 0;
+            double wind_level = wind.kind == SettingKind.number ? wind.number : 0;
+            return (usable_level(rain_level), usable_level(wind_level));
+        }
+
+        // A weather level, or 0 for nonsense (a broken number must not blast noise).
+        static double usable_level(double level)
+        {
+            return double.IsNaN(level) || double.IsInfinity(level) || level < 0 ? 0 : level;
         }
 
         // The setting with this name in a list, or a "nothing" setting if it isn't there.

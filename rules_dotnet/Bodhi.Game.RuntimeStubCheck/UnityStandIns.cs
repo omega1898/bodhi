@@ -139,7 +139,11 @@ namespace UnityEngine
 
     public class AudioListener : Behaviour { }
 
-    public class AudioClip : Object { }
+    public class AudioClip : Object
+    {
+        public static AudioClip Create(string name, int length_samples, int channels, int frequency, bool stream) => null;
+        public bool SetData(float[] data, int offset_samples) => true;
+    }
 
     public class AudioSource : Behaviour
     {

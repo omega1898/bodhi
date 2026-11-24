@@ -37,7 +37,13 @@ The scripts in `Runtime/` can only really be compiled by Unity. In the cloud, `d
 3. When Unity asks to switch to the new Input System, say yes (or set **Project Settings**, **Player**, **Active Input Handling** to **Input System Package**).
 4. In an empty scene, add an empty GameObject, add the `ChapterDirector` component to it, and press Play.
 
-Sounds and music are optional: put clips in `Assets/Resources/Sounds/` (named like `bark`, `whistle`, `thunder`) and `Assets/Resources/Music/` (named after each chapter's mood). Without them the game is silent.
+Every sound effect, the music for each mood, and the rain and wind are made in code (`Logic/SoundSynth.cs` and `Logic/MusicSynth.cs`, played by `Runtime/GameAudio.cs`), so the game has sound with no audio files at all. To replace one with a recorded file, put a clip with the same name in `Assets/Resources/Sounds/` (like `bark`, `whistle`, `thunder`) or `Assets/Resources/Music/` (named after the mood, like `calm` or `tense`); the file wins.
+
+To listen to the made sounds without Unity, run this from the repository folder. It writes one `.wav` file per sound into the folder you name:
+
+```
+dotnet run --project rules_dotnet/Bodhi.Audio.Preview -- audio_preview
+```
 
 ## Adding it to the Unity project
 

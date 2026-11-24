@@ -1,0 +1,15 @@
+<!-- Purpose: a small program that writes every made sound and music loop to .wav files, so a
+     person can listen to them without Unity: run it with the folder to write into (see game/README.md). -->
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+    <Nullable>disable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Only the sound makers, which need nothing else from the game. -->
+    <Compile Include="../../game/Logic/SoundSynth.cs;../../game/Logic/MusicSynth.cs;../../game/Logic/WavFile.cs" />
+  </ItemGroup>
+</Project>
