@@ -39,13 +39,13 @@ namespace Bodhi.Rules
                 },
                 rules = new StoryRule[]
                 {
-                    new StoryRule { on = "level_started", lines = new string[] { "We walked west for six days.", "{dog} found every stick on the old road. Every single one." }, objective = "Follow the road home." },
+                    new StoryRule { on = "level_started", lines = new string[] { "We walked west for six days.", "{dog} found every stick on the old road. Every single one." }, objective = "Follow the road home. Switch to {dog} to sniff around.", switching = true },
                     new StoryRule { on = "saw_house", lines = new string[] { "And then, there it was.", "The green door. Still green. Two doors down, the blue door, still shut. Not for long." }, objective = "Go home." },
                     new StoryRule { on = "home_door_opened", lines = new string[] { "A waterline on the walls, halfway up. Mud on everything.", "But the roof held over the bedroom, and the bed was dry." }, objective = "Mark how tall {dog} is now." },
                     new StoryRule { on = "height_marked_again", lines = new string[] { "'{dog}, 8 weeks.' Down by my ankle.", "'{dog}, one year.' Up past my knee. My handwriting, both times." }, objective = "Feed him. His bowl is where it always was." },
                     new StoryRule { on = "last_meal", lines = new string[] { "He went straight to it. He remembered." }, objective = "Six days of road on him. Towel him dry." },
                     new StoryRule { on = "towelled_dry", lines = new string[] { "He shook himself all over me.", "I laughed for the first time in a year." }, objective = "Time for bed." },
-                    new StoryRule { on = "tucked_in", lines = new string[] { "I tucked the blanket round him, the way I did the first night.", "He sighed the way dogs sigh when everything is right." }, objective = "", follow = false, schedule_seconds = 6, schedule_event = "lay_down" },
+                    new StoryRule { on = "tucked_in", lines = new string[] { "I tucked the blanket round him, the way I did the first night.", "He sighed the way dogs sigh when everything is right." }, objective = "", switching = false, follow = false, schedule_seconds = 6, schedule_event = "lay_down" },
                     new StoryRule { on = "lay_down", lines = new string[] { "Then I lay down beside him.", "Our house. Our bed. Both of us, home." }, schedule_seconds = 8, schedule_event = "chapter_done", cutscene = CutsceneChange.start, cutscene_skip_to = "chapter_done" },
                     new StoryRule { on = "chapter_done", complete = true },
                 },

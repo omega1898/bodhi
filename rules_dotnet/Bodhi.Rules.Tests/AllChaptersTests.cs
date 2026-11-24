@@ -83,40 +83,63 @@ namespace Bodhi.Rules.Tests
             }
         }
 
-        // Found by this test: three of Bodhi's keepsakes can't be found, in the browser game either.
-        // They need him to sniff them out, but nothing in these two quiet chapters ever lets the
-        // player be him. Listed here so the gap stays visible; fixing the data makes the test
-        // below fail, as a reminder to empty this list.
-        static readonly string[] known_unfindable_keepsakes = { "last_morning:stolen_sock", "home:best_stick", "home:other_slipper" };
-
-        // Every keepsake can be found (4 in the first chapter, 3 in each of the others), apart
-        // from the known gap above.
+        // Every keepsake can be found: 4 in the first chapter, 3 in each of the others. (This
+        // test found three of Bodhi's that couldn't be, in The Last Morning and Home, because
+        // nothing there let the player be him. Both chapters now let you switch to him.)
         [TestCaseSource(nameof(chapter_ids))]
         public void every_keepsake_can_be_found(string id)
         {
             var script = chapter(id);
             var keepsakes = script.things.Where(thing => !string.IsNullOrEmpty(thing.keepsake)).Select(thing => thing.keepsake).ToList();
             Assert.That(keepsakes.Count, Is.EqualTo(id == "coming_home" ? 4 : 3));
-            var findable = keepsakes.Where(name => !known_unfindable_keepsakes.Contains(id + ":" + name));
             var run = ChapterRobot.play(script, skip_films: false);
-            Assert.That(run.found_keepsakes, Is.EquivalentTo(findable), id);
+            Assert.That(run.found_keepsakes, Is.EquivalentTo(keepsakes), id);
         }
 
-        // The known gap is exactly what it says: Bodhi's own hidden keepsakes, in a chapter where
-        // no rule ever gives the player control of him or lets them switch.
-        [Test]
-        public void the_unfindable_keepsakes_are_bodhis_in_chapters_without_him()
+        // Break it: a chapter with one of Bodhi's hidden things must let the player be him at
+        // some point, by handing him control or by allowing a switch.
+        [TestCaseSource(nameof(chapter_ids))]
+        public void a_chapter_with_his_hidden_things_lets_you_be_him(string id)
         {
-            foreach (var entry in known_unfindable_keepsakes)
+            var script = chapter(id);
+            if (script.things.Any(thing => thing.who == Character.dog && thing.hidden))
             {
-                var parts = entry.Split(':');
-                var script = chapter(parts[0]);
-                var thing = script.things.Single(candidate => candidate.keepsake == parts[1]);
-                Assert.That(thing.who, Is.EqualTo(Character.dog), entry);
-                Assert.That(thing.hidden, Is.True, entry);
-                Assert.That(script.rules.Any(rule => rule.control == Character.dog || rule.switching == true), Is.False,
-                    entry + " is findable now: take it off known_unfindable_keepsakes.");
+                Assert.That(script.rules.Any(rule => rule.control == Character.dog || rule.switching == true), Is.True, id);
             }
+        }
+
+        // In The Last Morning and Home you can switch to Bodhi from the start, and switching
+        // stops when she sets out (Last Morning) or tucks him in (Home), so each ending plays
+        // as her, as written.
+        [TestCase("last_morning", "set_out")]
+        [TestCase("home", "tucked_in")]
+        public void the_quiet_chapters_let_you_switch_until_the_ending(string id, string ending_event)
+        {
+            var script = chapter(id);
+            var run = new ChapterRun(script);
+            run.start();
+            Assert.That(run.switching_allowed, Is.True, id + ": from the start");
+            Assert.That(run.switch_character(), Is.True);
+            Assert.That(run.controlled_character, Is.EqualTo(Character.dog));
+            ChapterRobot.finish(run, skip_films: false, stop_when: playing => playing.has_happened(ending_event));
+            Assert.That(run.switching_allowed, Is.False, id + ": after " + ending_event);
+            Assert.That(run.controlled_character, Is.EqualTo(Character.human), id + ": the ending plays as her");
+        }
+
+        // Break it: while you're playing Bodhi, she can't set out (or tuck him in): those are
+        // hers to do, so the ending always plays as her. Switch back, and she can.
+        [Test]
+        public void the_endings_wait_until_you_are_her()
+        {
+            var run = new ChapterRun(chapter("last_morning"));
+            run.start();
+            Assert.That(run.use("photo_taken", true), Is.True);
+            Assert.That(run.switch_character(), Is.True);
+            Assert.That(run.report_zone("set_out", true, true), Is.False, "as him");
+            Assert.That(run.switch_character(), Is.True);
+            Assert.That(run.report_zone("set_out", true, true), Is.True, "as her");
+            Assert.That(run.switching_allowed, Is.False);
+            Assert.That(chapter("home").things.Single(thing => thing.event_name == "tucked_in").who, Is.EqualTo(Character.human));
         }
 
         // Every event a rule waits for can be made by something: a thing, a zone, a timer, a
@@ -230,15 +253,18 @@ namespace Bodhi.Rules.Tests
                 return;
             }
             // Like a player exploring: while he's Bodhi, sniff around before moving the story on.
-            if (run.controlled_character == Character.dog)
+            // While she's playing and a switch is allowed, switch to him first if he hasn't
+            // sniffed out everything yet.
+            var hidden = script.things.FirstOrDefault(thing => thing.hidden && !sniffed_at.Contains(thing) && !run.has_happened(thing.event_name));
+            if (hidden != null && run.controlled_character == Character.dog)
             {
-                var hidden = script.things.FirstOrDefault(thing => thing.hidden && !sniffed_at.Contains(thing) && !run.has_happened(thing.event_name));
-                if (hidden != null)
-                {
-                    sniffed_at.Add(hidden);
-                    run.sniff(hidden.x, hidden.y);
-                    return;
-                }
+                sniffed_at.Add(hidden);
+                run.sniff(hidden.x, hidden.y);
+                return;
+            }
+            if (hidden != null && run.switching_allowed && run.switch_character())
+            {
+                return;
             }
             // Keepsakes first: a player picks up what they find before moving on.
             foreach (var thing in script.things.OrderBy(thing => string.IsNullOrEmpty(thing.keepsake)))
@@ -259,7 +285,9 @@ namespace Bodhi.Rules.Tests
             {
                 return;
             }
-            if ((story_waits_for(script, run, "dog_petted") || story_waits_for(script, run, "dog_leaned_in")) && run.pet())
+            int events_before_petting = run.event_order.Count;
+            if ((story_waits_for(script, run, "dog_petted") || story_waits_for(script, run, "dog_leaned_in")) && run.pet()
+                && run.event_order.Count > events_before_petting)  // Only she can pet: as him, it does nothing new.
             {
                 return;
             }
