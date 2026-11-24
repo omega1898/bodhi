@@ -82,6 +82,27 @@ const getting_up_rate = 78;
 // very first drawing): just before the back foot swings through, which reads as a first step.
 const walk_start_phase = 0.2;
 
+// Her gaits and a dog's, slowest first, and the speeds between them. A real person breaks into
+// a run somewhere above a brisk walk; a dog walks, trots at the pace of a person hurrying, and
+// gallops only when it really runs. Each switch has two lines `gait_margin` either side, so a
+// speed close to a line doesn't flicker between two gaits. Matches FlipbookChooser.gait_for.
+const gait_steps = {
+    her: { gaits: ['walk', 'run'], speeds: [160] },
+    dog: { gaits: ['walk', 'trot', 'gallop'], speeds: [85, 200] },
+};
+const gait_margin = 10;
+function gait_for(is_dog, current, speed) {
+    const steps = is_dog ? gait_steps.dog : gait_steps.her;
+    let index = Math.max(0, steps.gaits.indexOf(current));
+    while (index < steps.speeds.length && speed > steps.speeds[index] + gait_margin) {
+        index += 1;
+    }
+    while (index > 0 && speed < steps.speeds[index - 1] - gait_margin) {
+        index -= 1;
+    }
+    return steps.gaits[index];
+}
+
 // Loads every animation sheet. Tries the path next to the page first (the app), then the
 // repository's art folder (playing prototype/web/index.html from a checkout); the likely one first.
 function load_flipbook_sheets() {
@@ -400,23 +421,20 @@ function choose_flipbook_frame(character, character_name, time_seconds) {
         state.pose_started = Math.max(state.pose_started, time_seconds);
     }
     if (pose === 'walk') {
-        // Walk or run (trot or gallop for the dog), by speed. Two thresholds, so a speed near
-        // the line doesn't flicker between the two.
-        const slow_gait = character_name === 'her' ? 'walk' : 'trot';
+        // Walk or run for her; walk, trot or gallop for the dog, by speed (see gait_for).
         // A smaller dog's stride is shorter in the world, so his cycle covers less ground.
         const size = character.size_scale || 1;
-        const fast_gait = character_name === 'her' ? 'run' : 'gallop';
-        const switch_speed = character_name === 'her' ? 125 : 150;
-        if (state.gait !== fast_gait && speed > switch_speed + 10) {
-            state.gait = fast_gait;
-        } else if (state.gait !== slow_gait && speed < switch_speed - 10) {
-            state.gait = slow_gait;
+        let gait = gait_for(character_name !== 'her', state.gait, speed);
+        if (gait === 'walk' && character_name !== 'her' && !animations.walk) {
+            gait = 'trot';  // Drawings made before dogs had a walk: trot instead.
         }
-        // The cycle moves on by the distance covered, so a planted foot stays planted. Walk and
-        // run share one position in the cycle, so changing gait never skips a step.
-        const gait = state.gait || slow_gait;
+        // A new gait carries on from the drawing whose feet are closest to the ones just shown:
+        // a walk and a trot put their feet down in a different order.
+        const changed_gait = state.gait !== null && state.gait !== undefined && gait !== state.gait;
+        state.gait = gait;
+        // The cycle moves on by the distance covered, so a planted foot stays planted.
         const entry = animations[gait];
-        if (state.starting_stride) {
+        if (state.starting_stride || (changed_gait && state.last_feet)) {
             state.phase = state.last_feet ? closest_phase(entry, state.last_feet, state.facing) : walk_start_phase;
             state.starting_stride = false;
         } else {

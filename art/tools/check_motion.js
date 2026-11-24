@@ -30,7 +30,7 @@ const largest_slide = 0.5;
 // like sitting down, loop only their last part).
 const loops = {
     her: { idle: 0, walk: 0, run: 0, embrace: 0, sit: 0, kneel: tool.intro_drawings },
-    dog: { idle: 0, trot: 0, gallop: 0, sniff: 0, sleep: 0, lean: 0, sit: tool.intro_drawings, embrace: tool.intro_drawings },
+    dog: { idle: 0, walk: 0, trot: 0, gallop: 0, sniff: 0, sleep: 0, lean: 0, sit: tool.intro_drawings, embrace: tool.intro_drawings },
 };
 
 // The named points of a pose that are watched for pops. The dog's are taken after its build
@@ -98,7 +98,8 @@ function measure(character, name, frames, cycle_length) {
     // A drawing's neighbours: wrapping round inside the looping part, held still at the ends
     // of a one-off move (so its first and last drawings aren't judged against nothing).
     const at = function at(index) {
-        if (looping && index >= loop_start) {
+        // A loop from the first drawing wraps both ways: before drawing 0 comes the last one.
+        if (looping && (index >= loop_start || loop_start === 0)) {
             const length = count - loop_start;
             return points[loop_start + ((index - loop_start) % length + length) % length];
         }

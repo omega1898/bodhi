@@ -14,6 +14,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const gaits = require('./gaits.js');  // How a real person and a real dog walk, drawing by drawing.
 
 const repository_root = path.resolve(__dirname, '..', '..');
 const output_folder = path.join(repository_root, 'art', 'animations');
@@ -195,6 +196,9 @@ function spline_pose(a, b, c, d, t) {
 // More drawings, played proportionally faster, keep every move's timing but halve how far
 // anything jumps between two drawings, which is what reads as shaky on a phone.
 const cycle_steps = 4;
+// Walk and trot cycles are drawn 40 times a cycle: they are on screen most, and a foot swinging
+// forward moves fast, so more drawings keep each jump between them small.
+const walk_drawings = 40;
 const move_steps = 4;
 // The jump's drawings are picked by how fast the body rises or falls, not by time, so extra ones
 // cost no speed: the knees tucking up is quick, and needs them most.
@@ -413,16 +417,6 @@ function mirror_her(values) {
     });
 }
 
-// Her walk: the four classic keys (contact, down, passing, up), then the same with the other leg.
-// Each row: hip height, near foot, far foot, foot angles, arm swing, hair and hem lag.
-// The planted foot moves back the same 7.5 units every frame, so in the game, where frames
-// advance with distance walked, it stays put on the ground instead of sliding.
-const her_walk_keys = [
-    { hip_y: -40.8, near_foot: [15, 0], far_foot: [-15, -0.6], near_foot_angle: 0.28, far_foot_angle: -0.45, swing: -7, hair: 0.0, hem: 0.03 },
-    { hip_y: -40.2, near_foot: [7.5, 0], far_foot: [-12, -3.2], near_foot_angle: 0, far_foot_angle: -0.7, swing: -4, hair: 0.06, hem: 0.05 },
-    { hip_y: -43.3, near_foot: [0, 0], far_foot: [2, -5], near_foot_angle: 0, far_foot_angle: -0.2, swing: 0, hair: 0.09, hem: 0.01 },
-    { hip_y: -43.8, near_foot: [-7.5, 0], far_foot: [10, -2.2], near_foot_angle: -0.3, far_foot_angle: 0.12, swing: 5, hair: 0.05, hem: -0.03 },
-];
 // Her run: contact, recoil, push off, flight. Shoulders lean in, elbows bent, heels kick high.
 // The planted foot moves back 10 units a frame.
 const her_run_keys = [
@@ -488,7 +482,8 @@ const her_animations = {
     idle: breathing(12 * breath_detail, function idle_pose(breath) {
         return her_pose(Object.assign({}, her_standing, { hip_y: -43.6 - breath * 0.4, near_hand: [1.5, 25.5 - breath * 0.4], far_hand: [-0.5, 25.5 - breath * 0.4], hair: breath * 0.04, scarf: 0.3 + breath * 0.06 }));
     }),
-    walk: follow_through(in_between(her_cycle_keys(her_walk_keys, 0.04, 25), cycle_steps, true).map(her_pose), her_loose_parts, cycle_steps, true),
+    // The walk is worked out drawing by drawing from how a real person walks (see gaits.js).
+    walk: follow_through(gaits.her_walk_values(walk_drawings).map(function walk_pose(values) { return her_pose(her_values(values)); }), her_loose_parts, walk_drawings / 8, true),
     run: follow_through(in_between(her_cycle_keys(her_run_keys, 0.14, 17), cycle_steps, true).map(her_pose), her_loose_parts, cycle_steps, true),
     jump: follow_through(in_between(her_jump_keys, jump_steps, false).map(her_pose), her_loose_parts, jump_steps, false),
     // Landing starts from touch-down (the end of the jump, feet now on the floor), sinks into
@@ -644,15 +639,36 @@ function draw_dog(adult_pose, build) {
         body_point(withers, axis, 5.5, 2),
     ].map(to_body);
 
-    // A leg: one furry tube from inside the body, through the joint, to the paw.
-    const leg = function draw_leg(top, paw, widths, color) {
+    // How far the hips are down toward sitting (0 standing, 1 sitting). Sitting, the back feet
+    // lie flat on the floor from paw to hock.
+    const crouch = Math.min(1, Math.max(0, (22 + pelvis[1]) / 8));
+    // A leg: one furry tube from inside the body, through its joints, to the paw.
+    //   front:  a front leg (shoulder, elbow, wrist, paw) rather than a back one (hip, stifle,
+    //           hock, paw). A dog's elbow points back and its stifle (knee) forward.
+    //   fold:   in the air, how far the wrist or hock folds the paw back (0 to 1).
+    const leg = function draw_leg(top, paw, widths, color, front, fold) {
         // Bigger paws are lifted by as much as they grew, so they still stand on the floor.
         const paw_point = add(paw, [0, -1.2 - 8 * (build.leg_width - 1)]);
-        // Standing, the joints bend back as a dog's do; lying down (`folded`), they fold up into
-        // the body instead of poking down through the floor.
         const bone = 10.5 * build.leg_bone;
-        const joint = solve_joint(top, paw_point, bone, bone, pose.folded ? -1 : 1);
-        const points = [top, joint, paw_point].map(to_body);
+        let points;
+        if (pose.folded || (front && pose.reaching)) {
+            // Lying down (`folded`) the joints fold up into the body instead of poking down
+            // through the floor; a front leg reaching up (the hug) bends like an arm.
+            const joint = solve_joint(top, paw_point, bone, bone, pose.folded ? -1 : 1);
+            points = [top, joint, paw_point];
+        } else {
+            // The short bone above the paw: nearly upright when the paw is down, folding back
+            // in the air. The back one slopes more (the hock sits behind the paw), and lies flat
+            // along the floor when sitting.
+            const lowest_bone = front ? [-0.4, -3.6] : [-1.8, -5.6];
+            const turned = rotate_point(scale(lowest_bone, build.leg_bone), (fold || 0) * (front ? 1.9 : 1.2) - (front ? 0 : crouch * 1.25));
+            const wrist = add(paw_point, turned);
+            const upper = (front ? 10.4 : 9.4) * build.leg_bone;
+            const joint = solve_joint(top, wrist, upper, upper, front ? 1 : -1);
+            points = [top, joint, wrist, paw_point];
+            widths = [widths[0], widths[1], widths[2] * 0.95, widths[2]];
+        }
+        points = points.map(to_body);
         const paw_pixels = to_body(add(paw_point, [0.8, 0]));
         // Goldendoodle legs carry thick, shaggy fur ("furnishings") down to big round paws. Lying
         // down, the fur on the folded legs is pressed flat, and the knees tuck under the body.
@@ -695,21 +711,21 @@ function draw_dog(adult_pose, build) {
 
     const fur = [
         '<g filter="url(#far_side)">',
-        leg(front_top_far, pose.legs.far_front, [104, 88, 80], 'url(#coat)'),
-        leg(back_top_far, pose.legs.far_back, [130, 84, 68], 'url(#coat_dark)'),
+        leg(front_top_far, pose.legs.far_front, [104, 88, 80], 'url(#coat)', true, (pose.leg_fold || {}).far_front),
+        leg(back_top_far, pose.legs.far_back, [130, 84, 68], 'url(#coat_dark)', false, (pose.leg_fold || {}).far_back),
         '</g>',
         '<path d="' + tube_path(tail_points, tail_widths) + '" fill="url(#coat_light)"/>',
         '<path d="' + tube_path(tail_points, tail_widths) + '" fill="url(#curls)"/>',
         // Near legs go behind the body: the coat hides where they join, as on a real dog. A front
         // leg reaching up (the hug) is drawn over the body instead, so it reads as an arm.
-        pose.reaching ? '' : leg(front_top_near, pose.legs.near_front, [108, 92, 82], 'url(#coat)'),
-        leg(back_top_near, pose.legs.near_back, [134, 86, 70], 'url(#coat)'),  // Hock and foot stay slim: sitting, they lie on the floor.
+        pose.reaching ? '' : leg(front_top_near, pose.legs.near_front, [108, 92, 82], 'url(#coat)', true, (pose.leg_fold || {}).near_front),
+        leg(back_top_near, pose.legs.near_back, [134, 86, 70], 'url(#coat)', false, (pose.leg_fold || {}).near_back),  // Hock and foot stay slim: sitting, they lie on the floor.
         '<path d="' + smooth_closed_path(outline) + '" fill="url(#coat)"/>',
         '<path d="' + smooth_closed_path(outline) + '" fill="url(#curls)"/>',
         // His white blaze: the real Bodhi has a cream-white bib from his throat down his chest.
         '<path d="' + smooth_closed_path(blaze) + '" fill="' + blaze_color + '"/>',
         '<path d="' + smooth_closed_path(blaze) + '" fill="url(#curls)"/>',
-        pose.reaching ? '<g transform="translate(0,8)" opacity="0.35">' + leg(front_top_near, pose.legs.near_front, [92, 74, 64], '#6b4320') + '</g>' + leg(front_top_near, pose.legs.near_front, [92, 74, 64], 'url(#coat_light)') : '',
+        pose.reaching ? '<g transform="translate(0,8)" opacity="0.35">' + leg(front_top_near, pose.legs.near_front, [92, 74, 64], '#6b4320', true) + '</g>' + leg(front_top_near, pose.legs.near_front, [92, 74, 64], 'url(#coat_light)', true) : '',
     ];
     // Fur detail: a soft lighter band along the back where the light catches it. A wavy
     // goldendoodle coat isn't glossy, so this is wide and faint, not a shine.
@@ -738,46 +754,36 @@ function dog_pose(changes) {
     const standing = {
         pelvis: [-11, -27], withers: [11, -28], arch: 0, tuck: 2, head: [19, -39], head_angle: 0, ear: 0.22, tail: 0.45, tail_curl: 2.5,
         legs: { near_front: [13, 0], far_front: [11, 0], near_back: [-8, 0], far_back: [-11, 0] }, eyes: 'open', mouth: 'closed',
+        leg_fold: { near_front: 0, far_front: 0, near_back: 0, far_back: 0 },
     };
     const result = Object.assign({}, standing, changes);
     result.legs = Object.assign({}, standing.legs, changes.legs || {});
+    result.leg_fold = Object.assign({}, standing.leg_fold, changes.leg_fold || {});
     return result;
 }
 
-// The trot: diagonal legs move together. One leg's path over the 8 keys: planted and pushed
-// back for five (weight on it), then a quick lifted swing forward for three.
-const trot_paw_path = [[8, 0], [4, 0], [0, 0], [-4, 0], [-8, -0.6], [-5, -4.5], [2, -5.5], [6, -2]];
-const trot_body_lift = [-0.4, 0.4, -0.3, -1.0, -0.4, 0.4, -0.3, -1.0];
-const dog_trot_keys = trot_paw_path.map(function trot_key(unused, key) {
-    const pair_one = trot_paw_path[key];
-    const pair_two = trot_paw_path[(key + 4) % 8];
-    const lift = trot_body_lift[key];
-    return dog_pose({
-        pelvis: [-11, -27 + lift], withers: [11, -28 + lift], head: [19, -39 + lift * 0.4], head_angle: [0, 0.04, 0, -0.03][key % 4],
-        ear: [0.3, 0.42, 0.36, 0.26][key % 4], tail: [0.5, 0.42, 0.48, 0.58][key % 4],
-        legs: {
-            near_front: [13 + pair_one[0], pair_one[1]], far_back: [-11 + pair_one[0], pair_one[1]],
-            far_front: [11 + pair_two[0], pair_two[1]], near_back: [-8 + pair_two[0], pair_two[1]],
-        },
-    });
-});
-
 // The gallop (a "rotary" gallop): stretch out, front feet land, gather the back feet under a
-// rounded spine, back feet land, push, fly. The spine extending and gathering is what makes a
+// rounded spine, back feet land, push, fly. Paws in the air fold back at the wrist and hock. The spine extending and gathering is what makes a
 // running dog look alive.
 const dog_gallop_keys = [
     dog_pose({ pelvis: [-12.5, -28], withers: [12.5, -29], arch: -1.5, head: [22, -37], head_angle: 0.1, ear: 0.7, tail: 0.15,
-        legs: { near_front: [22, -3], far_front: [20, -4], near_back: [-21, -2], far_back: [-19, -3] } }),
+        legs: { near_front: [22, -3], far_front: [20, -4], near_back: [-18.5, -3.5], far_back: [-19, -3] },
+        leg_fold: { near_front: 0, far_front: 0, near_back: 0.2, far_back: 0.15 } }),
     dog_pose({ pelvis: [-11.5, -29.5], withers: [11.5, -27], arch: 0, head: [20, -37], head_angle: 0.06, ear: 0.6, tail: 0.2,
-        legs: { near_front: [18, 0], far_front: [15, -3], near_back: [-12, -5], far_back: [-15, -4] } }),
+        legs: { near_front: [18, 0], far_front: [15, -3], near_back: [-12, -5], far_back: [-15, -4] },
+        leg_fold: { near_front: 0, far_front: 0.2, near_back: 0.6, far_back: 0.5 } }),
     dog_pose({ pelvis: [-10, -29], withers: [10, -28], arch: 2.5, head: [18, -40], head_angle: -0.04, ear: 0.45, tail: 0.3,
-        legs: { near_front: [8, 0], far_front: [12, 0], near_back: [-7, -6], far_back: [-9, -5] } }),
+        legs: { near_front: [8, 0], far_front: [12, 0], near_back: [-7, -6], far_back: [-9, -5] },
+        leg_fold: { near_front: 0, far_front: 0, near_back: 0.7, far_back: 0.6 } }),
     dog_pose({ pelvis: [-8.5, -29.5], withers: [8.5, -29], arch: 4, head: [17, -40], head_angle: -0.06, ear: 0.5, tail: 0.25,
-        legs: { near_front: [5, -5], far_front: [7, -6], near_back: [0, -3], far_back: [-2, -4] } }),
+        legs: { near_front: [5, -5], far_front: [7, -6], near_back: [0, -3], far_back: [-2, -4] },
+        leg_fold: { near_front: 0.6, far_front: 0.7, near_back: 0.3, far_back: 0.4 } }),
     dog_pose({ pelvis: [-10, -26.5], withers: [10, -29], arch: 2, head: [18, -40], head_angle: 0, ear: 0.65, tail: 0.15,
-        legs: { near_front: [14, -6], far_front: [12, -5], near_back: [-4, 0], far_back: [-7, 0] } }),
+        legs: { near_front: [14, -6], far_front: [12, -5], near_back: [-4, 0], far_back: [-7, 0] },
+        leg_fold: { near_front: 0.8, far_front: 0.7, near_back: 0, far_back: 0 } }),
     dog_pose({ pelvis: [-11.5, -27.5], withers: [11.5, -29.5], arch: 0, head: [21, -39], head_angle: 0.06, ear: 0.7, tail: 0.1,
-        legs: { near_front: [20, -4], far_front: [18, -5], near_back: [-14, 0], far_back: [-18, -1] } }),
+        legs: { near_front: [20, -4], far_front: [18, -5], near_back: [-14, 0], far_back: [-18, -1] },
+        leg_fold: { near_front: 0.4, far_front: 0.5, near_back: 0, far_back: 0.1 } }),
 ];
 
 // The dog's home stance, which every landing, turn and stop settles into.
@@ -809,7 +815,9 @@ const dog_animations = {
     idle: breathing(8 * breath_detail, function idle_pose(breath, turn) {
         return dog_pose({ pelvis: [-11, -27 - breath * 0.3], withers: [11, -28 - breath * 0.3], head: [19, -39 - breath * 0.15], tail: wag(turn, 0.45, 0.8), ear: 0.22 + breath * 0.03 });
     }),
-    trot: follow_through(in_between(dog_trot_keys, cycle_steps, true), dog_loose_parts, cycle_steps, true),
+    // The walk and trot are worked out drawing by drawing from how a real dog moves (see gaits.js).
+    walk: follow_through(gaits.dog_gait_values(gaits.dog_walk, walk_drawings).map(dog_pose), dog_loose_parts, walk_drawings / 8, true),
+    trot: follow_through(gaits.dog_gait_values(gaits.dog_trot, walk_drawings).map(dog_pose), dog_loose_parts, walk_drawings / 8, true),
     gallop: follow_through(in_between(dog_gallop_keys, cycle_steps, true), dog_loose_parts, cycle_steps, true),
     // One arc: take-off, rising, the top (the middle drawing), falling, reaching for the ground.
     jump: follow_through(in_between([
@@ -905,8 +913,8 @@ const dog_builds = { bodhi: adult_build, bodhi_puppy: puppy_build, biscuit: old_
 // How far each walking cycle travels, in game units (see cycle_length_of). The gallop's planted
 // paws move back about 10 units per key over its 6 keys. In-betweens don't change the distance.
 const cycle_lengths = {
-    her: { walk: cycle_length_of(her_walk_keys), run: cycle_length_of(her_run_keys) },
-    bodhi: { trot: (trot_paw_path[0][0] - trot_paw_path[1][0]) * trot_paw_path.length, gallop: 60 },
+    her: { walk: gaits.her_walk.cycle_length, run: cycle_length_of(her_run_keys) },
+    bodhi: { walk: gaits.dog_walk.cycle_length, trot: gaits.dog_trot.cycle_length, gallop: 60 },
 };
 cycle_lengths.bodhi_puppy = cycle_lengths.bodhi;  // The puppy's paws travel the same paths.
 cycle_lengths.biscuit = cycle_lengths.bodhi;

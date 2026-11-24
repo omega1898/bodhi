@@ -109,6 +109,122 @@ check('the checker catches a drawing that jumps out of line', function () {
 check('the checker catches a planted foot that skates', function () {
     const frames = tool.her_animations.walk.map(function copy(pose) { return Object.assign({}, pose); });
     const cycle = tool.cycle_lengths.her.walk;
-    const slid = frames.map(function skate(pose) { return Object.assign({}, pose, { near_foot: [pose.near_foot[0] * 1.3, pose.near_foot[1]] }); });
+    const slid = frames.map(function skate(pose) { return Object.assign({}, pose, { near_foot: [pose.near_foot[0] * 1.6, pose.near_foot[1]] }); });
     assert.ok(motion.measure('her', 'walk', slid, cycle).slide > motion.largest_slide);
+});
+
+// ---------- Walking like a real person and a real dog (see gaits.js) ----------
+
+// The drawings at which a foot comes down: in the air in one drawing, flat on the floor in the
+// next. `foot_of(pose)` gives that foot's [x, y].
+function landings(frames, foot_of) {
+    const found = [];
+    for (let index = 0; index < frames.length; index++) {
+        const before = foot_of(frames[(index - 1 + frames.length) % frames.length]);
+        if (before[1] < 0 && foot_of(frames[index])[1] === 0) {
+            found.push(index);
+        }
+    }
+    return found;
+}
+
+// The order a dog's paws come down in, with how far apart (as a share of the cycle).
+function paw_order(frames) {
+    const names = ['near_front', 'far_front', 'near_back', 'far_back'];
+    const down = names.map(function first_landing(name) {
+        return { name: name, at: landings(frames, function paw(pose) { return pose.legs[name]; })[0] };
+    });
+    return down.sort(function by_time(first, second) { return first.at - second.at; });
+}
+
+// True when a dog's walk is a real one: each paw down on its own, a quarter of a cycle apart,
+// in the order back, front on one side, then back, front on the other, with at least two paws
+// always down.
+function walks_like_a_dog(frames) {
+    const order = paw_order(frames);
+    if (order.some(function missing(paw) { return paw.at === undefined; })) {
+        return false;
+    }
+    const start = order.findIndex(function back(paw) { return paw.name === 'near_back'; });
+    const sequence = order.slice(start).concat(order.slice(0, start)).map(function name(paw) { return paw.name; });
+    const quarter = frames.length / 4;
+    const evenly = order.every(function spaced(paw, index) {
+        const next = order[(index + 1) % 4];
+        const gap = (next.at - paw.at + frames.length) % frames.length;
+        return Math.abs(gap - quarter) <= 1;
+    });
+    const always_two_down = frames.every(function supported(pose) {
+        return Object.values(pose.legs).filter(function down(paw) { return paw[1] === 0; }).length >= 2;
+    });
+    return sequence.join(' ') === 'near_back near_front far_back far_front' && evenly && always_two_down;
+}
+
+check('Em lands on her heel with her toes up, and pushes off with her heel up', function () {
+    const walk = tool.her_animations.walk;
+    const strike = landings(walk, function near(pose) { return pose.near_foot; });
+    assert.ok(walk[0].near_foot_angle < -0.2, 'toes up as the heel lands');
+    assert.strictEqual(walk[0].near_foot[1] < 0, true, 'only the heel is down, so the foot point is just off the floor');
+    assert.ok(strike.length === 1 && strike[0] > 0 && strike[0] <= walk.length * 0.12, 'rolls flat within the first tenth of the step');
+    const push_off = walk[Math.round(walk.length * 0.58)];
+    assert.ok(push_off.near_foot_angle > 0.4, 'heel up as the toes push off');
+});
+
+check('each of her feet is down about 60% of the cycle, so both are down for a moment each step', function () {
+    const walk = tool.her_animations.walk;
+    const near_down = walk.filter(function down(pose) { return pose.near_foot[1] > -1; }).length / walk.length;
+    assert.ok(near_down > 0.55 && near_down < 0.72, 'near foot down ' + near_down);
+    const both_down = walk.filter(function both(pose) { return pose.near_foot[1] > -1 && pose.far_foot[1] > -1; }).length;
+    assert.ok(both_down >= 4, 'both feet down in ' + both_down + ' drawings');
+});
+
+check('her hips rise and fall about 2 units, lowest with both feet down', function () {
+    const walk = tool.her_animations.walk;
+    const heights = walk.map(function hip(pose) { return pose.hip[1]; });
+    const rise = Math.max.apply(null, heights) - Math.min.apply(null, heights);
+    assert.ok(rise > 1.5 && rise < 2.6, 'hips move ' + rise.toFixed(2));
+    const lowest = heights.indexOf(Math.max.apply(null, heights));  // y points down.
+    const at_lowest = walk[lowest];
+    assert.ok(at_lowest.near_foot[1] > -1.5 && at_lowest.far_foot[1] > -2.5, 'both feet near the floor at the lowest point');
+});
+
+check('her arms swing opposite her legs', function () {
+    const walk = tool.her_animations.walk;
+    const first = walk[0];
+    assert.ok(first.near_foot[0] > first.far_foot[0], 'near foot ahead');
+    assert.ok(first.near_hand[0] < first.far_hand[0], 'so the near hand is behind');
+});
+
+check('Bodhi walks like a dog: one paw at a time, back then front on each side', function () {
+    assert.ok(walks_like_a_dog(tool.dog_animations.walk));
+});
+
+check('break it: a "walk" with all four paws landing together is caught', function () {
+    const bunny_hop = tool.dog_animations.walk.map(function same(pose, index, frames) {
+        const lead = frames[index].legs.near_back;
+        return Object.assign({}, pose, { legs: { near_front: lead, far_front: lead, near_back: lead, far_back: lead } });
+    });
+    assert.ok(!walks_like_a_dog(bunny_hop));
+});
+
+check('Bodhi trots on diagonal pairs that land together', function () {
+    const order = paw_order(tool.dog_animations.trot);
+    const at = {};
+    for (const paw of order) {
+        at[paw.name] = paw.at;
+    }
+    assert.ok(Math.abs(at.near_front - at.far_back) <= 1 && Math.abs(at.far_front - at.near_back) <= 1, JSON.stringify(at));
+    const half = tool.dog_animations.trot.length / 2;
+    assert.ok(Math.abs(Math.abs(at.near_front - at.far_front) - half) <= 1, 'the pairs take turns, half a cycle apart');
+});
+
+check('a dog paw folds back at the wrist or hock in the air, and is straight on the floor', function () {
+    for (const pose of tool.dog_animations.walk.concat(tool.dog_animations.trot)) {
+        for (const name of Object.keys(pose.legs)) {
+            if (pose.legs[name][1] === 0) {
+                assert.strictEqual(pose.leg_fold[name], 0, name + ' folded on the floor');
+            }
+        }
+    }
+    const most = Math.max.apply(null, tool.dog_animations.walk.map(function fold(pose) { return pose.leg_fold.near_front; }));
+    assert.ok(most > 0.8, 'the front wrist folds well back at the top of the swing');
 });

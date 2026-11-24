@@ -53,7 +53,7 @@ namespace Bodhi.Rules.Tests
             Assert.That(her.on_ground, Is.True);
             Assert.That(her.feet_y, Is.EqualTo(520).Within(1e-9));
             Assert.That(her.center_x, Is.EqualTo(200).Within(1e-9));
-            walk(her, 1, 0.7, stage);
+            walk(her, 1, 1.0, stage);  // A real walking pace takes about a second to get there.
             Assert.That(her.center_x, Is.GreaterThan(300 + her.width / 2));
             Assert.That(her.feet_y, Is.EqualTo(510).Within(1e-9), "up on the kerb");
             Assert.That(her.blocked, Is.False);

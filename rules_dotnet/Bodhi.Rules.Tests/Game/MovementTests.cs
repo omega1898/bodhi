@@ -187,7 +187,9 @@ namespace Bodhi.Rules.Tests
             var her = new CharacterMotion(Character.human);
             walk(her, 1, 1.0);
             double halfway = CharacterSpec.her.walk_speed + (CharacterSpec.her.jog_speed - CharacterSpec.her.walk_speed) * 0.5;
-            Assert.That(her.velocity_x, Is.EqualTo(halfway).Within(4), "half a jog at 1 s");
+            // She speeds up over a few frames, so her speed trails the target a little; the gap
+            // from walk to jog is now twice as wide, so the allowance is too.
+            Assert.That(her.velocity_x, Is.EqualTo(halfway).Within(8), "half a jog at 1 s");
             var turner = new CharacterMotion(Character.human);
             walk(turner, 1, 0.6);
             walk(turner, -1, 0.6);

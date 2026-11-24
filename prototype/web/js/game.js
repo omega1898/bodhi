@@ -17,7 +17,7 @@ const character_specs = {
     // Speeds are world units per second; accelerations are units per second, per second.
     // Starting, stopping and turning take a moment, the way a body with weight does.
     // Weight shows in the animation; the controls themselves answer within about a tenth of a second.
-    human: { width: 26, height: 86, walk_speed: 175, jog_speed: 235, jump_speed: 620, acceleration: 1800, braking: 2600, turning: 3600, air_control: 1500 },
+    human: { width: 26, height: 86, walk_speed: 110, jog_speed: 235, jump_speed: 620, acceleration: 1800, braking: 2600, turning: 3600, air_control: 1500 },
     dog: { width: 46, height: 38, walk_speed: 235, jog_speed: 235, jump_speed: 690, acceleration: 2400, braking: 3000, turning: 4400, air_control: 2000 },
 };
 const progress_storage_key = 'until_we_find_home_progress';

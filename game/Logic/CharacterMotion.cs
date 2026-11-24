@@ -18,9 +18,11 @@ namespace Bodhi.Game
         public double walk_speed, jog_speed, jump_speed;
         public double acceleration, braking, turning, air_control;
 
+        // Her walk is a brisk walk a real person could keep up (her walking drawings are timed for
+        // it); keep pushing and she breaks into a jog, which shows her running.
         public static readonly CharacterSpec her = new CharacterSpec
         {
-            width = 26, height = 86, walk_speed = 175, jog_speed = 235, jump_speed = 620,
+            width = 26, height = 86, walk_speed = 110, jog_speed = 235, jump_speed = 620,
             acceleration = 1800, braking = 2600, turning = 3600, air_control = 1500,
         };
 
