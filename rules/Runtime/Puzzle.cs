@@ -281,6 +281,24 @@ namespace Bodhi.Rules
             state = puzzle.initial_state();
         }
 
+        // Starts a playthrough from a given state, for tests. A state that doesn't fit the
+        // puzzle (wrong length, a state number it doesn't have) falls back to the start.
+        internal PuzzleRun(Puzzle puzzle, int[] starting_state) : this(puzzle)
+        {
+            if (starting_state == null || starting_state.Length != puzzle.elements.Length)
+            {
+                return;
+            }
+            for (int index = 0; index < starting_state.Length; index += 1)
+            {
+                if (starting_state[index] < 0 || starting_state[index] >= puzzle.elements[index].states.Length)
+                {
+                    return;
+                }
+            }
+            state = (int[])starting_state.Clone();
+        }
+
         // The current state in words.
         public string describe() => puzzle.describe(state);
 
