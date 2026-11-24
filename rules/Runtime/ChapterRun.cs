@@ -31,7 +31,8 @@ namespace Bodhi.Rules
         }
     }
 
-    public class ChapterRun
+    // "partial": this class is written across two files; saving and resuming are in ChapterRunSave.cs.
+    public partial class ChapterRun
     {
         public const int maximum_event_name_length = 64;
         public const double embrace_seconds = 6.5;          // How long the embrace lasts.
@@ -70,6 +71,7 @@ namespace Bodhi.Rules
         double call_rest_left = 0;
         double answer_seconds_left = 0;
         Character? waiting_answerer = null;
+        bool replaying = false;  // True while a save is replayed: lasting changes only, no lines.
 
         public ChapterBeat current_beat { get; private set; } = ChapterBeat.together;
         public Character controlled_character { get; private set; } = Character.human;
@@ -430,7 +432,7 @@ namespace Bodhi.Rules
         // Carries out a rule's changes, in the browser game's order.
         void apply(StoryRule rule)
         {
-            foreach (var line in rule.lines ?? Array.Empty<string>())
+            foreach (var line in replaying ? Array.Empty<string>() : rule.lines ?? Array.Empty<string>())
             {
                 waiting_lines.Add(new StoryLine(line ?? "", rule.voice));
             }

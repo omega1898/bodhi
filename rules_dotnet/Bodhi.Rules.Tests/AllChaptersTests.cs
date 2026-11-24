@@ -23,7 +23,7 @@ namespace Bodhi.Rules.Tests
             "dog_leaned_in", "knelt_by_dog", "ball_thrown", "ball_fetched", "dog_sniffed",
         };
 
-        static IEnumerable<string> chapter_ids() => StoryChapters.all().Select(chapter => chapter.id);
+        public static IEnumerable<string> chapter_ids() => StoryChapters.all().Select(chapter => chapter.id);
 
         // Finds a chapter by id.
         static ChapterScript chapter(string id) => StoryChapters.all().Single(script => script.id == id);
@@ -183,8 +183,9 @@ namespace Bodhi.Rules.Tests
             return run;
         }
 
-        // Plays a run to its end, starting it first if nothing has happened yet.
-        public static void finish(ChapterRun run, bool skip_films)
+        // Plays a run to its end, starting it first if nothing has happened yet. With stop_when,
+        // it stops early, as soon as that question about the run answers true.
+        public static void finish(ChapterRun run, bool skip_films, Func<ChapterRun, bool> stop_when = null)
         {
             var script = run.chapter;
             if (run.event_order.Count == 0)
@@ -195,6 +196,10 @@ namespace Bodhi.Rules.Tests
             int switches_without_progress = 0;
             for (double seconds = 0; seconds < longest_game_seconds && !run.is_complete; seconds += step_seconds)
             {
+                if (stop_when != null && stop_when(run))
+                {
+                    return;
+                }
                 int events_before = run.event_order.Count;
                 if (run.cutscene_playing && skip_films)
                 {
