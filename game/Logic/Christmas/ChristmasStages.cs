@@ -13,6 +13,7 @@ namespace Bodhi.Game
                 lamp_in_window(),
                 kell_bridge(),
                 strand(),
+                lantern_train(),
             };
         }
 
@@ -25,6 +26,7 @@ namespace Bodhi.Game
                 case "lamp_in_window": return lamp_in_window();
                 case "kell_bridge": return kell_bridge();
                 case "strand": return strand();
+                case "lantern_train": return lantern_train();
                 default: return null;
             }
         }

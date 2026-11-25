@@ -411,24 +411,63 @@ Then the title card *Chapter Five: The Lantern Train*, 17 December.
 
 Follow Biscuit. / Lead Biscuit away. Find somewhere warm. / Push Biscuit back onto the kerb! / Find something dropped. Stay out of sight. / Ask at the stalls. / Put up posters. / Climb the town-hall steps. Look for him. / Whistle for {dog}. / Biscuit is fading. Find somewhere warm. / Climb in the back window. / Put up your last poster.
 
-### Chapter Five: The Lantern Train (17 December)
+### Chapter Five: The Lantern Train (17 December), in full
 
-*Underneath:* at the red door Bodhi becomes the leader. From here Biscuit follows him, and Bodhi turns them both for home.
+Written in full on 25 November 2026, when the chapter was built. The chapter's question: *will the train bring Em to them, or run them down?*
 
-| Beat | Voice | Line |
+*Underneath:* since the red door, Bodhi leads and Biscuit follows ("Slow is fine."). The railway is the one road that smells of home all the way. The terror of the viaduct is the closest they come all game: the width of a train window. For the first time, Em knows for certain he is alive, and for the first time since the blizzard, something answers her whistle.
+
+#### Up the line (Bodhi)
+
+| # | Beat | Voice | Caption |
+|---|---|---|---|
+| 1 | First light (film) | B | Rails. Iron and frost. They smell of the valley. Up. Home is up. |
+| 2 | | B | The old dog follows now. Slow. Slow is fine. |
+| 3 | The fallen tree | B | A tree, lying across. Over. The old dog can't. Round, then. |
+| 4 | Round it | B | Nose to his shoulder. Round. Round. There. |
+| 5 | Climbing | B | The light, going. The cold, coming. The rails go on, over nothing. |
+
+#### The Lantern Train (Em)
+
+| # | Beat | Voice | Caption |
+|---|---|---|---|
+| 6 | The call | Em | 'Two dogs went up the railway line at first light,' Kofi's mum said. |
+| 7 | | Em | The Lantern Train left Strand at four, every window gold. |
+| 8 | Boarding (film) | Em | Pat the guard let me ride up front. 'I'll not run them down,' he said. |
+| 9 | | Em | 'Not at Christmas. Not on my train.' |
+| 10 | | Em | We climbed out of Strand into the blue, the lanterns swinging. |
+
+#### The viaduct (Bodhi, then Em)
+
+| # | Beat | Voice | Caption |
+|---|---|---|---|
+| 11 | The viaduct | B | Stone, and under the stone, nothing. Wind from the gorge. Ice, hanging. |
+| 12 | | B | The old dog stops. Shakes. Goes on. |
+| 13 | The rails sing | B | The rails hum. Something big is coming. Big and loud and full of light. |
+| 14 | The recess (film) | B | Into the stone. Push the old dog in. Press. Press. |
+| 15 | The window | Em | Ginger curls, in the headlamp. One heartbeat, and gone under us. |
+| 16 | | B | Through the glass, going past: her. HER. |
+| 17 | | B | Then the noise. The old dog, running blind. Run with him. Run. |
+| 18 | The brake | Em | Pat pulled the brake before I'd finished shouting. |
+| 19 | Running back | Em | The train stopped beyond the viaduct. I ran back along the line with the lantern. |
+| 20 | The recess | Em | In the recess, two sets of prints, pressed right back against the stone. |
+| 21 | | Em | A tuft of ginger curls on the stone. Nothing else. |
+| 22 | The whistle (film) | Em | I whistled into the dark. |
+| 23 | Closes | Em | Then, far down in the trees, one bark. His. |
+
+Then the title card *Chapter Six: The Reindeer Hill*, 17 December, night.
+
+#### Keepsakes
+
+| Keepsake | Found by | Text |
 |---|---|---|
-| Opens | B | Rails. Iron and frost. They smell of the valley. Up. Home is up. |
-| | B | The old dog follows now. Slow. Slow is fine. |
-| The call | Em | 'Two dogs went up the railway line at first light,' Kofi's mum said. |
-| Pat | Em | Pat the guard let me ride up front. 'I'll not run them down,' he said. |
-| | Em | 'Not at Christmas. Not on my train.' |
-| The rails sing | B | The rails hum. Something big is coming. Big and loud and full of light. |
-| The recess | B | Into the stone. Push the old dog in. Press. Press. |
-| The window | Em | Ginger curls, in the headlamp. One heartbeat, and gone under us. |
-| | B | Through the glass, going past: her. HER. |
-| The brake | Em | Pat pulled the brake before I'd finished shouting. |
-| Closes | Em | In the recess, two sets of prints, pressed right back against the stone. |
-| | Em | Then, far down in the trees, one bark. His. |
+| The crumbs on a sleeper | Bodhi | Crumbs scattered along a sleeper for the birds. Someone walks this line with bread in their pocket. |
+| The lantern with a tag | Em | A lantern on the train with a child's tag: 'This one's for Mum, at the hospital.' |
+| The flask in the halt hut | Em | In the halt hut, a track worker's flask of tea, labelled: 'For whoever's on nights.' |
+
+#### Objectives, in order
+
+Follow the railway up the valley. / Help Biscuit round the fallen tree. / Board the Lantern Train. / Lead Biscuit across the viaduct. / Get Biscuit into the recess in the wall! / Run back to the recess. / Whistle into the forest.
 
 ### Chapter Six: The Reindeer Hill (17 December, night)
 
