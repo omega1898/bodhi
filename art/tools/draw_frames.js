@@ -189,12 +189,36 @@ function spline_pose(a, b, c, d, t) {
     return result;
 }
 
+// How many drawings go from one key to the next. Walking cycles get the most, because they are
+// on screen the most and a planted foot must move back in small, even steps; one-off moves get
+// four too; breathing loops (idle, sitting) are drawn with twice as many drawings as they first had.
+// More drawings, played proportionally faster, keep every move's timing but halve how far
+// anything jumps between two drawings, which is what reads as shaky on a phone.
+const cycle_steps = 4;
+const move_steps = 4;
+// The jump's drawings are picked by how fast the body rises or falls, not by time, so extra ones
+// cost no speed: the knees tucking up is quick, and needs them most.
+const jump_steps = 6;
+// The biggest moves (getting down onto the knees or rising into the hug, the hands or paws
+// travelling half a body's height, and the impact of landing) get six, so they still glide.
+const big_move_steps = 6;
+const breath_detail = 2;
+
 // Makes `steps` drawings from each key to the next. A loop (a walk, a trot) wraps round, so the
-// last key flows back into the first; a one-off move (a landing) ends exactly on its last key.
+// last key flows back into the first; a one-off move (a landing) ends exactly on its last key,
+// arriving there at rest (it slows into it), so whatever plays next starts from stillness
+// instead of from a body that stopped dead mid-motion. Its start keeps its speed, since a
+// landing or a skid begins with the body already moving.
 function in_between(keys, steps, loops) {
     const count = keys.length;
     const key_at = function key_at(index) {
-        return loops ? keys[(index + count) % count] : keys[Math.max(0, Math.min(count - 1, index))];
+        if (loops) {
+            return keys[(index + count) % count];
+        }
+        if (index >= count) {
+            return keys[count - 2];  // Mirrors the second-to-last key: no speed at the last one.
+        }
+        return keys[Math.max(0, index)];
     };
     const frames = [];
     const segments = loops ? count : count - 1;
@@ -208,6 +232,57 @@ function in_between(keys, steps, loops) {
     }
     return frames;
 }
+
+// Follow-through: the loose parts (her ponytail, scarf and coat hem; the dog's ears and tail)
+// don't move with the body like the rest of it. Each one is a spring pulled toward the angle the
+// keys give it: it gets there a moment late, swings a little past, and settles. That lag and
+// overshoot is what makes hair and ears read as soft instead of glued on.
+//   parts:   { field: period }, the spring's swing time in beats (one beat = one key's worth of
+//            drawings); longer is floppier (a long ear, a scarf end).
+//   beat:    drawings per beat.
+//   loops:   a loop is simulated round several times and the last time kept, so it joins up.
+//            A one-off move starts on its keyed angles and eases back onto them over its last
+//            beat, so it hands over to the next move exactly as before.
+const follow_damping = 0.45;   // Under 1: a little overshoot. 1 would settle with no swing past.
+const follow_substeps = 8;     // Small steps through each drawing keep the spring accurate.
+function follow_through(frames, parts, beat, loops) {
+    const result = frames.map(function copy(pose) { return Object.assign({}, pose); });
+    for (const [field, period] of Object.entries(parts)) {
+        const targets = frames.map(function target(pose) { return pose[field]; });
+        const speed = 2 * Math.PI / (period * beat);  // Natural swing speed, in turns per drawing.
+        let value = targets[0];
+        let velocity = 0;
+        const rounds = loops ? 4 : 1;
+        for (let round = 0; round < rounds; round++) {
+            for (let index = 0; index < frames.length; index++) {
+                if (round === rounds - 1) {
+                    result[index][field] = value;
+                }
+                const next_target = targets[(index + 1) % frames.length];
+                for (let step = 0; step < follow_substeps; step++) {
+                    const fraction = (step + 0.5) / follow_substeps;
+                    const target = loops || index + 1 < frames.length ? targets[index] + (next_target - targets[index]) * fraction : targets[index];
+                    const pull = speed * speed * (target - value) - 2 * follow_damping * speed * velocity;
+                    velocity += pull / follow_substeps;
+                    value += velocity / follow_substeps;
+                }
+            }
+        }
+        if (!loops) {
+            // Ease back onto the keyed angle over the last beat (a smooth S-curve blend).
+            for (let index = Math.max(0, frames.length - 1 - beat); index < frames.length; index++) {
+                const along = beat > 0 ? (index - (frames.length - 1 - beat)) / beat : 1;
+                const weight = along * along * (3 - 2 * along);
+                result[index][field] = result[index][field] + (targets[index] - result[index][field]) * weight;
+            }
+        }
+    }
+    return result;
+}
+
+// How floppy each loose part is (see follow_through).
+const her_loose_parts = { hair: 2.0, scarf: 2.6, hem: 1.4 };
+const dog_loose_parts = { ear: 1.8, tail: 2.4 };
 
 // A gentle loop of `count` drawings. `make(breath, turn)` gives the pose for breath 0 (out) to
 // 1 (in), with turn going from 0 to 1 once round the loop, for swaying things like a tail.
@@ -322,7 +397,8 @@ function her_pose(values) {
         near_foot: values.near_foot, far_foot: values.far_foot,
         near_foot_angle: values.near_foot_angle || 0, far_foot_angle: values.far_foot_angle || 0,
         near_hand: add(shoulder, values.near_hand), far_hand: add(shoulder, values.far_hand),
-        head_tilt: values.head_tilt || 0, hair: values.hair || 0, scarf: values.scarf || 0.3, hem: values.hem || 0,
+        head_tilt: values.head_tilt || 0, hair: values.hair || 0, scarf: values.scarf === undefined ? 0.3 : values.scarf,  // A scarf at 0 (the skid) is a real value, not missing.
+        hem: values.hem || 0,
         eyes: values.eyes || 'open',
     };
 }
@@ -408,51 +484,51 @@ function her_kneeling(breath) {
 // Every animation as a list of poses. Loops get two drawings per key; one-off moves get
 // in-betweens too, so nothing snaps from one pose to the next.
 const her_animations = {
-    idle: breathing(12, function idle_pose(breath) {
+    idle: breathing(12 * breath_detail, function idle_pose(breath) {
         return her_pose(Object.assign({}, her_standing, { hip_y: -43.6 - breath * 0.4, near_hand: [1.5, 25.5 - breath * 0.4], far_hand: [-0.5, 25.5 - breath * 0.4], hair: breath * 0.04, scarf: 0.3 + breath * 0.06 }));
     }),
-    walk: in_between(her_cycle_keys(her_walk_keys, 0.04, 25), 2, true).map(her_pose),
-    run: in_between(her_cycle_keys(her_run_keys, 0.14, 17), 2, true).map(her_pose),
-    jump: in_between(her_jump_keys, 2, false).map(her_pose),
+    walk: follow_through(in_between(her_cycle_keys(her_walk_keys, 0.04, 25), cycle_steps, true).map(her_pose), her_loose_parts, cycle_steps, true),
+    run: follow_through(in_between(her_cycle_keys(her_run_keys, 0.14, 17), cycle_steps, true).map(her_pose), her_loose_parts, cycle_steps, true),
+    jump: follow_through(in_between(her_jump_keys, jump_steps, false).map(her_pose), her_loose_parts, jump_steps, false),
     // Landing starts from touch-down (the end of the jump, feet now on the floor), sinks into
     // the impact, then rises back to standing, so the jump hands over without a snap.
-    land: in_between([
+    land: follow_through(in_between([
         Object.assign({}, her_jump_keys[4], { hip_y: -43, near_foot: [4.5, 0], far_foot: [-4.5, 0], near_foot_angle: 0, far_foot_angle: 0 }),
         her_values({ hip_y: -33, lean: 0.16, near_foot: [4.5, 0], far_foot: [-4.5, 0], near_hand: [9, 18], far_hand: [-3, 20], hair: -0.1, hem: 0.06 }),
         her_values({ hip_y: -40, lean: 0.06, near_foot: [4.5, 0], far_foot: [-4.5, 0], near_hand: [3, 24], far_hand: [-1, 24], hair: 0.06, hem: 0.02 }),
         her_standing,
-    ], 2, false).map(her_pose),
-    turn: in_between([
+    ], big_move_steps, false).map(her_pose), her_loose_parts, big_move_steps, false),
+    turn: follow_through(in_between([
         her_values({ hip_y: -41.5, lean: 0.1, near_foot: [4.5, 0], far_foot: [-6, -1.2], far_foot_angle: -0.4, near_hand: [5, 22], far_hand: [-3, 22], hair: 0.3, scarf: 0.6, hem: 0.05 }),
         her_values({ hip_y: -43, lean: 0.05, near_foot: [4.5, 0], far_foot: [-4.5, 0], near_hand: [2, 25], far_hand: [0, 25], hair: 0.12, scarf: 0.45, hem: 0.03 }),
         her_standing,
-    ], 2, false).map(her_pose),
+    ], move_steps, false).map(her_pose), her_loose_parts, move_steps, false),
     // Stopping from a run: the front foot brakes, the back foot steps up, the coat and hair
     // carry on forward a moment, then everything settles.
-    stop: in_between([
+    stop: follow_through(in_between([
         her_values({ hip_y: -41, lean: -0.08, near_foot: [5, 0], far_foot: [-8, -1.5], far_foot_angle: -0.5, near_hand: [6, 22], far_hand: [-4, 23], hair: -0.15, scarf: 0.1, hem: -0.08 }),
         her_values({ hip_y: -42.8, lean: 0.03, near_foot: [5, 0], far_foot: [-3, -1.2], far_foot_angle: -0.2, near_hand: [3, 24.5], far_hand: [-1, 25], hair: 0.05, scarf: 0.35, hem: 0.03 }),
         her_standing,
-    ], 2, false).map(her_pose),
+    ], move_steps, false).map(her_pose), her_loose_parts, move_steps, false),
     // A skid: she reversed at speed and is still sliding the old way. Drawn facing the slide,
     // the front heel dug in, body braced back, hair and scarf thrown forward. The game picks the
     // drawing by speed: the first while sliding fast, the last just before she pivots.
-    skid: in_between([
+    skid: follow_through(in_between([
         her_values({ hip_y: -39.5, lean: -0.16, near_foot: [10, 0], near_foot_angle: 0.35, far_foot: [-5, -1.5], far_foot_angle: -0.3, near_hand: [9, 16], far_hand: [12, 12], hair: -0.25, scarf: 0.0, hem: -0.1 }),
         her_values({ hip_y: -40.5, lean: -0.1, near_foot: [9, 0], near_foot_angle: 0.25, far_foot: [-3, -1], far_foot_angle: -0.2, near_hand: [7, 18], far_hand: [10, 15], hair: -0.18, scarf: 0.1, hem: -0.08 }),
         her_values({ hip_y: -41.8, lean: -0.04, near_foot: [7, 0], near_foot_angle: 0.1, far_foot: [-2, -0.5], near_hand: [4, 22], far_hand: [5, 21], hair: -0.08, scarf: 0.2, hem: -0.04 }),
-    ], 2, false).map(her_pose),
-    // Getting down (five drawings, played once), then breathing while kneeling (four, looped).
-    // Played backwards, the first five are also her getting up.
+    ], move_steps, false).map(her_pose), her_loose_parts, move_steps, false),
+    // Getting down (played once), then breathing while kneeling (looped).
+    // Played backwards, the getting-down drawings are also her getting up.
     kneel: in_between([
         her_standing,
         her_values({ hip_y: -35, lean: 0.12, near_foot: [10, -2], far_foot: [-10, -2], far_foot_angle: -0.5, near_hand: [8, 22], far_hand: [3, 23], hair: 0.05, hem: 0.04 }),
         her_kneeling(0),
-    ], 2, false).map(her_pose).concat(breathing(4, function kneeling_pose(breath) { return her_pose(her_kneeling(breath)); })),
-    embrace: breathing(8, function hold(breath) {
+    ], big_move_steps, false).map(her_pose).concat(breathing(4 * breath_detail, function kneeling_pose(breath) { return her_pose(her_kneeling(breath)); })),
+    embrace: breathing(8 * breath_detail, function hold(breath) {
         return her_pose(her_values({ hip_y: -23 - breath * 0.4, hip_x: -1, lean: 0.2, near_foot: [13, 0], far_foot: [-19, 0], far_foot_angle: -1.3, near_hand: [11, 19], far_hand: [16, 14], head_tilt: 0.14, eyes: 'closed', hair: 0.05 }));
     }),
-    sit: breathing(8, function seated(breath) {
+    sit: breathing(8 * breath_detail, function seated(breath) {
         return her_pose(her_values({ hip_y: -22 - breath * 0.3, lean: 0.05, near_foot: [21, 0], far_foot: [18, 0], near_hand: [15, 22], far_hand: [12, 22], hair: 0.02 * breath }));
     }),
 };
@@ -675,40 +751,48 @@ const dog_gallop_keys = [
     dog_pose({ pelvis: [-11.5, -29.5], withers: [11.5, -27], arch: 0, head: [20, -37], head_angle: 0.06, ear: 0.6, tail: 0.2,
         legs: { near_front: [18, 0], far_front: [15, -3], near_back: [-12, -5], far_back: [-15, -4] } }),
     dog_pose({ pelvis: [-10, -29], withers: [10, -28], arch: 2.5, head: [18, -40], head_angle: -0.04, ear: 0.45, tail: 0.3,
-        legs: { near_front: [9, 0], far_front: [12, 0], near_back: [-7, -6], far_back: [-9, -5] } }),
+        legs: { near_front: [8, 0], far_front: [12, 0], near_back: [-7, -6], far_back: [-9, -5] } }),
     dog_pose({ pelvis: [-8.5, -29.5], withers: [8.5, -29], arch: 4, head: [17, -40], head_angle: -0.06, ear: 0.5, tail: 0.25,
         legs: { near_front: [5, -5], far_front: [7, -6], near_back: [0, -3], far_back: [-2, -4] } }),
     dog_pose({ pelvis: [-10, -26.5], withers: [10, -29], arch: 2, head: [18, -40], head_angle: 0, ear: 0.65, tail: 0.15,
         legs: { near_front: [14, -6], far_front: [12, -5], near_back: [-4, 0], far_back: [-7, 0] } }),
     dog_pose({ pelvis: [-11.5, -27.5], withers: [11.5, -29.5], arch: 0, head: [21, -39], head_angle: 0.06, ear: 0.7, tail: 0.1,
-        legs: { near_front: [20, -4], far_front: [18, -5], near_back: [-15, 0], far_back: [-18, -1] } }),
+        legs: { near_front: [20, -4], far_front: [18, -5], near_back: [-14, 0], far_back: [-18, -1] } }),
 ];
 
 // The dog's home stance, which every landing, turn and stop settles into.
 const dog_standing = dog_pose({});
 
+// A tail wag over one loop (turn from 0 to 1): it starts at `rest`, still, swings to `high`
+// halfway and comes back. Starting still matters: the move before a loop (sitting down, a
+// landing) slows to a stop at that same tail angle, and a wag that set off at full speed from
+// there would flick.
+function wag(turn, rest, high) {
+    return rest + (high - rest) * (1 - Math.cos(2 * Math.PI * turn)) / 2;
+}
+
 // The dog sitting: hips down, front legs straight, the tail sweeping the floor.
 function dog_sitting(breath, turn) {
-    return dog_pose({ pelvis: [-7, -12], withers: [8, -28 - breath * 0.3], arch: -1, head: [16, -43 - breath * 0.3], ear: 0.22 + breath * 0.02, tail: -0.2 + 0.2 * Math.sin(2 * Math.PI * turn),
+    return dog_pose({ pelvis: [-7, -12], withers: [8, -28 - breath * 0.3], arch: -1, head: [16, -43 - breath * 0.3], ear: 0.22 + breath * 0.02, tail: wag(turn, -0.2, 0.1),
         legs: { near_front: [12, 0], far_front: [10, 0], near_back: [1, 0], far_back: [-2, 0] } });
 }
 
 // The dog up on its back legs, front paws over her shoulders, eyes closed, tail going.
 function dog_hugging(breath, turn) {
-    return dog_pose({ pelvis: [-5, -14], withers: [2, -36 - breath * 0.4], arch: 0, tuck: 0, head: [8, -50 - breath * 0.4], head_angle: 0.35, ear: 0.25, tail: 0.3 + 0.2 * Math.sin(2 * Math.PI * turn),
+    return dog_pose({ pelvis: [-5, -14], withers: [2, -36 - breath * 0.4], arch: 0, tuck: 0, head: [8, -50 - breath * 0.4], head_angle: 0.35, ear: 0.25, tail: wag(turn, 0.3, 0.6),
         eyes: 'closed', reaching: true, legs: { near_front: [19, -47], far_front: [16, -45], near_back: [-4, 0], far_back: [-7, 0] } });
 }
 
 const dog_animations = {
     // The wag swings either side of the standing tail angle, so idle starts exactly where every
     // landing, turn and stop ends.
-    idle: breathing(8, function idle_pose(breath, turn) {
-        return dog_pose({ pelvis: [-11, -27 - breath * 0.3], withers: [11, -28 - breath * 0.3], head: [19, -39 - breath * 0.15], tail: 0.45 + 0.25 * Math.sin(2 * Math.PI * turn), ear: 0.22 + breath * 0.03 });
+    idle: breathing(8 * breath_detail, function idle_pose(breath, turn) {
+        return dog_pose({ pelvis: [-11, -27 - breath * 0.3], withers: [11, -28 - breath * 0.3], head: [19, -39 - breath * 0.15], tail: wag(turn, 0.45, 0.8), ear: 0.22 + breath * 0.03 });
     }),
-    trot: in_between(dog_trot_keys, 2, true),
-    gallop: in_between(dog_gallop_keys, 2, true),
+    trot: follow_through(in_between(dog_trot_keys, cycle_steps, true), dog_loose_parts, cycle_steps, true),
+    gallop: follow_through(in_between(dog_gallop_keys, cycle_steps, true), dog_loose_parts, cycle_steps, true),
     // One arc: take-off, rising, the top (the middle drawing), falling, reaching for the ground.
-    jump: in_between([
+    jump: follow_through(in_between([
         dog_pose({ pelvis: [-11, -26], withers: [11, -33], arch: 0, head: [20, -44], head_angle: -0.15, ear: 0.1, tail: 0.6,
             legs: { near_front: [17, -12], far_front: [15, -11], near_back: [-19, -2], far_back: [-21, -1] } }),
         dog_pose({ pelvis: [-11, -28], withers: [11, -31], arch: 1.5, head: [20, -42], head_angle: -0.05, ear: 0.0, tail: 0.5,
@@ -719,70 +803,70 @@ const dog_animations = {
             legs: { near_front: [19, -5], far_front: [17, -6], near_back: [-15, -6], far_back: [-13, -7] } }),
         dog_pose({ pelvis: [-11, -29], withers: [11, -26], arch: 0, head: [21, -37], head_angle: 0.08, ear: 0.65, tail: 0.3,
             legs: { near_front: [16, -1], far_front: [14, -2], near_back: [-12, -4], far_back: [-10, -5] } }),
-    ], 2, false),
+    ], jump_steps, false), dog_loose_parts, jump_steps, false),
     // Landing starts from touch-down (front paws first), sinks into the impact, then stands.
-    land: in_between([
+    land: follow_through(in_between([
         dog_pose({ pelvis: [-11, -28], withers: [11, -25.5], head: [21, -37], head_angle: 0.08, ear: 0.6, tail: 0.3,
             legs: { near_front: [15.5, 0], far_front: [13.5, -0.8], near_back: [-11.5, -3], far_back: [-10, -3.5] } }),
         dog_pose({ pelvis: [-10.5, -22], withers: [10.5, -21], arch: -0.5, head: [19, -32], head_angle: 0.12, ear: 0.75, tail: 0.3 }),
         dog_pose({ pelvis: [-11, -25.5], withers: [11, -26.5], head: [19, -37], head_angle: 0.04, ear: 0.45, tail: 0.4 }),
         dog_standing,
-    ], 2, false),
-    turn: in_between([
+    ], big_move_steps, false), dog_loose_parts, big_move_steps, false),
+    turn: follow_through(in_between([
         dog_pose({ pelvis: [-8, -27], withers: [8, -28], arch: 2, head: [16, -38], head_angle: -0.12, ear: 0.5, tail: 0.7,
             legs: { near_front: [9, -1], far_front: [7, -1], near_back: [-5, -1], far_back: [-7, -1] } }),
         dog_pose({ pelvis: [-10, -27], withers: [10, -28], arch: 0.5, head: [18, -39], head_angle: -0.04, ear: 0.32, tail: 0.6 }),
         dog_standing,
-    ], 2, false),
+    ], move_steps, false), dog_loose_parts, move_steps, false),
     // A skid, as hers: drawn facing the slide, front paws braced, hips sunk, ears flung forward.
-    skid: in_between([
+    skid: follow_through(in_between([
         dog_pose({ pelvis: [-12.5, -23.5], withers: [9, -25.5], arch: -1.5, head: [17, -35], head_angle: 0.12, ear: -0.25, tail: 0.25,
             legs: { near_front: [21, 0], far_front: [19, 0], near_back: [-5, 0], far_back: [-7, 0] } }),
         dog_pose({ pelvis: [-12, -25], withers: [9.5, -26.5], arch: -1, head: [17.5, -36.5], head_angle: 0.08, ear: -0.1, tail: 0.3,
             legs: { near_front: [19, 0], far_front: [17, 0], near_back: [-6, 0], far_back: [-8, 0] } }),
         dog_pose({ pelvis: [-11.5, -26.3], withers: [10.5, -27.5], head: [18.5, -38], head_angle: 0.03, ear: 0.05, tail: 0.38,
             legs: { near_front: [16, 0], far_front: [14, 0], near_back: [-7, 0], far_back: [-9.5, 0] } }),
-    ], 2, false),
+    ], move_steps, false), dog_loose_parts, move_steps, false),
     // Stopping from a run: front paws brace, the hips sink back, the ears swing forward.
-    stop: in_between([
+    stop: follow_through(in_between([
         dog_pose({ pelvis: [-12, -25], withers: [10, -26.5], arch: -1, head: [20, -36], head_angle: 0.08, ear: 0.7, tail: 0.3,
             legs: { near_back: [-6, -1.5], far_back: [-8, -1] } }),
         dog_pose({ pelvis: [-11, -26.5], withers: [11, -27.8], head: [19, -38.5], ear: 0.4, tail: 0.4, legs: { far_back: [-10, -0.8] } }),
         dog_standing,
-    ], 2, false),
-    // Sitting down (five drawings, played once), then sitting and breathing (four, looped).
-    // Played backwards, the first five are also the dog getting up.
+    ], move_steps, false), dog_loose_parts, move_steps, false),
+    // Sitting down (played once), then sitting and breathing (looped).
+    // Played backwards, the getting-down drawings are also the dog getting up.
     sit: in_between([
         dog_standing,
         dog_pose({ pelvis: [-9, -18], withers: [10, -28], head: [18, -41], ear: 0.25, tail: 0.1, legs: { near_back: [-3, -1.5], far_back: [-6, -1.5] } }),
         dog_sitting(0, 0),
-    ], 2, false).concat(breathing(4, dog_sitting)),
-    sniff: breathing(8, function nose(breath, turn) {
+    ], big_move_steps, false).concat(breathing(4 * breath_detail, dog_sitting)),
+    sniff: breathing(8 * breath_detail, function nose(breath, turn) {
         return dog_pose({ pelvis: [-11, -27.5], withers: [11, -26], head: [25 + 0.5 * Math.sin(4 * Math.PI * turn), -16 + breath * 1.2], head_angle: 0.42, ear: 0.0, tail: 0.55 + 0.15 * Math.sin(4 * Math.PI * turn),
             legs: { near_front: [14, 0], far_front: [12, 0] } });
     }),
-    bark: in_between([
+    bark: follow_through(in_between([
         dog_pose({ pelvis: [-11, -26], withers: [11, -26.5], head: [17, -36], head_angle: 0.1, ear: 0.3, tail: 0.5 }),
         dog_pose({ pelvis: [-11, -27.5], withers: [11, -29.5], head: [21, -43], head_angle: -0.3, ear: 0.0, tail: 0.65, mouth: 'open' }),
         dog_pose({ pelvis: [-11, -27], withers: [11, -28.5], head: [20, -41], head_angle: -0.15, ear: 0.15, tail: 0.55 }),
-    ], 2, false),
-    sleep: breathing(6, function breathe(breath) {
+    ], move_steps, false), dog_loose_parts, move_steps, false),
+    sleep: breathing(6 * breath_detail, function breathe(breath) {
         // The long ear lies back along the floor, as a sleeping dog's does, and the bearded chin
         // rests just above it.
         return dog_pose({ pelvis: [-10, -10 - breath * 0.4], withers: [10, -11 - breath * 0.4], arch: -2, tuck: 0, head: [21, -12.5], head_angle: 0.15, ear: 0.95, tail: -0.15, tail_curl: -1,
             eyes: 'closed', folded: true, legs: { near_front: [22, -2], far_front: [20, -2], near_back: [-1, -1], far_back: [-4, -1] } });
     }),
-    lean: breathing(6, function nuzzle(breath, turn) {
-        return dog_pose({ pelvis: [-11, -27], withers: [11, -27.5], head: [21, -35 + breath * 0.4], head_angle: -0.2, ear: 0.3, tail: 0.55 + 0.2 * Math.sin(2 * Math.PI * turn), eyes: 'closed' });
+    lean: breathing(6 * breath_detail, function nuzzle(breath, turn) {
+        return dog_pose({ pelvis: [-11, -27], withers: [11, -27.5], head: [21, -35 + breath * 0.4], head_angle: -0.2, ear: 0.3, tail: wag(turn, 0.55, 0.85), eyes: 'closed' });
     }),
-    // Rising onto the back legs into the hug (five drawings, played once), then holding on and
-    // breathing (six, looped). Played backwards, the first five bring the dog back down.
+    // Rising onto the back legs into the hug (played once), then holding on and breathing
+    // (looped). Played backwards, the getting-up drawings bring the dog back down.
     embrace: in_between([
         dog_standing,
         dog_pose({ pelvis: [-8, -20], withers: [5, -33], arch: 0.5, tuck: 1, head: [12, -46], head_angle: 0.22, ear: 0.3, tail: 0.5, reaching: true,
-            legs: { near_front: [16, -24], far_front: [14, -22], near_back: [-5, 0], far_back: [-8, 0] } }),
+            legs: { near_front: [17, -30], far_front: [15, -28], near_back: [-5, 0], far_back: [-8, 0] } }),
         dog_hugging(0, 0),
-    ], 2, false).concat(breathing(6, dog_hugging)),
+    ], big_move_steps, false).concat(breathing(6 * breath_detail, dog_hugging)),
 };
 
 // ---------- Writing the files ----------
@@ -853,15 +937,19 @@ function hand_over_gap(character, from_pose, to_pose) {
 
 // The hand-overs the game makes from one animation straight into another: [from animation,
 // from drawing, to animation, to drawing]. A drawing of -1 means the last one.
+// Getting down (kneeling, sitting, rising into the hug) is three keys, so its drawings are the
+// ones in between plus the last key; the breathing loop starts right after them.
+const intro_drawings = 2 * big_move_steps + 1;
 const hand_overs = {
     her: [
         ['land', -1, 'idle', 0], ['turn', -1, 'idle', 0], ['stop', -1, 'idle', 0], ['jump', -1, 'land', 0],
-        ['idle', 0, 'kneel', 0], ['kneel', 4, 'kneel', 5], ['kneel', 5, 'embrace', 0], ['embrace', 0, 'kneel', 5], ['kneel', 0, 'idle', 0],
+        ['idle', 0, 'kneel', 0], ['kneel', intro_drawings - 1, 'kneel', intro_drawings], ['kneel', intro_drawings, 'embrace', 0],
+        ['embrace', 0, 'kneel', intro_drawings], ['kneel', 0, 'idle', 0],
     ],
     bodhi: [
         ['land', -1, 'idle', 0], ['turn', -1, 'idle', 0], ['stop', -1, 'idle', 0], ['jump', -1, 'land', 0],
-        ['idle', 0, 'sit', 0], ['sit', 4, 'sit', 5], ['sit', 0, 'idle', 0],
-        ['idle', 0, 'embrace', 0], ['embrace', 4, 'embrace', 5], ['embrace', 0, 'idle', 0],
+        ['idle', 0, 'sit', 0], ['sit', intro_drawings - 1, 'sit', intro_drawings], ['sit', 0, 'idle', 0],
+        ['idle', 0, 'embrace', 0], ['embrace', intro_drawings - 1, 'embrace', intro_drawings], ['embrace', 0, 'idle', 0],
     ],
 };
 hand_overs.bodhi_puppy = hand_overs.bodhi;  // Same moves, checked again with puppy proportions.
@@ -1036,7 +1124,7 @@ if (require.main === module) {
     main();
 } else {
     module.exports = {
-        her_animations, dog_animations, cells, cycle_lengths, dog_builds, built_dog_pose, key_points,
+        her_animations, dog_animations, cells, intro_drawings, follow_through, wag, cycle_steps, move_steps, jump_steps, big_move_steps, breath_detail, cycle_lengths, dog_builds, built_dog_pose, key_points,
         puppy_definitions, biscuit_look, check_biscuit_look, extract_definitions, dog_sheet, hand_over_gap, largest_smooth_gap,
     };
 }

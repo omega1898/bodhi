@@ -22,32 +22,34 @@ const flipbook = {
     enabled: true,
 };
 
-// How each animation plays when it isn't driven by distance or by jumping speed.
+// How each animation plays when it isn't driven by distance or by jumping speed. Rates are in
+// drawings a second; the drawing tool makes many in-between drawings, so the rates are high
+// while each move still takes the same time.
 //   loop: round and round at `rate` drawings a second.
 //   once: through once at `rate`, then holds the last drawing.
 //   intro: the first `intro_frames` drawings once at `rate` (getting down), then loops the rest
 //   at `loop_rate` (breathing while down).
 const flipbook_playback = {
     her: {
-        idle: { mode: 'loop', rate: 5 },  // 12 drawings: one breath every 2.4 seconds.
-        land: { mode: 'once', rate: 24 },
-        turn: { mode: 'once', rate: 22 },
-        stop: { mode: 'once', rate: 18 },
-        kneel: { mode: 'intro', rate: 14, intro_frames: 5, loop_rate: 3 },
-        embrace: { mode: 'loop', rate: 4 },
-        sit: { mode: 'loop', rate: 4 },
+        idle: { mode: 'loop', rate: 10 },  // 24 drawings: one breath every 2.4 seconds.
+        land: { mode: 'once', rate: 65 },
+        turn: { mode: 'once', rate: 40 },
+        stop: { mode: 'once', rate: 32 },
+        kneel: { mode: 'intro', rate: 36, intro_frames: 13, loop_rate: 6 },
+        embrace: { mode: 'loop', rate: 8 },
+        sit: { mode: 'loop', rate: 8 },
     },
     bodhi: {
-        idle: { mode: 'loop', rate: 6 },  // Faster when happy: see choose_flipbook_frame.
-        land: { mode: 'once', rate: 24 },
-        turn: { mode: 'once', rate: 22 },
-        stop: { mode: 'once', rate: 18 },
-        sit: { mode: 'intro', rate: 14, intro_frames: 5, loop_rate: 3 },
-        sniff: { mode: 'loop', rate: 10 },
-        bark: { mode: 'once', rate: 14 },
-        sleep: { mode: 'loop', rate: 3 },
-        lean: { mode: 'loop', rate: 4 },
-        embrace: { mode: 'intro', rate: 12, intro_frames: 5, loop_rate: 4 },
+        idle: { mode: 'loop', rate: 12 },  // Faster when happy: see choose_flipbook_frame.
+        land: { mode: 'once', rate: 65 },
+        turn: { mode: 'once', rate: 40 },
+        stop: { mode: 'once', rate: 32 },
+        sit: { mode: 'intro', rate: 36, intro_frames: 13, loop_rate: 6 },
+        sniff: { mode: 'loop', rate: 20 },
+        bark: { mode: 'once', rate: 25 },
+        sleep: { mode: 'loop', rate: 6 },
+        lean: { mode: 'loop', rate: 8 },
+        embrace: { mode: 'intro', rate: 31, intro_frames: 13, loop_rate: 8 },
     },
 };
 
@@ -77,7 +79,7 @@ function is_dog_drawing(character_name) {
 const flipbook_paint_scale = { bodhi_puppy: 0.7, biscuit: 0.9 };
 
 // Drawings a second when getting up: an intro played backwards, faster than getting down.
-const getting_up_rate = 30;
+const getting_up_rate = 78;
 
 // Where in its cycle a walk or trot starts when there are no feet to match yet (a character's
 // very first drawing): just before the back foot swings through, which reads as a first step.
@@ -430,7 +432,7 @@ function choose_flipbook_frame(character, character_name, time_seconds) {
     const animation_name = pose === 'stand' || !animations[pose] ? 'idle' : pose;
     const playback = Object.assign({}, playbacks[animation_name]);
     if (is_dog_drawing(character_name) && animation_name === 'idle') {
-        playback.rate = 6 + clamp_between(character.wag || 0, 0, 1) * 14;  // A happier dog wags faster.
+        playback.rate = 12 + clamp_between(character.wag || 0, 0, 1) * 28;  // A happier dog wags faster.
     }
     let started = state.pose_started;
     if (animation_name === 'idle') {
