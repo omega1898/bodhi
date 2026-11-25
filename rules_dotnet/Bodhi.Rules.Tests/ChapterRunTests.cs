@@ -2,6 +2,7 @@
 // builds a tiny chapter by hand, plays it the way the scene would report things, and checks the
 // story moves exactly as the browser game's rules did (prototype/web/js/game.js).
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Bodhi.Rules;
 using NUnit.Framework;
@@ -389,6 +390,42 @@ namespace Bodhi.Rules.Tests
         {
             Assert.That(StoryText.personalize("{dog} wagged. I held {them} and {their} lead.", "Bodhi"),
                 Is.EqualTo("Bodhi wagged. I held him and his lead."));
+        }
+
+        // Her name, Em, is filled into {her}, and Ama calls her by it at High Farm.
+        [Test]
+        public void text_is_personalised_with_her_name()
+        {
+            Assert.That(StoryText.personalize("'Come on, {her}.' {dog} ran.", "Bodhi"), Is.EqualTo("'Come on, Em.' Bodhi ran."));
+            var high_farm = StoryChapters.all().Single(chapter => chapter.id == "high_farm");
+            Assert.That(high_farm.aftermath.Select(line => StoryText.personalize(line, "Bodhi")), Has.Some.Contains("open, Em."));
+        }
+
+        // Break it: a misspelt name slot ({Her}, {dogs}, a stray brace) would show on screen as
+        // code. Every line a player can read, in every chapter, must come out with none left.
+        [Test]
+        public void no_chapter_text_shows_an_unfilled_name_slot()
+        {
+            foreach (var chapter in StoryChapters.all())
+            {
+                var texts = new List<string> { chapter.title, chapter.eyebrow, chapter.place };
+                texts.AddRange(chapter.aftermath);
+                foreach (var thing in chapter.things)
+                {
+                    texts.Add(thing.label);
+                    texts.Add(thing.memory_text);
+                }
+                foreach (var rule in chapter.rules)
+                {
+                    texts.AddRange(rule.lines ?? new string[0]);
+                    texts.Add(rule.objective);
+                }
+                foreach (var text in texts)
+                {
+                    string shown = StoryText.personalize(text, "Bodhi");
+                    Assert.That(shown, Does.Not.Contain("{").And.Not.Contain("}"), chapter.id + ": " + text);
+                }
+            }
         }
 
         // Break it: a script with nulls, empty names, a rule that loops on itself, NaN times and

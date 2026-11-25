@@ -601,7 +601,7 @@ namespace Bodhi.Game
             level = null;
             built_for = null;
             var campaign = session.campaign;
-            hud.show_year_end("A year with " + dog_name + ".\n\nKeepsakes found: " + campaign.keepsakes_found + " of " + campaign.keepsake_total);
+            hud.show_year_end(StoryText.her_name + " and " + dog_name + "'s first year.\n\nKeepsakes found: " + campaign.keepsakes_found + " of " + campaign.keepsake_total);
             started = false;
         }
 
