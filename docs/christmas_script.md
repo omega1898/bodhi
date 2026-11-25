@@ -611,18 +611,60 @@ Then the title card *Chapter Eight: Blackwater*, 20 December.
 
 Look after him: towel, paws, breakfast, a cuddle. / Answer Tam's phone. / Ask Tam the way home. / Switch to {dog}. Find the runner pin in the straw. / Fit the pin to the runner. / Put {dog} in the harness. / Switch to {dog}. Pull the empty sled. / Say goodbye, and set out. / Pull together up the first slope.
 
-### Chapter Eight: Blackwater (20 December)
+### Chapter Eight: Blackwater (20 December), in full
 
-| Beat | Voice | Line |
+Written in full on 25 November 2026, when the chapter was built. The chapter's question: *what happens when he has to do the thing she can't?*
+
+*Underneath:* trust under strain, both ways. The ice that is joy to Bodhi in the first minute is death to Em in the tenth: she is too heavy for black ice and he is not. So the player does what she can't, as him, while she does what he can't, at the pulley. He hears it in her voice that she is frightened, though she never says it: "Calm. Too calm." And in a hut nobody will pass all winter, she lights a candle in the window anyway, because that is what you do.
+
+#### The tarn
+
+| # | Beat | Voice | Caption |
+|---|---|---|---|
+| 1 | The tarn (film) | Em | Blackwater Tarn was frozen from shore to shore, and it was singing. |
+| 2 | | Em | Tam's map said 'keep to the shore'. A cornice had come down across the shore. |
+| 3 | | Em | There was only the ice, close in, where it was white. Never the black. |
+| 4 | On the ice | B | Ice! Slide. Legs go everywhere. Again! |
+| 5 | The gust (film) | Em | Halfway over, the wind came down off the fell like a slammed door. |
+| 6 | | Em | It took the sled out onto the black ice like it had been waiting to. |
+| 7 | | Em | I was too heavy for black ice. He wasn't. |
+
+#### The black ice (Bodhi, then Em)
+
+| # | Beat | Voice | Caption |
+|---|---|---|---|
+| 8 | The crawl | B | Belly low. Ice talks. Ice complains. Slow. Slow. |
+| 9 | | B | The old dog, in the sled, very still. Good. Stay still. |
+| 10 | The rope | B | The rope. Teeth. Hold. |
+| 11 | | B | Her voice, behind. Calm. Too calm. |
+| 12 | The pulley | Em | The hut's boat rope ran through a pulley, rusted stiff. I kicked it loose. |
+| 13 | The crank | Em | I threw him the line, and turned the crank, and turned it. |
+| 14 | Hauled in | Em | The ice cracked behind them, a long black line. |
+| 15 | | Em | It held. |
+| 16 | The shore | Em | I had them both on the shore before I let myself breathe. |
+
+#### The fishing hut
+
+| # | Beat | Voice | Caption |
+|---|---|---|---|
+| 17 | The stove (film) | Em | The hut had a stove the size of a bread bin. It was the best stove in the world. |
+| 18 | | Em | I dried his belly by it while he steamed and grumbled. |
+| 19 | The candle | Em | I put a candle in the hut window. Nobody would see it. I lit it anyway. |
+| 20 | Closes | Em | All night the ice boomed, like a door very far away. |
+
+Then the title card *Chapter Nine: The Bothy*, 21 December.
+
+#### Keepsakes
+
+| Keepsake | Found by | Text |
 |---|---|---|
-| Opens | Em | Blackwater Tarn was frozen from shore to shore, and it was singing. |
-| | B | Ice! Slide. Legs go everywhere. Again! |
-| The map | Em | Tam's map said 'keep to the shore'. A cornice had come down across the shore. |
-| The gust | Em | The wind took the sled out onto the black ice like it had been waiting to. |
-| | Em | I was too heavy for black ice. He wasn't. |
-| The crawl | B | Belly low. Ice talks. Ice complains. Slow. Slow. The rope. Teeth. |
-| Closes | Em | I put a candle in the hut window. Nobody would see it. I lit it anyway. |
-| | Em | All night the ice boomed, like a door very far away. |
+| The fishing log | Em | The hut's fishing log, last entry: 'Caught nothing. Saw an otter. Perfect day.' |
+| The child's skate | Bodhi | A child's ice skate on a nail by the hut door, left for the next one who needs it. |
+| The biscuit tin | Em | A biscuit tin frozen into the step, 'FOR THE NEXT ONE' painted on its lid. Inside: matches. |
+
+#### Objectives, in order
+
+Cross close to the shore. Keep to the white ice. / Switch to {dog}. Crawl out to the sled. Slowly. / Take the sled rope in your teeth. / Switch to Em. Free the hut's pulley. / Turn the crank. / Shelter in the fishing hut.
 
 ### Chapter Nine: The Bothy (21 to 22 December)
 

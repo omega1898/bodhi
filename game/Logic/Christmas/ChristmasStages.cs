@@ -16,6 +16,7 @@ namespace Bodhi.Game
                 lantern_train(),
                 reindeer_hill(),
                 tams_sled(),
+                blackwater(),
             };
         }
 
@@ -31,6 +32,7 @@ namespace Bodhi.Game
                 case "lantern_train": return lantern_train();
                 case "reindeer_hill": return reindeer_hill();
                 case "tams_sled": return tams_sled();
+                case "blackwater": return blackwater();
                 default: return null;
             }
         }
