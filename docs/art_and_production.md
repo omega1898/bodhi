@@ -18,7 +18,8 @@
 | Rule | Value in the browser game | Why |
 |---|---|---|
 | Starting, stopping, turning take a moment | She speeds up at 1000 units/s², brakes at 1500, turns at 2300; the dog is quicker (1500 / 1800 / 3000) | Instant speed changes read as weightless |
-| Holding a direction breaks into a jog | Walk 175 → jog 235 after about 0.7 s | A body builds momentum |
+| Holding a direction breaks into a jog | Walk 110 (a brisk walk a real person could keep up) → jog 235 after about 0.7 s | A body builds momentum; a walk any faster reads as a frantic shuffle |
+| Walks follow real gait | Em: each foot down 60% of the cycle, heel first with toes up, heel peeling up before toe-off, hips rising about 2 units. Bodhi: a four-beat walk (back left, front left, back right, front right) below 85, a trot on diagonal pairs up to 200, a gallop above; in the air his paws fold back at the wrist and hock. Worked out in art/tools/gaits.js | Viewers know how people and dogs walk; a step out of order or a stiff leg reads as wrong even when they can't say why |
 | Falling pulls harder than rising | Gravity 1800 going up, 2500 coming down | Jumps feel weighty, not floaty |
 | Turning rotates through | About 0.15 s (she), 0.12 s (dog); never thinner than half width | A flip in one frame reads as a paper cut-out |
 | The body leans into speed and braking | Up to about 0.13 radians (7°) | An upright post on rails reads as a toy |
@@ -33,7 +34,7 @@
 - **The ground she stands on sits about two thirds of the way down the screen.**
 - **Zoom glides** over about 0.7 s.
 
-In Unreal these become: character movement settings (acceleration, braking, gravity scale), animation blend spaces (walk to jog, trot to gallop), two-bone IK on feet, and physics or spring bones on ears, tail and hair.
+In Unreal these become: character movement settings (acceleration, braking, gravity scale), animation blend spaces (walk to jog; walk to trot to gallop), two-bone IK on feet, and physics or spring bones on ears, tail and hair.
 
 **The browser game (`prototype/web/`) is the art blueprint, not the final look.** It proves composition, colour, light and timing. The Unreal version keeps those decisions and adds real 3D, materials and fur.
 

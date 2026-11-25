@@ -366,29 +366,27 @@ namespace Bodhi.Game
             return choice(animation_name, timed_frame(playback, frame_count(animation_name), time - began, !intro_allowed), 0);
         }
 
-        // Walk or run (trot or gallop for a dog) by speed, moved on by distance covered.
+        // Walk or run for her; walk, trot or gallop for a dog: by speed, moved on by distance covered.
         FlipbookChoice stride(FlipbookInput input, double speed)
         {
-            string slow_gait = is_dog ? "trot" : "walk";
-            string fast_gait = is_dog ? "gallop" : "run";
-            double switch_speed = is_dog ? 150 : 125;
-            // Two thresholds, so a speed near the line doesn't flicker between the two.
-            if (gait != fast_gait && speed > switch_speed + 10)
-            {
-                gait = fast_gait;
-            }
-            else if (gait != slow_gait && speed < switch_speed - 10)
-            {
-                gait = slow_gait;
-            }
-            string chosen = gait ?? slow_gait;
+            string chosen = gait_for(is_dog, gait, speed);
             var entry = drawings.animation(chosen);
+            if ((entry == null || entry.count == 0) && chosen == "walk" && is_dog)
+            {
+                chosen = "trot";  // Drawings made before dogs had a walk: trot instead.
+                entry = drawings.animation(chosen);
+            }
             if (entry == null || entry.count == 0)
             {
                 return choice("idle", 0, 0);
             }
+            // A new gait carries on from the drawing whose feet are closest to the ones just
+            // shown: a walk and a trot put their feet down in a different order, so the same
+            // point in both cycles can have the feet in quite different places.
+            bool changed_gait = gait != null && chosen != gait;
+            gait = chosen;
             double size = input.size_scale > 0 ? input.size_scale : 1;
-            if (starting_stride)
+            if (starting_stride || (changed_gait && last_feet != null))
             {
                 phase = last_feet != null ? closest_phase(entry, last_feet, last_facing) : walk_start_phase;
                 starting_stride = false;
@@ -398,6 +396,34 @@ namespace Bodhi.Game
                 phase = (phase + moved / (entry.cycle_length * size)) % 1;
             }
             return choice(chosen, (int)Math.Floor(phase * entry.count), 0);
+        }
+
+        // Her gaits and a dog's, slowest first, and the speeds between them. A real person
+        // breaks into a run somewhere above a brisk walk; a dog walks, trots at the pace of a
+        // person hurrying, and gallops only when it really runs.
+        static readonly string[] her_gaits = { "walk", "run" };
+        static readonly double[] her_gait_speeds = { 160 };
+        static readonly string[] dog_gaits = { "walk", "trot", "gallop" };
+        static readonly double[] dog_gait_speeds = { 85, 200 };
+        public const double gait_margin = 10;  // Each switch has two lines this far either side.
+
+        // Which gait to use at a speed, given the one in use now (null when just setting off).
+        // It moves up a gait only clearly above a line and down only clearly below it, so a
+        // speed close to a line doesn't flicker between two gaits.
+        public static string gait_for(bool is_dog, string current, double speed)
+        {
+            var gaits = is_dog ? dog_gaits : her_gaits;
+            var lines = is_dog ? dog_gait_speeds : her_gait_speeds;
+            int index = Math.Max(0, Array.IndexOf(gaits, current));
+            while (index < lines.Length && speed > lines[index] + gait_margin)
+            {
+                index += 1;
+            }
+            while (index > 0 && speed < lines[index - 1] - gait_margin)
+            {
+                index -= 1;
+            }
+            return gaits[index];
         }
 
         // The point in a cycle whose feet are closest to the feet just shown, so setting off,

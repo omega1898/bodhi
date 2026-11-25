@@ -48,7 +48,7 @@ namespace Bodhi.Rules.Tests
         [Test]
         public void walking_keeps_a_planted_foot_on_the_ground()
         {
-            foreach (var (set_name, speed) in new[] { ("her", 100.0), ("her", 200.0), ("bodhi", 120.0), ("bodhi", 230.0) })
+            foreach (var (set_name, speed) in new[] { ("her", 100.0), ("her", 200.0), ("bodhi", 60.0), ("bodhi", 150.0), ("bodhi", 230.0) })
             {
                 var walker = new Driven(set_name, "walk");
                 walker.input.velocity_x = speed;
@@ -60,7 +60,7 @@ namespace Bodhi.Rules.Tests
                 for (int frame = 0; frame < 240; frame++)
                 {
                     choice = walker.step();
-                    Assert.That(choice.animation, Is.EqualTo(set_name == "her" ? (speed > 135 ? "run" : "walk") : (speed > 160 ? "gallop" : "trot")));
+                    Assert.That(choice.animation, Is.EqualTo(set_name == "her" ? (speed > 170 ? "run" : "walk") : speed > 210 ? "gallop" : speed > 95 ? "trot" : "walk"));
                     var feet = FrameSheets.set(set_name).animation(choice.animation).frames[choice.frame].feet;
                     for (int foot = 0; foot < feet.Length / 2; foot++)
                     {
@@ -155,14 +155,63 @@ namespace Bodhi.Rules.Tests
         public void gaits_do_not_flicker_near_the_switch_speed()
         {
             var her = new Driven("her", "walk");
-            her.input.velocity_x = 140;
+            her.input.velocity_x = 175;
             Assert.That(her.run(0.3).animation, Is.EqualTo("run"));
-            her.input.velocity_x = 120;
+            her.input.velocity_x = 155;
             Assert.That(her.run(0.3).animation, Is.EqualTo("run"), "just under the line: still running");
-            her.input.velocity_x = 110;
+            her.input.velocity_x = 140;
             Assert.That(her.run(0.3).animation, Is.EqualTo("walk"));
-            her.input.velocity_x = 130;
+            her.input.velocity_x = 165;
             Assert.That(her.run(0.3).animation, Is.EqualTo("walk"), "just over the line: still walking");
+        }
+
+        [Test]
+        public void a_dog_walks_slowly_trots_at_a_hurry_and_gallops_flat_out()
+        {
+            var dog = new Driven("bodhi", "walk");
+            dog.input.velocity_x = 60;
+            Assert.That(dog.run(0.3).animation, Is.EqualTo("walk"));
+            dog.input.velocity_x = 90;
+            Assert.That(dog.run(0.3).animation, Is.EqualTo("walk"), "just over the line: still walking");
+            dog.input.velocity_x = 165;
+            Assert.That(dog.run(0.3).animation, Is.EqualTo("trot"), "following her closely, he trots");
+            dog.input.velocity_x = 235;
+            Assert.That(dog.run(0.3).animation, Is.EqualTo("gallop"));
+            dog.input.velocity_x = 195;
+            Assert.That(dog.run(0.3).animation, Is.EqualTo("gallop"), "just under the line: still galloping");
+            dog.input.velocity_x = 60;
+            Assert.That(dog.run(0.3).animation, Is.EqualTo("walk"), "slowing right down drops two gaits");
+        }
+
+        [Test]
+        public void changing_gait_carries_on_from_where_the_feet_are()
+        {
+            // A walk puts one paw down at a time and a trot two at once, so the same point in
+            // the two cycles has the paws in different places. Speeding up from a walk to a
+            // trot picks the trot drawing whose paws are nearest the walk's last ones.
+            var dog = new Driven("bodhi", "walk");
+            dog.input.velocity_x = 60;
+            var walking = dog.run(0.5);
+            var walk_feet = FrameSheets.set("bodhi").animation("walk").frames[walking.frame].feet;
+            dog.input.velocity_x = 150;
+            var trotting = dog.step();
+            Assert.That(trotting.animation, Is.EqualTo("trot"));
+            var trot = FrameSheets.set("bodhi").animation("trot");
+            var trot_feet = trot.frames[trotting.frame].feet;
+            int best = (int)Math.Floor(FlipbookChooser.closest_phase(trot, walk_feet, 1) * trot.count);
+            Assert.That(Math.Abs(trotting.frame - best), Is.LessThanOrEqualTo(1), "the trot starts from the closest feet, give or take the step just taken");
+            Assert.That(trot_feet.Length, Is.EqualTo(walk_feet.Length));
+        }
+
+        [Test]
+        public void break_it_gait_speeds_that_are_nonsense_still_pick_a_gait()
+        {
+            foreach (var speed in new[] { double.NaN, double.NegativeInfinity, -50, 0, 1e9 })
+            {
+                Assert.That(FlipbookChooser.gait_for(true, "walk", speed), Is.AnyOf("walk", "trot", "gallop"));
+                Assert.That(FlipbookChooser.gait_for(false, "nonsense", speed), Is.AnyOf("walk", "run"));
+            }
+            Assert.That(FlipbookChooser.gait_for(true, null, 230), Is.EqualTo("gallop"), "setting off flat out goes straight to a gallop");
         }
 
         [Test]

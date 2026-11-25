@@ -40,7 +40,7 @@ namespace Bodhi.Rules.Tests
         public void every_set_has_every_animation_with_its_drawings()
         {
             string[] her = { "idle", "walk", "run", "jump", "land", "turn", "stop", "skid", "kneel", "embrace", "sit" };
-            string[] dog = { "idle", "trot", "gallop", "jump", "land", "turn", "skid", "stop", "sit", "sniff", "bark", "sleep", "lean", "embrace" };
+            string[] dog = { "idle", "walk", "trot", "gallop", "jump", "land", "turn", "skid", "stop", "sit", "sniff", "bark", "sleep", "lean", "embrace" };
             Assert.That(FrameSheets.all.Select(set => set.name), Is.EquivalentTo(new[] { "her", "bodhi", "bodhi_puppy", "biscuit" }));
             foreach (var set in FrameSheets.all)
             {
@@ -54,7 +54,7 @@ namespace Bodhi.Rules.Tests
                         Assert.That(drawing.foot_count, Is.EqualTo(set.name == "her" ? 2 : 4), set.name + " " + animation.name + " feet");
                     }
                 }
-                foreach (var cycle in set.name == "her" ? new[] { "walk", "run" } : new[] { "trot", "gallop" })
+                foreach (var cycle in set.name == "her" ? new[] { "walk", "run" } : new[] { "walk", "trot", "gallop" })
                 {
                     Assert.That(set.animation(cycle).cycle_length, Is.GreaterThan(0), set.name + " " + cycle + " needs its cycle length");
                 }
