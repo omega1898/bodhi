@@ -17,3 +17,5 @@
 *.userprefs
 # The Xcode project Unity writes when it builds for iOS.
 /ios_build/
+# The backup Unity writes beside an iOS build (debug symbols); it must never ship or be committed.
+/ios_build_BackUpThisFolder_ButDontShipItWithYourGame/

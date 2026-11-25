@@ -26,9 +26,11 @@ namespace Bodhi.Game
 
         // The solid material: colours come from the mesh. `rim` is the cold edge light (stronger on
         // the characters, so they read against the night), `sparkle` is for snow, `gloss` for shine.
-        public static Material solid(float rim = 0.25f, float sparkle = 0, float gloss = 0, float wrap = 0.35f)
+        public static Material solid(float rim = 0.25f, float sparkle = 0, float gloss = 0, float wrap = 0.35f, float grain = 0.16f)
         {
+            prepare_grain();
             var material = new Material(shader("Bodhi/Lit"));
+            material.SetFloat("_Grain", grain);
             material.SetColor("_RimColor", PaletteColours.moon_rim);
             material.SetFloat("_RimStrength", rim);
             material.SetFloat("_Sparkle", sparkle);
@@ -37,12 +39,67 @@ namespace Bodhi.Game
             return material;
         }
 
+        // The painted-grain picture every solid material shares: soft blotchy noise, 128 pixels
+        // square, that repeats seamlessly (each layer's grid wraps round at the edges). Made once.
+        static Texture2D grain_picture;
+        static void prepare_grain()
+        {
+            if (grain_picture != null)
+            {
+                return;
+            }
+            const int size = 128;
+            var random = new System.Random(1898);
+            var pixels = new Color32[size * size];
+            var total = new float[size * size];
+            float weight = 1f, weights = 0f;
+            for (int cells = 4; cells <= 32; cells *= 2)  // Big soft blotches, then finer ones.
+            {
+                var corners = new float[cells * cells];
+                for (int index = 0; index < corners.Length; index++)
+                {
+                    corners[index] = (float)random.NextDouble();
+                }
+                for (int y = 0; y < size; y++)
+                {
+                    for (int x = 0; x < size; x++)
+                    {
+                        float across = (float)x / size * cells, down = (float)y / size * cells;
+                        int left = (int)across, top = (int)down;
+                        float sx = Mathf.SmoothStep(0, 1, across - left), sy = Mathf.SmoothStep(0, 1, down - top);
+                        float a = corners[(top % cells) * cells + left % cells], b = corners[(top % cells) * cells + (left + 1) % cells];
+                        float c = corners[((top + 1) % cells) * cells + left % cells], d = corners[((top + 1) % cells) * cells + (left + 1) % cells];
+                        total[y * size + x] += Mathf.Lerp(Mathf.Lerp(a, b, sx), Mathf.Lerp(c, d, sx), sy) * weight;
+                    }
+                }
+                weights += weight;
+                weight *= 0.55f;
+            }
+            for (int index = 0; index < pixels.Length; index++)
+            {
+                byte value = (byte)Mathf.Clamp(total[index] / weights * 255f, 0, 255);
+                pixels[index] = new Color32(value, value, value, 255);
+            }
+            grain_picture = new Texture2D(size, size, TextureFormat.RGBA32, true) { name = "painted grain", wrapMode = TextureWrapMode.Repeat, filterMode = FilterMode.Trilinear };
+            grain_picture.SetPixels32(pixels);
+            grain_picture.Apply(true, true);
+            Shader.SetGlobalTexture("_BodhiGrain", grain_picture);
+        }
+
         // A solid material that also glows with its own light (a lantern's glass, a lit window).
         // `strength` above 1 crosses the bloom threshold, so it softly glows on screen.
         public static Material glowing(Color colour, float strength)
         {
             var material = solid(0);
             material.SetColor("_EmissionColor", colour * strength);
+            return material;
+        }
+
+        // Fairy lights: bulbs glowing in their own colours (from the mesh), each twinkling.
+        public static Material fairy_lights(float strength)
+        {
+            var material = glowing(Color.white, strength);
+            material.SetFloat("_Twinkle", 1f);
             return material;
         }
 

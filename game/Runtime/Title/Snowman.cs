@@ -16,7 +16,7 @@ namespace Bodhi.Game
 
         readonly Transform parent;
         readonly Transform bottom, middle, head, thrown;
-        readonly GameObject eyes, nose, left_arm, right_arm, stick;
+        readonly GameObject eyes, nose, left_arm, right_arm, stick, santa_hat;
 
         // Builds every piece under `parent`, all hidden until the choreography shows them.
         public Snowman(Transform parent)
@@ -57,6 +57,23 @@ namespace Bodhi.Game
                 new MeshKit.Ring(0.12f, 0, carrot),
             }, 8, Vector3.one);
             nose = MeshKit.show("carrot nose", carrot_kit.build("carrot"), plain, parent, true);
+
+            // A Santa hat for the season, tipped jauntily to one side, with a white fur band and pompom.
+            var hat = new MeshKit();
+            var hat_red = new Color(0.78f, 0.1f, 0.12f);
+            var fur = new Color(0.95f, 0.95f, 0.97f);
+            var brim = new Vector3(0, (float)(SnowmanPlay.head_height + SnowmanPlay.head_radius * 0.62), 0);
+            var tilt = Quaternion.Euler(-8, 0, -16);
+            hat.add_round_shape(brim, tilt, new[]
+            {
+                new MeshKit.Ring(0, 0.16f, hat_red),
+                new MeshKit.Ring(0.13f, 0.12f, hat_red),
+                new MeshKit.Ring(0.26f, 0.06f, hat_red),
+                new MeshKit.Ring(0.36f, 0.015f, hat_red),
+            }, 14, Vector3.one);
+            hat.add_ball(brim + tilt * new Vector3(0, 0.01f, 0), new Vector3(0.18f, 0.045f, 0.18f), fur, 12, 0.01f, 0.03f, tilt);
+            hat.add_ball(brim + tilt * new Vector3(0.02f, 0.36f, 0), Vector3.one * 0.045f, fur, 8, 0.008f, 0.02f);
+            santa_hat = MeshKit.show("santa hat", hat.build("santa hat"), plain, parent, true);
 
             left_arm = MeshKit.show("left stick arm", stick_mesh(-1), plain, parent, true);
             right_arm = MeshKit.show("right stick arm", stick_mesh(1), plain, parent, true);
@@ -103,6 +120,7 @@ namespace Bodhi.Game
             place_ball(head, frame.head, frame.em.facing, hands);
             eyes.SetActive(frame.has_eyes);
             nose.SetActive(frame.has_nose);
+            santa_hat.SetActive(frame.has_eyes);
             left_arm.SetActive(frame.has_left_arm);
             right_arm.SetActive(frame.has_right_arm);
 

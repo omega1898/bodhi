@@ -37,8 +37,15 @@ namespace Bodhi.Setup
 
         // The whole game runs in one scene holding one object with ChapterDirector on it.
         // ChapterDirector makes the camera, the text and buttons and every chapter by itself.
+        // An existing scene is left alone: remaking it on every build would reshuffle Unity's
+        // internal IDs in the file each time and fill pull requests with noise.
         static void make_game_scene()
         {
+            if (File.Exists(scene_path))
+            {
+                EditorBuildSettings.scenes = new[] { new EditorBuildSettingsScene(scene_path, true) };
+                return;
+            }
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             var director = new GameObject("Game");
             director.AddComponent<Bodhi.Game.ChapterDirector>();

@@ -116,6 +116,7 @@ namespace Bodhi.Game
             float gallop_bob = 0.015f - 0.055f * flight;
             pose.body_drop = Mathf.Lerp(Mathf.Lerp(walk_bob, trot_bob, trot), gallop_bob, gallop) * going;
             pose.spine_flex = 15 * Mathf.Cos(turn * (phase - 0.92f)) * gallop;
+            pose.body_roll = 3.5f * Mathf.Sin(turn * phase) * (trot + (1 - trot - gallop) * 0.5f) * going;  // Rocks over each step.
             pose.body_pitch = 5 * Mathf.Sin(turn * (phase - 0.15f)) * gallop;
             pose.neck_pitch = Mathf.Lerp(-4 + 3 * Mathf.Cos(2 * turn * phase) * trot, 10 + 7 * Mathf.Cos(turn * (phase - 0.42f)), gallop);
             pose.head_pitch = Mathf.Lerp(0, -6, gallop);

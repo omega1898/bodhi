@@ -29,6 +29,7 @@ namespace Bodhi.Game
         readonly NightSky sky;
         readonly SnowLand land;
         readonly SnowFall snow;
+        readonly WinterLife life;
         readonly Volume post;
         readonly Light lantern_light;
         readonly Snowman snowman;
@@ -66,6 +67,8 @@ namespace Bodhi.Game
             lantern_light = WorldLook.lamp("Lantern light", root.transform, lantern_spot + Vector3.up * 0.5f, PaletteColours.warm_amber, 1.5f, 5f);
             WorldLook.lamp("Cabin window light", root.transform, land.cabin_window + new Vector3(0, 0, -1.2f), PaletteColours.warm_amber, 3f, 9f);
             Lantern.build(root.transform, lantern_spot);
+            Christmas.build(root.transform, land);
+            life = new WinterLife(root.transform, land.chimney_top, lantern_spot);
 
             snowman = new Snowman(root.transform);
             em = HumanFigure.build_em(root.transform);
@@ -129,6 +132,7 @@ namespace Bodhi.Game
                 snow.puff(root.transform.TransformPoint(new Vector3((float)puff.x, (float)puff.y, (float)puff.z)), puff.amount);
             }
             kick_up_snow(delta);
+            life.update(delta, em.foot_points, bodhi.paw_points, em.mouth_point, bodhi.mouth, em.body.localEulerAngles.y, bodhi.body.localEulerAngles.y);
         }
 
         // How far a character should turn their head, in degrees from the way they face, to look
@@ -164,6 +168,7 @@ namespace Bodhi.Game
         public void settle_snow(float seconds)
         {
             snow.run_for(seconds);
+            life.run_for(seconds);
         }
     }
 }

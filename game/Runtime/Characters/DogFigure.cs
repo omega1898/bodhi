@@ -57,6 +57,21 @@ namespace Bodhi.Game
         // His root (paws on the snow, turned the way he faces).
         public Transform body => root;
 
+        // The bottom of each paw, in world space (for paw prints in the snow).
+        public Vector3[] paw_points
+        {
+            get
+            {
+                var points = new Vector3[4];
+                for (int leg = 0; leg < 4; leg++)
+                {
+                    float length = leg < 2 ? front_paw_height : hind_foot + hind_paw_height;
+                    points[leg] = feet[leg].position - feet[leg].up * length;
+                }
+                return points;
+            }
+        }
+
         // How far his head should turn toward what he's looking at; TitleWorld sets it.
         public float look_yaw { get; set; }
 
@@ -105,7 +120,12 @@ namespace Bodhi.Game
                 var around_next = new Vector3(Mathf.Cos(angle_next) * 0.098f, 0.025f - Mathf.Sin(angle_next) * 0.012f, Mathf.Sin(angle_next) * 0.09f + 0.01f);
                 collar.add_tube(around_now, around_next, 0.013f, 0.013f, collar_red, collar_red, 6);
             }
-            collar.add_ball(new Vector3(0, 0.0f, 0.105f), Vector3.one * 0.016f, new Color(0.85f, 0.72f, 0.35f), 6);  // His tag.
+            // For Christmas: a little gold bell and a red bow at the front of his collar.
+            collar.add_ball(new Vector3(0, -0.012f, 0.108f), Vector3.one * 0.02f, new Color(0.9f, 0.74f, 0.32f), 8);
+            for (int side = -1; side <= 1; side += 2)
+            {
+                collar.add_ball(new Vector3(side * 0.028f, 0.018f, 0.104f), new Vector3(0.028f, 0.018f, 0.012f), new Color(0.82f, 0.08f, 0.1f), 6);
+            }
             part("collar", neck, collar, shiny);
 
             // His head: ginger crown and topknot, cream muzzle and beard, black nose, dark eyes.

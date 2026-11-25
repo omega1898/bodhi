@@ -20,6 +20,12 @@ namespace UnityEngine
         public static float Distance(Vector2 a, Vector2 b) => 0;
     }
 
+    public struct Vector4
+    {
+        public float x, y, z, w;
+        public Vector4(float x, float y, float z, float w) { this.x = x; this.y = y; this.z = z; this.w = w; }
+    }
+
     public struct Vector3
     {
         public float x, y, z;
@@ -59,6 +65,8 @@ namespace UnityEngine
         public static float Min(float a, float b) => Math.Min(a, b);
         public static float Clamp(float value, float min, float max) => Math.Max(min, Math.Min(max, value));
         public static float Clamp01(float value) => Clamp(value, 0, 1);
+        public static float Sqrt(float value) => (float)Math.Sqrt(value);
+        public static float Abs(float value) => Math.Abs(value);
         public static float MoveTowards(float current, float target, float max_delta) => target;
         public static float SmoothDamp(float current, float target, ref float velocity, float smooth_time) => target;
     }
@@ -223,6 +231,7 @@ namespace UnityEngine
         public static Sprite Create(Texture2D texture, Rect rect, Vector2 pivot) => null;
         public static Sprite Create(Texture2D texture, Rect rect, Vector2 pivot, float pixels_per_unit) => null;
         public static Sprite Create(Texture2D texture, Rect rect, Vector2 pivot, float pixels_per_unit, uint extrude, SpriteMeshType mesh_type) => null;
+        public static Sprite Create(Texture2D texture, Rect rect, Vector2 pivot, float pixels_per_unit, uint extrude, SpriteMeshType mesh_type, Vector4 border) => null;
     }
 
     public class Renderer : Component
