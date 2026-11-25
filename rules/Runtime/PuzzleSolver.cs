@@ -145,6 +145,45 @@ namespace Bodhi.Rules
             return new List<int[]>(states_by_key.Values);
         }
 
+        // The next step on a shortest path from this state to the goal, for the hint rule.
+        // Breadth-first search finds the nearest goal first, so walking back from it to the
+        // start gives a shortest path; its first move is the step to hint at. The distance is
+        // -1 when the goal can't be reached from here (a dead end) and 0 at the goal.
+        internal static NextStep next_step(Puzzle puzzle, int[] state)
+        {
+            var goal_keys = new List<string>();
+            var first_move_into = new Dictionary<string, Move>();
+            explore_from(puzzle, state, null, new Dictionary<string, int[]>(), first_move_into, new List<Move>(), goal_keys);
+            if (goal_keys.Count == 0)
+            {
+                return new NextStep(-1, null);
+            }
+            string key = goal_keys[0];
+            string first_action_name = null;
+            int distance = 0;
+            while (first_move_into.TryGetValue(key, out var move))
+            {
+                first_action_name = move.action_name;  // Overwritten until we reach the start.
+                key = move.from_key;
+                distance += 1;
+            }
+            return new NextStep(distance, first_action_name);
+        }
+
+        // How far the goal is, and the first action toward it (null at the goal or a dead end).
+        internal readonly struct NextStep
+        {
+            public readonly int distance;
+            public readonly string action_name;
+
+            // Makes one answer.
+            public NextStep(int distance, string action_name)
+            {
+                this.distance = distance;
+                this.action_name = action_name;
+            }
+        }
+
         // True if the goal can be reached with only this character acting.
         static bool can_solve_alone(Puzzle puzzle, Character who)
         {
@@ -158,7 +197,13 @@ namespace Bodhi.Rules
         static void explore(Puzzle puzzle, Character? only_who, Dictionary<string, int[]> states_by_key,
             Dictionary<string, Move> first_move_into, List<Move> moves, List<string> goal_keys)
         {
-            var start = puzzle.initial_state();
+            explore_from(puzzle, puzzle.initial_state(), only_who, states_by_key, first_move_into, moves, goal_keys);
+        }
+
+        // The same search, from any state (the hint rule searches from where the player is now).
+        static void explore_from(Puzzle puzzle, int[] start, Character? only_who, Dictionary<string, int[]> states_by_key,
+            Dictionary<string, Move> first_move_into, List<Move> moves, List<string> goal_keys)
+        {
             string start_key = key_of(start);
             states_by_key[start_key] = start;
             var queue = new Queue<int[]>();
