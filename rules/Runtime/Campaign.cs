@@ -75,6 +75,23 @@ namespace Bodhi.Rules
             return current_run;
         }
 
+        // Carries on the chapter in progress from its save (ChapterRun.to_save_text). Null if the
+        // save is damaged or is of any chapter but this one. Finishing the run counts as usual.
+        public ChapterRun resume_chapter(string chapter_save_text, out SavedPlaces places)
+        {
+            places = default;
+            if (is_finished)
+            {
+                return null;
+            }
+            var run = ChapterRun.resume(chapters[chapter_index], chapter_save_text, out places);
+            if (run != null)
+            {
+                current_run = run;
+            }
+            return run;
+        }
+
         // Ends the chapter: keeps his care, the keepsakes and the remembered moments, then moves
         // on. Only for the run begin_chapter gave out, once it's complete. True if it counted.
         public bool finish_chapter(ChapterRun run)
