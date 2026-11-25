@@ -35,3 +35,7 @@ jobs:
       # Compile the rules alone the way Unity 6 would (.NET Standard 2.1, C# 9).
       - name: Check the rules compile for Unity
         run: dotnet build rules_dotnet/Bodhi.Rules.UnityCheck --nologo
+
+      # Break-it tests for the tool that turns the browser chapters into C# data.
+      - name: Check the chapter exporter refuses bad data
+        run: node rules_dotnet/tools/export_chapters_test.js
