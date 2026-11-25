@@ -19,6 +19,7 @@ namespace Bodhi.Game
                 blackwater(),
                 bothy(),
                 windy_gap(),
+                christmas_eve(),
             };
         }
 
@@ -37,6 +38,7 @@ namespace Bodhi.Game
                 case "blackwater": return blackwater();
                 case "bothy": return bothy();
                 case "windy_gap": return windy_gap();
+                case "christmas_eve": return christmas_eve();
                 default: return null;
             }
         }

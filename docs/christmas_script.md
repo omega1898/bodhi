@@ -784,29 +784,64 @@ Then the title card *Chapter Eleven: Christmas Eve*, 24 December.
 
 Pull together up to the pass. / Look at Em first. / Chase the sled down the gully. Hold it. / Nudge Biscuit onto the shelf. / Cut steps in the frozen waterfall. / Fix Tam's rope. / Climb down to the sheepfold. / (they meet) / Haul the sled up to the top of the pass.
 
-### Chapter Eleven: Christmas Eve (24 December)
+### Chapter Eleven: Christmas Eve (24 December), in full
 
-*Underneath:* Bodhi does what Moss did fifty years ago, on the same path, in the same storm, toward the same lit windows. Mina has read the church's old storm book and asked the vicar to ring Mercy.
+Written in full on 25 November 2026, when the chapter was built. The chapter's question: *will they get home?* The climax.
 
-| Beat | Voice | Line |
+*Underneath:* Bodhi does what Moss did fifty years ago, on the same path, in the same storm, toward the same lit windows. The roles reverse: the dog Em carried home in Chapter One now leads her, and the player plays him, with Em following on the harness. The old saying is now literal. The custom the young thought was decoration, a light in the window for anyone still out on the hill, is the only thing in the world. Mina, who never latched the log store, has turned her guilt into a village: she found the church's old storm book, had Mercy rung, and went door to door until every house had a candle lit.
+
+#### The white-out
+
+| # | Beat | Voice | Caption |
+|---|---|---|---|
+| 1 | Opens (film) | Em | We started down at noon, to beat the storm. The storm won. |
+| 2 | | B | White. Loud. Her hand on the harness, holding tight. Slow. |
+| 3 | The lantern (film) | Em | The wind blew the lantern out. After that there was no up, no down, no hand. |
+| 4 | | Em | I held his harness, and I let him lead. |
+| 5 | He leads | B | White on top. Underneath: sheep, boots, old dogs. The old path. |
+| 6 | | B | Snow forgets. Noses don't. |
+| 7 | The old path | B | Here. Sheep, a hundred winters of sheep. This way. |
+| 8 | | B | And dogs, long ago, a hundred of them, going home this way. |
+| 9 | Holding on | Em | Every few minutes I whistled, so he'd know I was still holding on. |
+| 10 | | B | Her whistle. Behind. Holding on. Bark back. Here. Here. |
+| 11 | Mercy | B | A sound. Deep. Far. Again. Again. Like the old dog's bark, but huge. |
+| 12 | | Em | Mercy. Someone was ringing Mercy, every quarter hour, for the hill. |
+
+#### The lights
+
+| # | Beat | Voice | Caption |
+|---|---|---|---|
+| 13 | The village (film) | Em | The storm thinned, and Hollin was there below us. Every window was lit. |
+| 14 | | Em | Candles, lamps, torches in jam jars. Nobody had power. Everybody had a light. |
+| 15 | | Em | And highest of all, under the pines, one brighter than the rest. Mine. |
+| 16 | The footbridge | B | Ice underfoot. The rope in the teeth. Across. Across. |
+| 17 | | Em | I knocked the ice off the handrail rope with my fist, and steadied the sled. |
+| 18 | Over | Em | Over the burn, over the gorge, one step and then the next. |
+
+#### Home
+
+| # | Beat | Voice | Caption |
+|---|---|---|---|
+| 19 | The porch (film) | B | The girl. On the porch. The girl's smell, crying. |
+| 20 | | Em | Mina was on my porch with a torch. She heard his bell before she saw anything. |
+| 21 | | Em | Biscuit barked once. Mina ran. |
+| 22 | | Em | 'I kept it lit,' she said into Biscuit's fur. 'Every night. Like you said.' |
+| 23 | Closes | Em | The lamp was still in my window. Mina had kept it lit for ten nights. |
+| 24 | | Em | Then Mercy rang twelve, and it was Christmas. |
+
+Then the title card *Chapter Twelve: Christmas Day*, 25 December.
+
+#### Keepsakes
+
+| Keepsake | Found by | Text |
 |---|---|---|
-| Opens | Em | We started down at noon, to beat the storm. The storm won. |
-| | B | White. Loud. Her hand on the harness, holding tight. Slow. |
-| The lantern | Em | The wind blew the lantern out. After that there was no up, no down, no hand. |
-| | Em | I held his harness, and I let him lead. |
-| The old path | B | White on top. Underneath: sheep, boots, old dogs. The old path. |
-| | B | Snow forgets. Noses don't. |
-| Holding on | Em | Every few minutes I whistled, so he'd know I was still holding on. |
-| | B | Her whistle. Behind. Holding on. Bark back. Here. Here. |
-| Mercy | B | A sound. Deep. Far. Again. Again. Like the old dog's bark, but huge. |
-| | Em | Mercy. Someone was ringing Mercy, every quarter hour, for the hill. |
-| The village | Em | The storm thinned, and Hollin was there below us. Every window was lit. |
-| | Em | Candles, lamps, torches in jam jars. Nobody had power. Everybody had a light. |
-| | Em | And highest of all, under the pines, one brighter than the rest. Mine. |
-| Mina | B | The girl. On the porch. The girl's smell, crying. |
-| | Em | Biscuit barked once. Mina ran. |
-| Closes | Em | The lamp was still in my window. Mina had kept it lit for ten nights. |
-| | Em | Then Mercy rang twelve, and it was Christmas. |
+| The wool on the post | Bodhi | Sheep's wool snagged on a marker post, grey with age: the old drovers' road, still there under the snow. |
+| The farthest candle | Em | In the farthest window of the village, an old man's house, a candle. Mina had gone up and lit it for him. |
+| The vicar's note | Em | Pinned to my porch post: 'Bell every quarter hour until they're down. Volunteers to Mina.' |
+
+#### Objectives, in order
+
+Keep going down. Keep the marker posts close. / Lead Em down. Find the old path by its smell. / Bark, so she knows you're there. / Lead her toward the bell. / Cross the iced footbridge together. / Down through the pines. Home.
 
 ### Chapter Twelve: Christmas Day (25 December)
 
