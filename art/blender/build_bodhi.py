@@ -174,8 +174,8 @@ def ear(side):
     # hangs close against his cheek down past his jaw, flaring a little at the bottom.
     middle = joint("head") + Vector((x * 0.092, 0.012, -0.05))
     obj = ball("ear." + side, middle, (0.042, 0.068, 0.13), 3)
-    for vertex in obj.data.vertices:
-        below = max(0.0, (middle.z - vertex.co.z) / 0.13)
+    for vertex in obj.data.vertices:  # The ear's own corners are measured from its middle.
+        below = max(0.0, -vertex.co.z / 0.13)
         vertex.co.x += x * 0.018 * below
     curly(obj, 0.018, 0.03, subdivide=1)
     return obj

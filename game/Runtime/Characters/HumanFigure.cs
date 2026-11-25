@@ -33,6 +33,7 @@ namespace Bodhi.Game
         readonly Transform left_upper_arm, right_upper_arm, left_forearm, right_forearm;
 
         HumanPose current = HumanPose.standing();
+        SkinnedModel model;   // Her real model from Blender, once she's wearing it.
         float facing_now, facing_speed;             // Her turning, eased.
         float speed_now;                            // Her speed, eased.
         float phase;                                // How far through a stride.
@@ -245,6 +246,52 @@ namespace Bodhi.Game
             apply(current);
             swing_hair(delta);
             swing_cloth(delta);
+            model?.follow();
+        }
+
+        // Puts on her real 3D model (art/blender/build_em.py, imported from game/Resources/Models):
+        // the code-built pieces hide, and every frame the model's bones point the way this
+        // figure's parts do (SkinnedModel). Without a model she simply stays as she is.
+        public void wear(GameObject prefab)
+        {
+            if (prefab == null)
+            {
+                return;
+            }
+            model = new SkinnedModel(prefab, root, WorldLook.solid(rim: 0.5f, wrap: 0.5f, grain: 0.04f));
+            foreach (var piece in root.GetComponentsInChildren<MeshRenderer>())
+            {
+                piece.enabled = false;
+            }
+            model.face_forward(model.bone("foot.L_end"), model.bone("foot.L"));
+            // Each bone, the next bone in its chain ("_end" marks a chain's tip), and the two
+            // points on this figure it should point between.
+            model.hips_follow(model.bone("hips"), hips);
+            model.link(model.bone("hips"), "spine", hips, spine);
+            model.link(model.bone("spine"), "chest", spine, chest);
+            model.link(model.bone("chest"), "neck", chest, neck);
+            model.link(model.bone("neck"), "head", neck, head);
+            model.link(model.bone("head"), "head_end", head, null, new Vector3(0, 0.18f, 0));
+            model.link(model.bone("hair"), "hair_end", hair, null, new Vector3(0, -0.3f, 0));
+            model.link(model.bone("coat_skirt"), "coat_skirt_end", coat_skirt, null, new Vector3(0, -0.4f, 0));
+            model.link(model.bone("scarf_end"), "scarf_end_end", scarf_end, null, new Vector3(0, -0.21f, 0));
+            foreach (int side in new[] { -1, 1 })
+            {
+                var upper_arm = model.bone_on_side("upper_arm", side);
+                string ending = upper_arm != null ? upper_arm.name.Substring(upper_arm.name.Length - 2) : "";  // ".L" or ".R"
+                bool left = side < 0;
+                model.link(upper_arm, "forearm" + ending, left ? left_upper_arm : right_upper_arm, left ? left_forearm : right_forearm);
+                model.link(model.bone("forearm" + ending), "hand" + ending, left ? left_forearm : right_forearm, left ? left_hand : right_hand);
+                model.link(model.bone("hand" + ending), "hand" + ending + "_end", left ? left_hand : right_hand, null, new Vector3(0, -0.1f, 0));
+                var leg = left ? left_leg : right_leg;
+                var foot = left ? left_foot_bone : right_foot_bone;
+                var thigh = model.bone_on_side("thigh", side);
+                string leg_ending = thigh != null ? thigh.name.Substring(thigh.name.Length - 2) : "";
+                model.link(thigh, "shin" + leg_ending, leg.upper, leg.lower);
+                model.link(model.bone("shin" + leg_ending), "foot" + leg_ending, leg.lower, foot);
+                model.link(model.bone("foot" + leg_ending), "foot" + leg_ending + "_end", foot, null, new Vector3(0, -0.035f, 0.17f));
+            }
+            model.follow();
         }
 
         // Her coat skirt and the end of her scarf swing behind her movement: they trail back as
