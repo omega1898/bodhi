@@ -398,6 +398,35 @@ namespace Bodhi.Rules.Tests
             Assert.That(order.IndexOf("reunion_embrace"), Is.GreaterThan(order.IndexOf("crank_turned")));
         }
 
+        // Chapter Nine: Biscuit's recovery is the morning after both of them kept him alive.
+        // Bodhi lay along him and dug out the logs; Em kept the fire; then the polite bark.
+        [Test]
+        public void chapter_nine_biscuit_recovers_only_after_the_long_night()
+        {
+            var run = ChapterRobot.play(ChristmasChapters.bothy(), skip_films: false);
+            var order = run.event_order.ToList();
+            Assert.That(order.IndexOf("morning"), Is.GreaterThan(order.IndexOf("lay_along_biscuit")));
+            Assert.That(order.IndexOf("morning"), Is.GreaterThan(order.IndexOf("logs_carried")));
+            Assert.That(order.IndexOf("morning"), Is.GreaterThan(order.IndexOf("stick_brought")));
+            Assert.That(order.IndexOf("tams_bothy"), Is.GreaterThan(order.IndexOf("book_1974")), "the book tells her whose bothy it is");
+        }
+
+        // Break it: the woodpile is outside, so Bodhi can't dig the logs before Em has
+        // shouldered the snow-jammed door open.
+        [Test]
+        public void chapter_nine_logs_wait_for_the_door()
+        {
+            var run = new ChapterRun(ChristmasChapters.bothy());
+            ChapterRobot.finish(run, skip_films: true, stop_when: playing => playing.has_happened("fire_low"));
+            Assert.That(run.switch_character(), Is.True);
+            run.sniff(2000, 520);
+            Assert.That(run.use("logs_dug", true), Is.False, "the door is still shut");
+            Assert.That(run.switch_character(), Is.True);
+            Assert.That(run.use("door_shouldered", true), Is.True);
+            Assert.That(run.switch_character(), Is.True);
+            Assert.That(run.use("logs_dug", true), Is.True);
+        }
+
         // Break it: each call gives a fresh copy, so one playthrough can't change another's chapter.
         [Test]
         public void each_copy_of_a_chapter_is_separate()
