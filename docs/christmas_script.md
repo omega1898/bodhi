@@ -666,25 +666,68 @@ Then the title card *Chapter Nine: The Bothy*, 21 December.
 
 Cross close to the shore. Keep to the white ice. / Switch to {dog}. Crawl out to the sled. Slowly. / Take the sled rope in your teeth. / Switch to Em. Free the hut's pulley. / Turn the crank. / Shelter in the fishing hut.
 
-### Chapter Nine: The Bothy (21 to 22 December)
+### Chapter Nine: The Bothy (21 to 22 December), in full
 
-*Underneath:* this is the bothy. Tam's bothy, Moss's bothy. Em finds out from the visitors' book, in a twelve-year-old's handwriting.
+Written in full on 25 November 2026, when the chapter was built. The chapter's question: *will Biscuit live?* The darkest and quietest chapter, and the only one that never leaves one small stone room.
 
-| Beat | Voice | Line |
+*Underneath:* this is the bothy. Tam's bothy, Moss's bothy. Em finds out from the visitors' book, in a twelve-year-old's handwriting, and from a name cut low on the doorframe where only a dog would see it. Fifty years apart, the same storm, the same room, a dog lying along someone to keep them alive. The puppy who needed looking after in Chapter One now keeps an old dog alive with the warmth of his body. Em never says she is afraid. She says she stopped sleeping.
+
+#### The first night
+
+| # | Beat | Voice | Caption |
+|---|---|---|---|
+| 1 | The door (film) | Em | The storm caught us at the bothy door, and held us there two days. |
+| 2 | | B | Stone. Smoke. Old boots. A hundred strangers, all of them kind. |
+| 3 | The fire | Em | There was kindling in the grate, laid by someone for whoever came next. |
+| 4 | Biscuit | Em | On the first night Biscuit stopped eating. |
+| 5 | | Em | I stopped sleeping. |
+| 6 | Lying close (film) | B | The old dog, too still. Lie close. Closer. Like under the fallen tree. |
+| 7 | | B | His heart, slow. Slower than before. |
+| 8 | The fire, low | Em | Some time after midnight the fire burned down to red. |
+| 9 | | Em | The woodpile was outside, under the drift. |
+| 10 | The door | Em | The door was jammed with snow. I put my shoulder to it, and the storm came in. |
+| 11 | The storm | B | Outside: the howl. Dark. Snow in the ears, the eyes, the mouth. |
+| 12 | The logs | B | Wood under the snow. Dig. Dig. Back to her. |
+| 13 | Carried in | Em | He'd dug out half the woodpile. I carried it in, armful by armful. |
+| 14 | | Em | The fire caught. Biscuit didn't lift his head. |
+| 15 | The towel | Em | He came in white and came out of the towel steaming. |
+
+#### The book
+
+| # | Beat | Voice | Caption |
+|---|---|---|---|
+| 16 | Reading (film) | Em | To pass the hours I read the visitors' book aloud. Forty years of strangers. |
+| 17 | | Em | Most of them had been stuck in this room at Christmas, like us. |
+| 18 | 1974 | N | 'Christmas 1974. Snowed in three nights. Moss kept me warm. T. R., aged 12.' |
+| 19 | | Em | T. R. Tam Rennie. This was Tam's bothy. This was where Moss had kept him alive. |
+
+#### The second night, and morning
+
+| # | Beat | Voice | Caption |
+|---|---|---|---|
+| 20 | The longest night | Em | The second night was the longest. I kept the fire. He kept Biscuit. |
+| 21 | The stick | B | A stick. A good stick. For her. |
+| 22 | The present (film) | Em | Near dawn he brought me a present: a stick, from the woodpile. |
+| 23 | | Em | I said thank you. I meant it. |
+| 24 | Morning | Em | In the morning Biscuit lifted his head, ate from my hand, and barked once. |
+| 25 | | Em | Hello. |
+| 26 | | B | The old dog. Warm. Hungry. Here. |
+| 27 | Closes | Em | I wrote our names in the book, under forty years of strangers. |
+| 28 | | Em | Then we went to climb the pass. |
+
+Then the title card *Chapter Ten: Windy Gap*, 23 December.
+
+#### Keepsakes
+
+| Keepsake | Found by | Text |
 |---|---|---|
-| Opens | Em | The storm caught us at the bothy door, and held us there two days. |
-| | B | Stone. Smoke. Old boots. A hundred strangers, all of them kind. |
-| Biscuit fails | Em | On the first night Biscuit stopped eating. I stopped sleeping. |
-| | B | The old dog, too still. Lie close. Closer. Like under the fallen tree. |
-| The book | N | 'Christmas 1987. Snowed in three days with my brother and a tin of peaches. Best ever.' |
-| | N | 'Christmas 1974. Snowed in three nights. Moss kept me warm. T. R., aged 12.' |
-| The doorframe | Em | Low on the doorframe, at a dog's height, someone had cut a name: MOSS. |
-| The woodpile | B | Outside: the howl. Dark. Wood under the snow. Dig. Dig. Back to her. |
-| The present | Em | On the second night he brought me a present: a stick, from the woodpile. |
-| Recovery | Em | In the morning Biscuit lifted his head, ate from my hand, and barked once. |
-| | Em | Hello. |
-| Closes | Em | I wrote our names in the book, under forty years of strangers. |
-| | Em | Then we went to climb the pass. |
+| The peaches, 1987 | Em | In the visitors' book: 'Christmas 1987. Snowed in three days with my brother and a tin of peaches. Best ever.' |
+| The shortbread, 1994 | Em | In the visitors' book: '1994. Left the shortbread. You're welcome.' The tin was still on the shelf. |
+| The name on the doorframe | Bodhi | Low on the doorframe, at a dog's height, someone had cut a name: MOSS. |
+
+#### Objectives, in order
+
+Light the fire. / Offer Biscuit some food. / Switch to {dog}. Keep Biscuit warm. / Open the door. It's jammed with snow. / Switch to {dog}. Find the logs under the drift. / Carry the logs in. / Towel {dog} dry. / Read the visitors' book. / Switch to {dog}. Bring her something.
 
 ### Chapter Ten: Windy Gap (23 December)
 

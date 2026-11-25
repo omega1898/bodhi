@@ -19,6 +19,7 @@ namespace Bodhi.Rules
                 reindeer_hill(),
                 tams_sled(),
                 blackwater(),
+                bothy(),
             };
         }
     }
