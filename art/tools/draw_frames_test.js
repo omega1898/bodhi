@@ -21,8 +21,8 @@ check('the painted sheet still has every colour the puppy and Biscuit swap', fun
 });
 
 check('a puppy colour missing from the sheet stops the tool', function () {
-    const repainted = definitions.split('#e0a867').join('#123456');
-    assert.throws(function () { tool.puppy_definitions(repainted); }, /puppy colours: #e0a867/);
+    const repainted = definitions.split('#d4925a').join('#123456');
+    assert.throws(function () { tool.puppy_definitions(repainted); }, /puppy colours: #d4925a/);
 });
 
 check('a Biscuit change that finds nothing stops the tool', function () {
@@ -33,7 +33,7 @@ check('a Biscuit change that finds nothing stops the tool', function () {
 
 check('Biscuit keeps no golden curl shading', function () {
     const grey = tool.biscuit_look(definitions);
-    for (const golden of ['#8a5528', '#6e4220', '#c99a62']) {
+    for (const golden of ['#7e4421', '#5e3218', '#c4895a']) {
         assert.strictEqual(grey.indexOf(golden), -1, golden + ' is still in Biscuit\'s coat');
     }
 });

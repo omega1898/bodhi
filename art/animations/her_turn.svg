@@ -13,13 +13,13 @@
       <feBlend in="grain_on_shape" in2="SourceGraphic" mode="multiply"/>
     </filter>
     <linearGradient id="skin" x1="1" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#f8dfca"/><stop offset="0.55" stop-color="#efcbb0"/><stop offset="1" stop-color="#d9a98c"/>
+      <stop offset="0" stop-color="#fbe5d6"/><stop offset="0.55" stop-color="#f3cfbb"/><stop offset="1" stop-color="#dcab94"/>
     </linearGradient>
     <linearGradient id="hair" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#f7e3a6"/><stop offset="0.5" stop-color="#e2bd69"/><stop offset="1" stop-color="#b48c43"/>
+      <stop offset="0" stop-color="#e9c887"/><stop offset="0.5" stop-color="#cfa25c"/><stop offset="1" stop-color="#9a7238"/>
     </linearGradient>
     <linearGradient id="ponytail" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#e9c878"/><stop offset="1" stop-color="#a98339"/>
+      <stop offset="0" stop-color="#d9b06a"/><stop offset="1" stop-color="#8f6a33"/>
     </linearGradient>
     <linearGradient id="coat" x1="1" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#4b9590"/><stop offset="0.45" stop-color="#2f6c69"/><stop offset="1" stop-color="#1b4544"/>
@@ -40,7 +40,7 @@
       <stop offset="0" stop-color="#8a6a46"/><stop offset="1" stop-color="#5a432c"/>
     </linearGradient>
     <radialGradient id="blush" cx="0.5" cy="0.5" r="0.5">
-      <stop offset="0" stop-color="#e8857a" stop-opacity="0.38"/><stop offset="1" stop-color="#e8857a" stop-opacity="0"/>
+      <stop offset="0" stop-color="#ec8a86" stop-opacity="0.5"/><stop offset="1" stop-color="#ec8a86" stop-opacity="0"/>
     </radialGradient>
   <linearGradient id="sleeve_lit" x1="1" y1="0" x2="0" y2="0"><stop offset="0" stop-color="#5aa59f"/><stop offset="1" stop-color="#2c625f"/></linearGradient><filter id="grain_soft" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="1" seed="9" result="noise"/><feColorMatrix in="noise" type="saturate" values="0" result="mono"/><feComponentTransfer in="mono" result="faint"><feFuncA type="table" tableValues="0 0.06"/></feComponentTransfer><feComposite in="faint" in2="SourceGraphic" operator="in" result="grain"/><feBlend in="grain" in2="SourceGraphic" mode="multiply"/></filter><filter id="far_side"><feColorMatrix type="matrix" values="0.64 0 0 0 0 0 0.64 0 0 0 0 0 0.7 0 0 0 0 0 1 0"/></filter></defs>
   <g id="frame_0" transform="translate(300,990)"><g filter="url(#grain_soft)"><g filter="url(#far_side)"><path d="M 20,-705.3 C -1.5,-689.8 -59.4,-620.2 -63.7,-579.2 C -67.9,-538.3 -21.1,-476.7 -5.5,-459.7 C 10.2,-442.8 32.5,-458.6 30.4,-477.5 C 28.3,-496.4 -23.8,-540.6 -18.1,-573 C -12.3,-605.4 58.6,-649.9 65,-672 C 71.3,-694 41.4,-720.7 20,-705.3 Z" fill="#23514f" stroke="#0f2a29" stroke-width="4" stroke-linejoin="round"/><g transform="translate(10.7,-472.2) rotate(-26.4)"><ellipse cx="0" cy="2" rx="21" ry="8" fill="#0c2322"/><path d="M -14,0 C -17,14 -16,28 -12,38 C -10,43 -6,46 -1,46 C 2,48 6,47 8,44 C 12,42 14,36 12,30 C 13,27 13,25 12,24 C 16,22 19,17 18,11 C 17,6 15,2 14,0 Z" fill="url(#skin)" stroke="#b9836a" stroke-width="1.6" stroke-linejoin="round"/><path d="M 10,7 C 18,10 21,20 16,27 C 14,28 12,27 11,25 C 12,20 11,15 9,12 Z" fill="#edc4aa" stroke="#b9836a" stroke-width="1.4" stroke-linejoin="round"/><path d="M -9,30 C -6,37 0,41 7,40 M -4,34 C -2,40 2,44 5,45 M -12,22 C -11,26 -10,29 -8,31" fill="none" stroke="#c48d72" stroke-width="1.8" stroke-linecap="round" opacity="0.8"/><path d="M -13,6 C -15,16 -14,26 -11,34" fill="none" stroke="#b07d64" stroke-width="2.5" stroke-linecap="round" opacity="0.35"/><path d="M -22,-6 C -22,4 22,4 22,-6 L 21,-12 C 21,-4 -21,-4 -21,-12 Z" fill="#1f4c4b"/><path d="M -20,-4 C -10,1 10,1 20,-4" fill="none" stroke="#5aa59f" stroke-width="2" stroke-linecap="round" opacity="0.5"/></g></g><g filter="url(#far_side)"><path d="M -39,-406.1 C -42.7,-372.5 23.3,-280.5 16.6,-222.8 C 9.8,-165.1 -70.1,-91.2 -79.6,-60.1 C -89.1,-28.9 -66,-10.3 -40.4,-35.9 C -14.9,-61.5 60.6,-148.8 73.8,-213.4 C 87,-278.1 57.8,-391.8 39,-423.9 C 20.2,-456 -35.2,-439.6 -39,-406.1 Z" fill="#2b3550" stroke="#161c2b" stroke-width="3" stroke-linejoin="round"/><path d="M 31.2,-222.1 Q 45.2,-210.1 59.2,-220.1" fill="none" stroke="#1a2030" stroke-width="3" opacity="0.5" stroke-linecap="round"/><g transform="translate(-60,-48) rotate(-22.9)" filter="url(#grain)">
@@ -81,30 +81,31 @@
     <path d="M -14,-4 C -30,30 -40,90 -36,150 L -6,156 C -10,110 -2,50 14,4 Z" fill="url(#scarf)"/>
     <path d="M -34,150 L -36,166 M -26,152 L -26,168 M -16,153 L -14,168 M -8,154 L -5,168" stroke="#8a361a" stroke-width="3" stroke-linecap="round"/>
     <path d="M -20,20 C -28,60 -30,100 -26,140" fill="none" stroke="#6e2a14" stroke-width="2.5" opacity="0.5"/>
-  </g><g transform="translate(-26.3,-841.1) rotate(34.4)" filter="url(#grain)">
-    <path d="M -14,-6 C -40,30 -50,90 -30,150 C -22,172 -8,186 4,190 C -6,160 4,110 20,60 C 26,30 20,6 12,-6 Z" fill="url(#ponytail)"/>
-    <path d="M -4,10 C -24,50 -30,110 -14,160 M 8,20 C -6,60 -6,110 0,160" fill="none" stroke="#fff3cf" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
-    <path d="M -30,150 C -22,172 -8,186 4,190" fill="none" stroke="#bcd6ef" stroke-width="3" opacity="0.5"/>
+  </g><g transform="translate(-21.7,-818.8) rotate(25.2)" filter="url(#grain)">
+    <path d="M -10,-14 C -34,10 -44,70 -40,130 C -38,170 -30,200 -14,214 C -4,206 2,196 6,186 C 12,198 22,206 30,208 C 26,170 30,110 32,60 C 34,24 26,-4 12,-16 Z" fill="url(#ponytail)"/>
+    <path d="M -2,0 C -22,40 -28,110 -22,190 M 10,6 C 0,60 0,130 4,180 M 22,10 C 18,60 20,130 22,196" fill="none" stroke="#f3dca0" stroke-width="2.5" stroke-linecap="round" opacity="0.55"/>
+    <path d="M -30,60 C -34,110 -32,160 -20,200 M 14,40 C 10,100 12,150 14,190" fill="none" stroke="#7e5a28" stroke-width="2" stroke-linecap="round" opacity="0.45"/>
+    <path d="M -40,130 C -38,170 -30,200 -14,214" fill="none" stroke="#bcd6ef" stroke-width="3" opacity="0.5"/>
   </g><g transform="translate(42.5,-688.6) rotate(3.5)" filter="url(#grain)">
     <path d="M -26,14 C -24,-18 -22,-38 -18,-48 L 30,-48 C 32,-30 34,-12 38,14 Z" fill="#dcae92"/>
     <path d="M -30,-40 C -70,-60 -88,-110 -80,-150 C -72,-192 -20,-205 20,-200 C 60,-196 84,-170 86,-136 C 87,-124 84,-114 88,-106 C 90,-100 96,-94 104,-84 C 108,-79 103,-73 94,-73 C 92,-70 92,-67 94,-64 C 98,-62 97,-57 92,-55 C 96,-52 95,-46 90,-44 C 92,-36 88,-28 78,-24 C 62,-18 40,-24 24,-34 C 10,-42 -10,-40 -30,-40 Z" fill="url(#skin)"/>
     <path d="M 24,-34 C 40,-26 62,-20 78,-24 C 70,-30 50,-34 36,-40 Z" fill="#cf9d80" opacity="0.6"/>
-    <circle cx="58" cy="-68" r="22" fill="url(#blush)"/>
+    <circle cx="58" cy="-68" r="26" fill="url(#blush)"/>
     <!-- The ear: its outer shape, the rolled rim along its back edge, and the hollow inside. -->
     <path d="M -4,-120 C -18,-121 -24,-108 -22,-94 C -20,-82 -14,-74 -6,-76 C 0,-78 2,-86 1,-94 C 4,-104 4,-116 -4,-120 Z" fill="#e4b49a"/>
     <path d="M -4,-116 C -15,-116 -19,-106 -18,-95 C -17,-86 -13,-80 -8,-80" fill="none" stroke="#f3cdb6" stroke-width="3" stroke-linecap="round"/>
     <path d="M -6,-108 C -12,-106 -13,-96 -10,-90 C -7,-86 -3,-88 -3,-94 C -2,-100 -2,-106 -6,-108 Z" fill="#c98f74"/>
     <path d="M -2,-90 C 0,-88 0,-85 -2,-83" fill="none" stroke="#b27a60" stroke-width="2" stroke-linecap="round"/>
     <path d="M 52,-103 C 58,-110 70,-110 77,-104 C 70,-98 58,-98 52,-103 Z" fill="#fbf6f0"/>
-    <circle cx="68" cy="-104" r="6.5" fill="#3f78b8"/>
-    <circle cx="68" cy="-104" r="6.5" fill="none" stroke="#24466d" stroke-width="1.5"/>
-    <circle cx="69" cy="-104" r="3" fill="#162033"/>
+    <circle cx="68" cy="-104" r="6.5" fill="#7d97a6"/>
+    <circle cx="68" cy="-104" r="6.5" fill="none" stroke="#4d6472" stroke-width="1.5"/>
+    <circle cx="69" cy="-104" r="3" fill="#1c2328"/>
     <circle cx="71" cy="-106.5" r="1.7" fill="#ffffff"/>
     <path d="M 49,-104 C 57,-115 72,-114 80,-105" fill="none" stroke="#4a3326" stroke-width="3.5" stroke-linecap="round"/>
     <path d="M 79,-106 L 85,-110 M 76,-109 L 80,-114" stroke="#4a3326" stroke-width="2" stroke-linecap="round"/>
     <path d="M 52,-113 C 60,-119 72,-118 79,-112" fill="none" stroke="#c99478" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
     <path d="M 55,-100 C 62,-97 70,-97 75,-100" fill="none" stroke="#b98468" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
-    <path d="M 46,-124 C 58,-132 74,-131 85,-124" fill="none" stroke="#b08640" stroke-width="5" stroke-linecap="round"/>
+    <path d="M 46,-124 C 58,-132 74,-131 85,-124" fill="none" stroke="#a88050" stroke-width="5" stroke-linecap="round"/>
     <path d="M 96,-78 C 99,-76 99,-74 96,-73" fill="none" stroke="#b98468" stroke-width="2" stroke-linecap="round"/>
     <!-- Lips: the upper lip, a fuller lower lip with a touch of light on it, and the line
          where they meet, turning in at the corner of the mouth. -->
@@ -112,18 +113,20 @@
     <path d="M 85,-55 C 89,-55 93,-55 94,-53 C 93,-49 89,-47 86,-48 C 87,-50 86,-53 85,-55 Z" fill="#cf8578"/>
     <path d="M 88,-51 C 89,-50 91,-50 92,-51" fill="none" stroke="#f2b3a6" stroke-width="1.5" stroke-linecap="round" opacity="0.8"/>
     <path d="M 81,-57 C 85,-56 91,-56 95,-57" fill="none" stroke="#8f4a40" stroke-width="1.6" stroke-linecap="round"/>
-    <!-- Hair: a soft mass over the top and back, a swept fringe, and highlights. -->
-    <path d="M 84,-140 C 82,-176 50,-206 6,-206 C -50,-206 -92,-170 -92,-118 C -92,-82 -78,-56 -56,-40 C -50,-60 -40,-78 -22,-84 C -14,-104 -10,-128 4,-140 C 24,-152 52,-150 84,-140 Z" fill="url(#hair)"/>
-    <!-- The fringe: three tapered locks swept forward across the forehead, each with its own
-         light edge, instead of one hard wedge. -->
-    <path d="M 84,-162 C 70,-150 56,-132 30,-123 C 52,-124 70,-132 86,-146 Z" fill="#cfa452"/>
-    <path d="M 86,-150 C 80,-138 70,-126 52,-118 C 68,-118 82,-126 89,-138 Z" fill="#d9b25e"/>
-    <path d="M 88,-140 C 86,-130 82,-122 72,-116 C 82,-117 89,-124 91,-132 Z" fill="#c79a4a"/>
-    <path d="M 80,-154 C 68,-140 56,-130 40,-124 M 84,-144 C 78,-134 70,-126 58,-120" fill="none" stroke="#f7e3a6" stroke-width="2" stroke-linecap="round" opacity="0.75"/>
-    <path d="M -64,-168 C -36,-198 18,-202 58,-182 C 18,-194 -30,-190 -64,-168 Z M -80,-128 C -66,-170 -24,-192 22,-188 C -22,-184 -60,-166 -80,-128 Z M -84,-96 C -86,-132 -60,-162 -26,-172 C -56,-156 -76,-130 -84,-96 Z" fill="#fff6d8" opacity="0.6"/>
-    <path d="M -70,-70 C -78,-100 -70,-130 -50,-150 M -40,-90 C -36,-120 -16,-140 10,-150" fill="none" stroke="#9e7a35" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
-    <path d="M -92,-118 C -92,-82 -78,-56 -56,-40" fill="none" stroke="#bcd6ef" stroke-width="4" stroke-linecap="round" opacity="0.55"/>
-    <ellipse cx="-78" cy="-148" rx="9" ry="12" fill="#8c3a1d" transform="rotate(-30 -78 -148)"/>
+    <!-- Hair, matched to the real Em: honey-blonde, parted in
+         the middle and worn down, straight past the shoulders, with no fringe. In profile the
+         hair runs back from the hairline over the crown, and a curtain falls past the ear and
+         the cheek. The long hair behind the shoulders is part_ponytail, so it can swing. -->
+    <path d="M 82,-146 C 80,-180 48,-208 4,-208 C -52,-208 -94,-172 -94,-118 C -94,-82 -80,-54 -58,-38 C -52,-58 -44,-74 -30,-80 C -22,-104 -6,-134 24,-146 C 42,-152 64,-152 82,-146 Z" fill="url(#hair)"/>
+    <!-- The curtain: straight hair falling from the parting, over the ear and past the jaw. -->
+    <path d="M 78,-152 C 46,-148 26,-124 20,-94 C 15,-68 18,-44 28,-22 C 6,-20 -16,-24 -30,-30 C -40,-62 -38,-118 -10,-148 C 18,-166 56,-164 78,-152 Z" fill="url(#hair)"/>
+    <path d="M 62,-150 C 34,-140 22,-116 18,-90 C 15,-66 18,-46 24,-30" fill="none" stroke="#f3dca0" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+    <path d="M 40,-148 C 10,-130 2,-96 4,-60 M 16,-152 C -12,-130 -18,-92 -14,-40" fill="none" stroke="#84612c" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+    <!-- The hairline at the forehead, softened where the parting starts. -->
+    <path d="M 84,-150 C 76,-158 66,-160 56,-156" fill="none" stroke="#b8894a" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+    <path d="M -64,-168 C -36,-198 18,-204 58,-186 C 18,-196 -30,-192 -64,-168 Z M -80,-128 C -66,-170 -24,-194 22,-190 C -22,-186 -60,-168 -80,-128 Z M -86,-96 C -88,-132 -62,-162 -28,-172 C -58,-156 -78,-130 -86,-96 Z" fill="#f8e6b8" opacity="0.55"/>
+    <path d="M -72,-68 C -80,-100 -72,-130 -52,-152 M -42,-88 C -38,-120 -18,-142 8,-152" fill="none" stroke="#84612c" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+    <path d="M -94,-118 C -94,-82 -80,-54 -58,-38" fill="none" stroke="#bcd6ef" stroke-width="4" stroke-linecap="round" opacity="0.55"/>
   </g><path d="M 15.4,-695.7 C 1.2,-673.4 -25.7,-588.2 -15.2,-548 C -4.7,-507.8 58.1,-465.3 78.4,-454.4 C 98.7,-443.6 114.7,-465.5 106.5,-482.8 C 98.4,-500.1 35.8,-525.1 29.7,-558.2 C 23.5,-591.3 71.9,-658.7 69.6,-681.6 C 67.2,-704.5 29.5,-717.9 15.4,-695.7 Z" fill="#0c2322" opacity="0.4" transform="translate(-9,7)"/><path d="M 15.4,-695.7 C 1.2,-673.4 -25.7,-588.2 -15.2,-548 C -4.7,-507.8 58.1,-465.3 78.4,-454.4 C 98.7,-443.6 114.7,-465.5 106.5,-482.8 C 98.4,-500.1 35.8,-525.1 29.7,-558.2 C 23.5,-591.3 71.9,-658.7 69.6,-681.6 C 67.2,-704.5 29.5,-717.9 15.4,-695.7 Z" fill="url(#sleeve_lit)" stroke="#0f2a29" stroke-width="4" stroke-linejoin="round"/><g transform="translate(89.6,-471.4) rotate(-45.2)"><ellipse cx="0" cy="2" rx="21" ry="8" fill="#0c2322"/><path d="M -14,0 C -17,14 -16,28 -12,38 C -10,43 -6,46 -1,46 C 2,48 6,47 8,44 C 12,42 14,36 12,30 C 13,27 13,25 12,24 C 16,22 19,17 18,11 C 17,6 15,2 14,0 Z" fill="url(#skin)" stroke="#b9836a" stroke-width="1.6" stroke-linejoin="round"/><path d="M 10,7 C 18,10 21,20 16,27 C 14,28 12,27 11,25 C 12,20 11,15 9,12 Z" fill="#edc4aa" stroke="#b9836a" stroke-width="1.4" stroke-linejoin="round"/><path d="M -9,30 C -6,37 0,41 7,40 M -4,34 C -2,40 2,44 5,45 M -12,22 C -11,26 -10,29 -8,31" fill="none" stroke="#c48d72" stroke-width="1.8" stroke-linecap="round" opacity="0.8"/><path d="M -13,6 C -15,16 -14,26 -11,34" fill="none" stroke="#b07d64" stroke-width="2.5" stroke-linecap="round" opacity="0.35"/><path d="M -22,-6 C -22,4 22,4 22,-6 L 21,-12 C 21,-4 -21,-4 -21,-12 Z" fill="#1f4c4b"/><path d="M -20,-4 C -10,1 10,1 20,-4" fill="none" stroke="#5aa59f" stroke-width="2" stroke-linecap="round" opacity="0.5"/></g></g></g>
   <g id="frame_1" transform="translate(940,990)"><g filter="url(#grain_soft)"><g filter="url(#far_side)"><path d="M 16.4,-706.9 C -3.9,-690.2 -55.5,-618 -58.6,-576.4 C -61.6,-534.8 -17.3,-474.1 -1.8,-457.1 C 13.6,-440.1 36.1,-455.4 34.2,-474.4 C 32.4,-493.5 -17.7,-537.9 -12.8,-571.6 C -7.9,-605.3 58.7,-654.1 63.6,-676.6 C 68.4,-699.2 36.8,-723.6 16.4,-706.9 Z" fill="#23514f" stroke="#0f2a29" stroke-width="4" stroke-linejoin="round"/><g transform="translate(14.5,-469.4) rotate(-25.6)"><ellipse cx="0" cy="2" rx="21" ry="8" fill="#0c2322"/><path d="M -14,0 C -17,14 -16,28 -12,38 C -10,43 -6,46 -1,46 C 2,48 6,47 8,44 C 12,42 14,36 12,30 C 13,27 13,25 12,24 C 16,22 19,17 18,11 C 17,6 15,2 14,0 Z" fill="url(#skin)" stroke="#b9836a" stroke-width="1.6" stroke-linejoin="round"/><path d="M 10,7 C 18,10 21,20 16,27 C 14,28 12,27 11,25 C 12,20 11,15 9,12 Z" fill="#edc4aa" stroke="#b9836a" stroke-width="1.4" stroke-linejoin="round"/><path d="M -9,30 C -6,37 0,41 7,40 M -4,34 C -2,40 2,44 5,45 M -12,22 C -11,26 -10,29 -8,31" fill="none" stroke="#c48d72" stroke-width="1.8" stroke-linecap="round" opacity="0.8"/><path d="M -13,6 C -15,16 -14,26 -11,34" fill="none" stroke="#b07d64" stroke-width="2.5" stroke-linecap="round" opacity="0.35"/><path d="M -22,-6 C -22,4 22,4 22,-6 L 21,-12 C 21,-4 -21,-4 -21,-12 Z" fill="#1f4c4b"/><path d="M -20,-4 C -10,1 10,1 20,-4" fill="none" stroke="#5aa59f" stroke-width="2" stroke-linecap="round" opacity="0.5"/></g></g><g filter="url(#far_side)"><path d="M -39.2,-409.8 C -43.7,-376.2 18.4,-283.3 12.1,-224.4 C 5.8,-165.6 -68.9,-88.5 -77,-56.8 C -85.2,-25.1 -61.3,-7.8 -36.9,-34.3 C -12.5,-60.8 56.8,-150.4 69.4,-215.7 C 82.1,-281 57.3,-393.6 39.2,-426 C 21.1,-458.3 -34.7,-443.4 -39.2,-409.8 Z" fill="#2b3550" stroke="#161c2b" stroke-width="3" stroke-linejoin="round"/><path d="M 26.8,-224.1 Q 40.8,-212.1 54.8,-222.1" fill="none" stroke="#1a2030" stroke-width="3" opacity="0.5" stroke-linecap="round"/><g transform="translate(-57,-45.6) rotate(-18.3)" filter="url(#grain)">
     <path d="M -28,-6 L 26,-6 C 40,0 66,8 76,20 C 80,28 78,36 70,36 L -30,36 C -34,24 -34,8 -28,-6 Z" fill="url(#leather)"/>
@@ -163,30 +166,31 @@
     <path d="M -14,-4 C -30,30 -40,90 -36,150 L -6,156 C -10,110 -2,50 14,4 Z" fill="url(#scarf)"/>
     <path d="M -34,150 L -36,166 M -26,152 L -26,168 M -16,153 L -14,168 M -8,154 L -5,168" stroke="#8a361a" stroke-width="3" stroke-linecap="round"/>
     <path d="M -20,20 C -28,60 -30,100 -26,140" fill="none" stroke="#6e2a14" stroke-width="2.5" opacity="0.5"/>
-  </g><g transform="translate(-29.3,-844) rotate(34.2)" filter="url(#grain)">
-    <path d="M -14,-6 C -40,30 -50,90 -30,150 C -22,172 -8,186 4,190 C -6,160 4,110 20,60 C 26,30 20,6 12,-6 Z" fill="url(#ponytail)"/>
-    <path d="M -4,10 C -24,50 -30,110 -14,160 M 8,20 C -6,60 -6,110 0,160" fill="none" stroke="#fff3cf" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
-    <path d="M -30,150 C -22,172 -8,186 4,190" fill="none" stroke="#bcd6ef" stroke-width="3" opacity="0.5"/>
+  </g><g transform="translate(-24.6,-821.7) rotate(25)" filter="url(#grain)">
+    <path d="M -10,-14 C -34,10 -44,70 -40,130 C -38,170 -30,200 -14,214 C -4,206 2,196 6,186 C 12,198 22,206 30,208 C 26,170 30,110 32,60 C 34,24 26,-4 12,-16 Z" fill="url(#ponytail)"/>
+    <path d="M -2,0 C -22,40 -28,110 -22,190 M 10,6 C 0,60 0,130 4,180 M 22,10 C 18,60 20,130 22,196" fill="none" stroke="#f3dca0" stroke-width="2.5" stroke-linecap="round" opacity="0.55"/>
+    <path d="M -30,60 C -34,110 -32,160 -20,200 M 14,40 C 10,100 12,150 14,190" fill="none" stroke="#7e5a28" stroke-width="2" stroke-linecap="round" opacity="0.45"/>
+    <path d="M -40,130 C -38,170 -30,200 -14,214" fill="none" stroke="#bcd6ef" stroke-width="3" opacity="0.5"/>
   </g><g transform="translate(40,-691.8) rotate(3.3)" filter="url(#grain)">
     <path d="M -26,14 C -24,-18 -22,-38 -18,-48 L 30,-48 C 32,-30 34,-12 38,14 Z" fill="#dcae92"/>
     <path d="M -30,-40 C -70,-60 -88,-110 -80,-150 C -72,-192 -20,-205 20,-200 C 60,-196 84,-170 86,-136 C 87,-124 84,-114 88,-106 C 90,-100 96,-94 104,-84 C 108,-79 103,-73 94,-73 C 92,-70 92,-67 94,-64 C 98,-62 97,-57 92,-55 C 96,-52 95,-46 90,-44 C 92,-36 88,-28 78,-24 C 62,-18 40,-24 24,-34 C 10,-42 -10,-40 -30,-40 Z" fill="url(#skin)"/>
     <path d="M 24,-34 C 40,-26 62,-20 78,-24 C 70,-30 50,-34 36,-40 Z" fill="#cf9d80" opacity="0.6"/>
-    <circle cx="58" cy="-68" r="22" fill="url(#blush)"/>
+    <circle cx="58" cy="-68" r="26" fill="url(#blush)"/>
     <!-- The ear: its outer shape, the rolled rim along its back edge, and the hollow inside. -->
     <path d="M -4,-120 C -18,-121 -24,-108 -22,-94 C -20,-82 -14,-74 -6,-76 C 0,-78 2,-86 1,-94 C 4,-104 4,-116 -4,-120 Z" fill="#e4b49a"/>
     <path d="M -4,-116 C -15,-116 -19,-106 -18,-95 C -17,-86 -13,-80 -8,-80" fill="none" stroke="#f3cdb6" stroke-width="3" stroke-linecap="round"/>
     <path d="M -6,-108 C -12,-106 -13,-96 -10,-90 C -7,-86 -3,-88 -3,-94 C -2,-100 -2,-106 -6,-108 Z" fill="#c98f74"/>
     <path d="M -2,-90 C 0,-88 0,-85 -2,-83" fill="none" stroke="#b27a60" stroke-width="2" stroke-linecap="round"/>
     <path d="M 52,-103 C 58,-110 70,-110 77,-104 C 70,-98 58,-98 52,-103 Z" fill="#fbf6f0"/>
-    <circle cx="68" cy="-104" r="6.5" fill="#3f78b8"/>
-    <circle cx="68" cy="-104" r="6.5" fill="none" stroke="#24466d" stroke-width="1.5"/>
-    <circle cx="69" cy="-104" r="3" fill="#162033"/>
+    <circle cx="68" cy="-104" r="6.5" fill="#7d97a6"/>
+    <circle cx="68" cy="-104" r="6.5" fill="none" stroke="#4d6472" stroke-width="1.5"/>
+    <circle cx="69" cy="-104" r="3" fill="#1c2328"/>
     <circle cx="71" cy="-106.5" r="1.7" fill="#ffffff"/>
     <path d="M 49,-104 C 57,-115 72,-114 80,-105" fill="none" stroke="#4a3326" stroke-width="3.5" stroke-linecap="round"/>
     <path d="M 79,-106 L 85,-110 M 76,-109 L 80,-114" stroke="#4a3326" stroke-width="2" stroke-linecap="round"/>
     <path d="M 52,-113 C 60,-119 72,-118 79,-112" fill="none" stroke="#c99478" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
     <path d="M 55,-100 C 62,-97 70,-97 75,-100" fill="none" stroke="#b98468" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
-    <path d="M 46,-124 C 58,-132 74,-131 85,-124" fill="none" stroke="#b08640" stroke-width="5" stroke-linecap="round"/>
+    <path d="M 46,-124 C 58,-132 74,-131 85,-124" fill="none" stroke="#a88050" stroke-width="5" stroke-linecap="round"/>
     <path d="M 96,-78 C 99,-76 99,-74 96,-73" fill="none" stroke="#b98468" stroke-width="2" stroke-linecap="round"/>
     <!-- Lips: the upper lip, a fuller lower lip with a touch of light on it, and the line
          where they meet, turning in at the corner of the mouth. -->
@@ -194,18 +198,20 @@
     <path d="M 85,-55 C 89,-55 93,-55 94,-53 C 93,-49 89,-47 86,-48 C 87,-50 86,-53 85,-55 Z" fill="#cf8578"/>
     <path d="M 88,-51 C 89,-50 91,-50 92,-51" fill="none" stroke="#f2b3a6" stroke-width="1.5" stroke-linecap="round" opacity="0.8"/>
     <path d="M 81,-57 C 85,-56 91,-56 95,-57" fill="none" stroke="#8f4a40" stroke-width="1.6" stroke-linecap="round"/>
-    <!-- Hair: a soft mass over the top and back, a swept fringe, and highlights. -->
-    <path d="M 84,-140 C 82,-176 50,-206 6,-206 C -50,-206 -92,-170 -92,-118 C -92,-82 -78,-56 -56,-40 C -50,-60 -40,-78 -22,-84 C -14,-104 -10,-128 4,-140 C 24,-152 52,-150 84,-140 Z" fill="url(#hair)"/>
-    <!-- The fringe: three tapered locks swept forward across the forehead, each with its own
-         light edge, instead of one hard wedge. -->
-    <path d="M 84,-162 C 70,-150 56,-132 30,-123 C 52,-124 70,-132 86,-146 Z" fill="#cfa452"/>
-    <path d="M 86,-150 C 80,-138 70,-126 52,-118 C 68,-118 82,-126 89,-138 Z" fill="#d9b25e"/>
-    <path d="M 88,-140 C 86,-130 82,-122 72,-116 C 82,-117 89,-124 91,-132 Z" fill="#c79a4a"/>
-    <path d="M 80,-154 C 68,-140 56,-130 40,-124 M 84,-144 C 78,-134 70,-126 58,-120" fill="none" stroke="#f7e3a6" stroke-width="2" stroke-linecap="round" opacity="0.75"/>
-    <path d="M -64,-168 C -36,-198 18,-202 58,-182 C 18,-194 -30,-190 -64,-168 Z M -80,-128 C -66,-170 -24,-192 22,-188 C -22,-184 -60,-166 -80,-128 Z M -84,-96 C -86,-132 -60,-162 -26,-172 C -56,-156 -76,-130 -84,-96 Z" fill="#fff6d8" opacity="0.6"/>
-    <path d="M -70,-70 C -78,-100 -70,-130 -50,-150 M -40,-90 C -36,-120 -16,-140 10,-150" fill="none" stroke="#9e7a35" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
-    <path d="M -92,-118 C -92,-82 -78,-56 -56,-40" fill="none" stroke="#bcd6ef" stroke-width="4" stroke-linecap="round" opacity="0.55"/>
-    <ellipse cx="-78" cy="-148" rx="9" ry="12" fill="#8c3a1d" transform="rotate(-30 -78 -148)"/>
+    <!-- Hair, matched to the real Em: honey-blonde, parted in
+         the middle and worn down, straight past the shoulders, with no fringe. In profile the
+         hair runs back from the hairline over the crown, and a curtain falls past the ear and
+         the cheek. The long hair behind the shoulders is part_ponytail, so it can swing. -->
+    <path d="M 82,-146 C 80,-180 48,-208 4,-208 C -52,-208 -94,-172 -94,-118 C -94,-82 -80,-54 -58,-38 C -52,-58 -44,-74 -30,-80 C -22,-104 -6,-134 24,-146 C 42,-152 64,-152 82,-146 Z" fill="url(#hair)"/>
+    <!-- The curtain: straight hair falling from the parting, over the ear and past the jaw. -->
+    <path d="M 78,-152 C 46,-148 26,-124 20,-94 C 15,-68 18,-44 28,-22 C 6,-20 -16,-24 -30,-30 C -40,-62 -38,-118 -10,-148 C 18,-166 56,-164 78,-152 Z" fill="url(#hair)"/>
+    <path d="M 62,-150 C 34,-140 22,-116 18,-90 C 15,-66 18,-46 24,-30" fill="none" stroke="#f3dca0" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+    <path d="M 40,-148 C 10,-130 2,-96 4,-60 M 16,-152 C -12,-130 -18,-92 -14,-40" fill="none" stroke="#84612c" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+    <!-- The hairline at the forehead, softened where the parting starts. -->
+    <path d="M 84,-150 C 76,-158 66,-160 56,-156" fill="none" stroke="#b8894a" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+    <path d="M -64,-168 C -36,-198 18,-204 58,-186 C 18,-196 -30,-192 -64,-168 Z M -80,-128 C -66,-170 -24,-194 22,-190 C -22,-186 -60,-168 -80,-128 Z M -86,-96 C -88,-132 -62,-162 -28,-172 C -58,-156 -78,-130 -86,-96 Z" fill="#f8e6b8" opacity="0.55"/>
+    <path d="M -72,-68 C -80,-100 -72,-130 -52,-152 M -42,-88 C -38,-120 -18,-142 8,-152" fill="none" stroke="#84612c" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+    <path d="M -94,-118 C -94,-82 -80,-54 -58,-38" fill="none" stroke="#bcd6ef" stroke-width="4" stroke-linecap="round" opacity="0.55"/>
   </g><path d="M 12.9,-698.7 C -1.2,-676.6 -26.8,-592.8 -17.5,-551.8 C -8.1,-510.8 49.5,-464.8 69,-452.6 C 88.4,-440.5 106,-461 99.1,-478.9 C 92.2,-496.9 33,-526.3 27.7,-560.6 C 22.3,-594.9 69.6,-661.8 67.1,-684.8 C 64.6,-707.8 27,-720.9 12.9,-698.7 Z" fill="#0c2322" opacity="0.4" transform="translate(-9,7)"/><path d="M 12.9,-698.7 C -1.2,-676.6 -26.8,-592.8 -17.5,-551.8 C -8.1,-510.8 49.5,-464.8 69,-452.6 C 88.4,-440.5 106,-461 99.1,-478.9 C 92.2,-496.9 33,-526.3 27.7,-560.6 C 22.3,-594.9 69.6,-661.8 67.1,-684.8 C 64.6,-707.8 27,-720.9 12.9,-698.7 Z" fill="url(#sleeve_lit)" stroke="#0f2a29" stroke-width="4" stroke-linejoin="round"/><g transform="translate(81.4,-468.8) rotate(-41.1)"><ellipse cx="0" cy="2" rx="21" ry="8" fill="#0c2322"/><path d="M -14,0 C -17,14 -16,28 -12,38 C -10,43 -6,46 -1,46 C 2,48 6,47 8,44 C 12,42 14,36 12,30 C 13,27 13,25 12,24 C 16,22 19,17 18,11 C 17,6 15,2 14,0 Z" fill="url(#skin)" stroke="#b9836a" stroke-width="1.6" stroke-linejoin="round"/><path d="M 10,7 C 18,10 21,20 16,27 C 14,28 12,27 11,25 C 12,20 11,15 9,12 Z" fill="#edc4aa" stroke="#b9836a" stroke-width="1.4" stroke-linejoin="round"/><path d="M -9,30 C -6,37 0,41 7,40 M -4,34 C -2,40 2,44 5,45 M -12,22 C -11,26 -10,29 -8,31" fill="none" stroke="#c48d72" stroke-width="1.8" stroke-linecap="round" opacity="0.8"/><path d="M -13,6 C -15,16 -14,26 -11,34" fill="none" stroke="#b07d64" stroke-width="2.5" stroke-linecap="round" opacity="0.35"/><path d="M -22,-6 C -22,4 22,4 22,-6 L 21,-12 C 21,-4 -21,-4 -21,-12 Z" fill="#1f4c4b"/><path d="M -20,-4 C -10,1 10,1 20,-4" fill="none" stroke="#5aa59f" stroke-width="2" stroke-linecap="round" opacity="0.5"/></g></g></g>
   <g id="frame_2" transform="translate(1580,990)"><g filter="url(#grain_soft)"><g filter="url(#far_side)"><path d="M 11.5,-708.9 C -7,-690.4 -48.4,-615.4 -49.7,-572.8 C -51,-530.2 -11.5,-470.7 3.5,-453.5 C 18.4,-436.3 41.3,-450.3 40.1,-469.7 C 38.9,-489.1 -7.3,-534.3 -3.8,-569.9 C -0.2,-605.6 58.9,-660.5 61.4,-683.6 C 64,-706.8 30,-727.4 11.5,-708.9 Z" fill="#23514f" stroke="#0f2a29" stroke-width="4" stroke-linejoin="round"/><g transform="translate(20.2,-465.3) rotate(-23.8)"><ellipse cx="0" cy="2" rx="21" ry="8" fill="#0c2322"/><path d="M -14,0 C -17,14 -16,28 -12,38 C -10,43 -6,46 -1,46 C 2,48 6,47 8,44 C 12,42 14,36 12,30 C 13,27 13,25 12,24 C 16,22 19,17 18,11 C 17,6 15,2 14,0 Z" fill="url(#skin)" stroke="#b9836a" stroke-width="1.6" stroke-linejoin="round"/><path d="M 10,7 C 18,10 21,20 16,27 C 14,28 12,27 11,25 C 12,20 11,15 9,12 Z" fill="#edc4aa" stroke="#b9836a" stroke-width="1.4" stroke-linejoin="round"/><path d="M -9,30 C -6,37 0,41 7,40 M -4,34 C -2,40 2,44 5,45 M -12,22 C -11,26 -10,29 -8,31" fill="none" stroke="#c48d72" stroke-width="1.8" stroke-linecap="round" opacity="0.8"/><path d="M -13,6 C -15,16 -14,26 -11,34" fill="none" stroke="#b07d64" stroke-width="2.5" stroke-linecap="round" opacity="0.35"/><path d="M -22,-6 C -22,4 22,4 22,-6 L 21,-12 C 21,-4 -21,-4 -21,-12 Z" fill="#1f4c4b"/><path d="M -20,-4 C -10,1 10,1 20,-4" fill="none" stroke="#5aa59f" stroke-width="2" stroke-linecap="round" opacity="0.5"/></g></g><g filter="url(#far_side)"><path d="M -39.5,-415.6 C -45.3,-382 9.9,-287.4 4.2,-226.8 C -1.4,-166.2 -67.3,-84.3 -73.3,-51.8 C -79.3,-19.4 -54.2,-4.3 -31.7,-32.2 C -9.2,-60 49.8,-152.8 61.7,-218.9 C 73.5,-284.9 56.3,-395.9 39.5,-428.6 C 22.6,-461.4 -33.6,-449.2 -39.5,-415.6 Z" fill="#2b3550" stroke="#161c2b" stroke-width="3" stroke-linejoin="round"/><path d="M 18.9,-226.8 Q 32.9,-214.8 46.9,-224.8" fill="none" stroke="#1a2030" stroke-width="3" opacity="0.5" stroke-linecap="round"/><g transform="translate(-52.5,-42) rotate(-11.5)" filter="url(#grain)">
     <path d="M -28,-6 L 26,-6 C 40,0 66,8 76,20 C 80,28 78,36 70,36 L -30,36 C -34,24 -34,8 -28,-6 Z" fill="url(#leather)"/>
@@ -245,30 +251,31 @@
     <path d="M -14,-4 C -30,30 -40,90 -36,150 L -6,156 C -10,110 -2,50 14,4 Z" fill="url(#scarf)"/>
     <path d="M -34,150 L -36,166 M -26,152 L -26,168 M -16,153 L -14,168 M -8,154 L -5,168" stroke="#8a361a" stroke-width="3" stroke-linecap="round"/>
     <path d="M -20,20 C -28,60 -30,100 -26,140" fill="none" stroke="#6e2a14" stroke-width="2.5" opacity="0.5"/>
-  </g><g transform="translate(-33.6,-848.2) rotate(33.1)" filter="url(#grain)">
-    <path d="M -14,-6 C -40,30 -50,90 -30,150 C -22,172 -8,186 4,190 C -6,160 4,110 20,60 C 26,30 20,6 12,-6 Z" fill="url(#ponytail)"/>
-    <path d="M -4,10 C -24,50 -30,110 -14,160 M 8,20 C -6,60 -6,110 0,160" fill="none" stroke="#fff3cf" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
-    <path d="M -30,150 C -22,172 -8,186 4,190" fill="none" stroke="#bcd6ef" stroke-width="3" opacity="0.5"/>
+  </g><g transform="translate(-28.8,-825.9) rotate(24)" filter="url(#grain)">
+    <path d="M -10,-14 C -34,10 -44,70 -40,130 C -38,170 -30,200 -14,214 C -4,206 2,196 6,186 C 12,198 22,206 30,208 C 26,170 30,110 32,60 C 34,24 26,-4 12,-16 Z" fill="url(#ponytail)"/>
+    <path d="M -2,0 C -22,40 -28,110 -22,190 M 10,6 C 0,60 0,130 4,180 M 22,10 C 18,60 20,130 22,196" fill="none" stroke="#f3dca0" stroke-width="2.5" stroke-linecap="round" opacity="0.55"/>
+    <path d="M -30,60 C -34,110 -32,160 -20,200 M 14,40 C 10,100 12,150 14,190" fill="none" stroke="#7e5a28" stroke-width="2" stroke-linecap="round" opacity="0.45"/>
+    <path d="M -40,130 C -38,170 -30,200 -14,214" fill="none" stroke="#bcd6ef" stroke-width="3" opacity="0.5"/>
   </g><g transform="translate(36.5,-696.3) rotate(3)" filter="url(#grain)">
     <path d="M -26,14 C -24,-18 -22,-38 -18,-48 L 30,-48 C 32,-30 34,-12 38,14 Z" fill="#dcae92"/>
     <path d="M -30,-40 C -70,-60 -88,-110 -80,-150 C -72,-192 -20,-205 20,-200 C 60,-196 84,-170 86,-136 C 87,-124 84,-114 88,-106 C 90,-100 96,-94 104,-84 C 108,-79 103,-73 94,-73 C 92,-70 92,-67 94,-64 C 98,-62 97,-57 92,-55 C 96,-52 95,-46 90,-44 C 92,-36 88,-28 78,-24 C 62,-18 40,-24 24,-34 C 10,-42 -10,-40 -30,-40 Z" fill="url(#skin)"/>
     <path d="M 24,-34 C 40,-26 62,-20 78,-24 C 70,-30 50,-34 36,-40 Z" fill="#cf9d80" opacity="0.6"/>
-    <circle cx="58" cy="-68" r="22" fill="url(#blush)"/>
+    <circle cx="58" cy="-68" r="26" fill="url(#blush)"/>
     <!-- The ear: its outer shape, the rolled rim along its back edge, and the hollow inside. -->
     <path d="M -4,-120 C -18,-121 -24,-108 -22,-94 C -20,-82 -14,-74 -6,-76 C 0,-78 2,-86 1,-94 C 4,-104 4,-116 -4,-120 Z" fill="#e4b49a"/>
     <path d="M -4,-116 C -15,-116 -19,-106 -18,-95 C -17,-86 -13,-80 -8,-80" fill="none" stroke="#f3cdb6" stroke-width="3" stroke-linecap="round"/>
     <path d="M -6,-108 C -12,-106 -13,-96 -10,-90 C -7,-86 -3,-88 -3,-94 C -2,-100 -2,-106 -6,-108 Z" fill="#c98f74"/>
     <path d="M -2,-90 C 0,-88 0,-85 -2,-83" fill="none" stroke="#b27a60" stroke-width="2" stroke-linecap="round"/>
     <path d="M 52,-103 C 58,-110 70,-110 77,-104 C 70,-98 58,-98 52,-103 Z" fill="#fbf6f0"/>
-    <circle cx="68" cy="-104" r="6.5" fill="#3f78b8"/>
-    <circle cx="68" cy="-104" r="6.5" fill="none" stroke="#24466d" stroke-width="1.5"/>
-    <circle cx="69" cy="-104" r="3" fill="#162033"/>
+    <circle cx="68" cy="-104" r="6.5" fill="#7d97a6"/>
+    <circle cx="68" cy="-104" r="6.5" fill="none" stroke="#4d6472" stroke-width="1.5"/>
+    <circle cx="69" cy="-104" r="3" fill="#1c2328"/>
     <circle cx="71" cy="-106.5" r="1.7" fill="#ffffff"/>
     <path d="M 49,-104 C 57,-115 72,-114 80,-105" fill="none" stroke="#4a3326" stroke-width="3.5" stroke-linecap="round"/>
     <path d="M 79,-106 L 85,-110 M 76,-109 L 80,-114" stroke="#4a3326" stroke-width="2" stroke-linecap="round"/>
     <path d="M 52,-113 C 60,-119 72,-118 79,-112" fill="none" stroke="#c99478" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
     <path d="M 55,-100 C 62,-97 70,-97 75,-100" fill="none" stroke="#b98468" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
-    <path d="M 46,-124 C 58,-132 74,-131 85,-124" fill="none" stroke="#b08640" stroke-width="5" stroke-linecap="round"/>
+    <path d="M 46,-124 C 58,-132 74,-131 85,-124" fill="none" stroke="#a88050" stroke-width="5" stroke-linecap="round"/>
     <path d="M 96,-78 C 99,-76 99,-74 96,-73" fill="none" stroke="#b98468" stroke-width="2" stroke-linecap="round"/>
     <!-- Lips: the upper lip, a fuller lower lip with a touch of light on it, and the line
          where they meet, turning in at the corner of the mouth. -->
@@ -276,18 +283,20 @@
     <path d="M 85,-55 C 89,-55 93,-55 94,-53 C 93,-49 89,-47 86,-48 C 87,-50 86,-53 85,-55 Z" fill="#cf8578"/>
     <path d="M 88,-51 C 89,-50 91,-50 92,-51" fill="none" stroke="#f2b3a6" stroke-width="1.5" stroke-linecap="round" opacity="0.8"/>
     <path d="M 81,-57 C 85,-56 91,-56 95,-57" fill="none" stroke="#8f4a40" stroke-width="1.6" stroke-linecap="round"/>
-    <!-- Hair: a soft mass over the top and back, a swept fringe, and highlights. -->
-    <path d="M 84,-140 C 82,-176 50,-206 6,-206 C -50,-206 -92,-170 -92,-118 C -92,-82 -78,-56 -56,-40 C -50,-60 -40,-78 -22,-84 C -14,-104 -10,-128 4,-140 C 24,-152 52,-150 84,-140 Z" fill="url(#hair)"/>
-    <!-- The fringe: three tapered locks swept forward across the forehead, each with its own
-         light edge, instead of one hard wedge. -->
-    <path d="M 84,-162 C 70,-150 56,-132 30,-123 C 52,-124 70,-132 86,-146 Z" fill="#cfa452"/>
-    <path d="M 86,-150 C 80,-138 70,-126 52,-118 C 68,-118 82,-126 89,-138 Z" fill="#d9b25e"/>
-    <path d="M 88,-140 C 86,-130 82,-122 72,-116 C 82,-117 89,-124 91,-132 Z" fill="#c79a4a"/>
-    <path d="M 80,-154 C 68,-140 56,-130 40,-124 M 84,-144 C 78,-134 70,-126 58,-120" fill="none" stroke="#f7e3a6" stroke-width="2" stroke-linecap="round" opacity="0.75"/>
-    <path d="M -64,-168 C -36,-198 18,-202 58,-182 C 18,-194 -30,-190 -64,-168 Z M -80,-128 C -66,-170 -24,-192 22,-188 C -22,-184 -60,-166 -80,-128 Z M -84,-96 C -86,-132 -60,-162 -26,-172 C -56,-156 -76,-130 -84,-96 Z" fill="#fff6d8" opacity="0.6"/>
-    <path d="M -70,-70 C -78,-100 -70,-130 -50,-150 M -40,-90 C -36,-120 -16,-140 10,-150" fill="none" stroke="#9e7a35" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
-    <path d="M -92,-118 C -92,-82 -78,-56 -56,-40" fill="none" stroke="#bcd6ef" stroke-width="4" stroke-linecap="round" opacity="0.55"/>
-    <ellipse cx="-78" cy="-148" rx="9" ry="12" fill="#8c3a1d" transform="rotate(-30 -78 -148)"/>
+    <!-- Hair, matched to the real Em: honey-blonde, parted in
+         the middle and worn down, straight past the shoulders, with no fringe. In profile the
+         hair runs back from the hairline over the crown, and a curtain falls past the ear and
+         the cheek. The long hair behind the shoulders is part_ponytail, so it can swing. -->
+    <path d="M 82,-146 C 80,-180 48,-208 4,-208 C -52,-208 -94,-172 -94,-118 C -94,-82 -80,-54 -58,-38 C -52,-58 -44,-74 -30,-80 C -22,-104 -6,-134 24,-146 C 42,-152 64,-152 82,-146 Z" fill="url(#hair)"/>
+    <!-- The curtain: straight hair falling from the parting, over the ear and past the jaw. -->
+    <path d="M 78,-152 C 46,-148 26,-124 20,-94 C 15,-68 18,-44 28,-22 C 6,-20 -16,-24 -30,-30 C -40,-62 -38,-118 -10,-148 C 18,-166 56,-164 78,-152 Z" fill="url(#hair)"/>
+    <path d="M 62,-150 C 34,-140 22,-116 18,-90 C 15,-66 18,-46 24,-30" fill="none" stroke="#f3dca0" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+    <path d="M 40,-148 C 10,-130 2,-96 4,-60 M 16,-152 C -12,-130 -18,-92 -14,-40" fill="none" stroke="#84612c" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+    <!-- The hairline at the forehead, softened where the parting starts. -->
+    <path d="M 84,-150 C 76,-158 66,-160 56,-156" fill="none" stroke="#b8894a" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+    <path d="M -64,-168 C -36,-198 18,-204 58,-186 C 18,-196 -30,-192 -64,-168 Z M -80,-128 C -66,-170 -24,-194 22,-190 C -22,-186 -60,-168 -80,-128 Z M -86,-96 C -88,-132 -62,-162 -28,-172 C -58,-156 -78,-130 -86,-96 Z" fill="#f8e6b8" opacity="0.55"/>
+    <path d="M -72,-68 C -80,-100 -72,-130 -52,-152 M -42,-88 C -38,-120 -18,-142 8,-152" fill="none" stroke="#84612c" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+    <path d="M -94,-118 C -94,-82 -80,-54 -58,-38" fill="none" stroke="#bcd6ef" stroke-width="4" stroke-linecap="round" opacity="0.55"/>
   </g><path d="M 9.3,-702.9 C -4.6,-680.7 -27,-598.9 -19.3,-556.8 C -11.6,-514.7 37.4,-464.2 55.3,-450.2 C 73.3,-436.2 93.1,-454.1 88.2,-473 C 83.4,-491.9 30.3,-527.5 26.2,-563.7 C 22.1,-599.8 66.5,-666.5 63.7,-689.7 C 60.9,-712.9 23.1,-725 9.3,-702.9 Z" fill="#0c2322" opacity="0.4" transform="translate(-9,7)"/><path d="M 9.3,-702.9 C -4.6,-680.7 -27,-598.9 -19.3,-556.8 C -11.6,-514.7 37.4,-464.2 55.3,-450.2 C 73.3,-436.2 93.1,-454.1 88.2,-473 C 83.4,-491.9 30.3,-527.5 26.2,-563.7 C 22.1,-599.8 66.5,-666.5 63.7,-689.7 C 60.9,-712.9 23.1,-725 9.3,-702.9 Z" fill="url(#sleeve_lit)" stroke="#0f2a29" stroke-width="4" stroke-linejoin="round"/><g transform="translate(69.5,-464.9) rotate(-34.7)"><ellipse cx="0" cy="2" rx="21" ry="8" fill="#0c2322"/><path d="M -14,0 C -17,14 -16,28 -12,38 C -10,43 -6,46 -1,46 C 2,48 6,47 8,44 C 12,42 14,36 12,30 C 13,27 13,25 12,24 C 16,22 19,17 18,11 C 17,6 15,2 14,0 Z" fill="url(#skin)" stroke="#b9836a" stroke-width="1.6" stroke-linejoin="round"/><path d="M 10,7 C 18,10 21,20 16,27 C 14,28 12,27 11,25 C 12,20 11,15 9,12 Z" fill="#edc4aa" stroke="#b9836a" stroke-width="1.4" stroke-linejoin="round"/><path d="M -9,30 C -6,37 0,41 7,40 M -4,34 C -2,40 2,44 5,45 M -12,22 C -11,26 -10,29 -8,31" fill="none" stroke="#c48d72" stroke-width="1.8" stroke-linecap="round" opacity="0.8"/><path d="M -13,6 C -15,16 -14,26 -11,34" fill="none" stroke="#b07d64" stroke-width="2.5" stroke-linecap="round" opacity="0.35"/><path d="M -22,-6 C -22,4 22,4 22,-6 L 21,-12 C 21,-4 -21,-4 -21,-12 Z" fill="#1f4c4b"/><path d="M -20,-4 C -10,1 10,1 20,-4" fill="none" stroke="#5aa59f" stroke-width="2" stroke-linecap="round" opacity="0.5"/></g></g></g>
   <g id="frame_3" transform="translate(2220,990)"><g filter="url(#grain_soft)"><g filter="url(#far_side)"><path d="M 6.2,-710.6 C -10.1,-690.5 -39.2,-613.5 -38.9,-570.1 C -38.6,-526.7 -6,-467.9 8.1,-450.3 C 22.1,-432.7 45.6,-444.7 45.5,-464.5 C 45.3,-484.3 4.9,-531.3 7.1,-569.1 C 9.3,-606.8 58.9,-667.7 58.8,-691.3 C 58.6,-714.9 22.5,-730.8 6.2,-710.6 Z" fill="#23514f" stroke="#0f2a29" stroke-width="4" stroke-linejoin="round"/><g transform="translate(25.3,-461.2) rotate(-20.8)"><ellipse cx="0" cy="2" rx="21" ry="8" fill="#0c2322"/><path d="M -14,0 C -17,14 -16,28 -12,38 C -10,43 -6,46 -1,46 C 2,48 6,47 8,44 C 12,42 14,36 12,30 C 13,27 13,25 12,24 C 16,22 19,17 18,11 C 17,6 15,2 14,0 Z" fill="url(#skin)" stroke="#b9836a" stroke-width="1.6" stroke-linejoin="round"/><path d="M 10,7 C 18,10 21,20 16,27 C 14,28 12,27 11,25 C 12,20 11,15 9,12 Z" fill="#edc4aa" stroke="#b9836a" stroke-width="1.4" stroke-linejoin="round"/><path d="M -9,30 C -6,37 0,41 7,40 M -4,34 C -2,40 2,44 5,45 M -12,22 C -11,26 -10,29 -8,31" fill="none" stroke="#c48d72" stroke-width="1.8" stroke-linecap="round" opacity="0.8"/><path d="M -13,6 C -15,16 -14,26 -11,34" fill="none" stroke="#b07d64" stroke-width="2.5" stroke-linecap="round" opacity="0.35"/><path d="M -22,-6 C -22,4 22,4 22,-6 L 21,-12 C 21,-4 -21,-4 -21,-12 Z" fill="#1f4c4b"/><path d="M -20,-4 C -10,1 10,1 20,-4" fill="none" stroke="#5aa59f" stroke-width="2" stroke-linecap="round" opacity="0.5"/></g></g><g filter="url(#far_side)"><path d="M -39.8,-422.2 C -47.5,-388.6 -1.7,-291.9 -6.7,-229.3 C -11.7,-166.7 -66.3,-79.7 -69.6,-46.5 C -72.9,-13.3 -46.6,-1.1 -26.5,-30.4 C -6.4,-59.7 39.8,-155.4 50.9,-222.2 C 61.9,-288.9 54.9,-397.6 39.8,-430.9 C 24.7,-464.2 -32,-455.8 -39.8,-422.2 Z" fill="#2b3550" stroke="#161c2b" stroke-width="3" stroke-linejoin="round"/><path d="M 8.1,-229.7 Q 22.1,-217.7 36.1,-227.7" fill="none" stroke="#1a2030" stroke-width="3" opacity="0.5" stroke-linecap="round"/><g transform="translate(-48,-38.4) rotate(-4.7)" filter="url(#grain)">
     <path d="M -28,-6 L 26,-6 C 40,0 66,8 76,20 C 80,28 78,36 70,36 L -30,36 C -34,24 -34,8 -28,-6 Z" fill="url(#leather)"/>
@@ -327,30 +336,31 @@
     <path d="M -14,-4 C -30,30 -40,90 -36,150 L -6,156 C -10,110 -2,50 14,4 Z" fill="url(#scarf)"/>
     <path d="M -34,150 L -36,166 M -26,152 L -26,168 M -16,153 L -14,168 M -8,154 L -5,168" stroke="#8a361a" stroke-width="3" stroke-linecap="round"/>
     <path d="M -20,20 C -28,60 -30,100 -26,140" fill="none" stroke="#6e2a14" stroke-width="2.5" opacity="0.5"/>
-  </g><g transform="translate(-38.4,-852.5) rotate(31)" filter="url(#grain)">
-    <path d="M -14,-6 C -40,30 -50,90 -30,150 C -22,172 -8,186 4,190 C -6,160 4,110 20,60 C 26,30 20,6 12,-6 Z" fill="url(#ponytail)"/>
-    <path d="M -4,10 C -24,50 -30,110 -14,160 M 8,20 C -6,60 -6,110 0,160" fill="none" stroke="#fff3cf" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
-    <path d="M -30,150 C -22,172 -8,186 4,190" fill="none" stroke="#bcd6ef" stroke-width="3" opacity="0.5"/>
+  </g><g transform="translate(-33.5,-830.2) rotate(21.8)" filter="url(#grain)">
+    <path d="M -10,-14 C -34,10 -44,70 -40,130 C -38,170 -30,200 -14,214 C -4,206 2,196 6,186 C 12,198 22,206 30,208 C 26,170 30,110 32,60 C 34,24 26,-4 12,-16 Z" fill="url(#ponytail)"/>
+    <path d="M -2,0 C -22,40 -28,110 -22,190 M 10,6 C 0,60 0,130 4,180 M 22,10 C 18,60 20,130 22,196" fill="none" stroke="#f3dca0" stroke-width="2.5" stroke-linecap="round" opacity="0.55"/>
+    <path d="M -30,60 C -34,110 -32,160 -20,200 M 14,40 C 10,100 12,150 14,190" fill="none" stroke="#7e5a28" stroke-width="2" stroke-linecap="round" opacity="0.45"/>
+    <path d="M -40,130 C -38,170 -30,200 -14,214" fill="none" stroke="#bcd6ef" stroke-width="3" opacity="0.5"/>
   </g><g transform="translate(32.5,-701) rotate(2.7)" filter="url(#grain)">
     <path d="M -26,14 C -24,-18 -22,-38 -18,-48 L 30,-48 C 32,-30 34,-12 38,14 Z" fill="#dcae92"/>
     <path d="M -30,-40 C -70,-60 -88,-110 -80,-150 C -72,-192 -20,-205 20,-200 C 60,-196 84,-170 86,-136 C 87,-124 84,-114 88,-106 C 90,-100 96,-94 104,-84 C 108,-79 103,-73 94,-73 C 92,-70 92,-67 94,-64 C 98,-62 97,-57 92,-55 C 96,-52 95,-46 90,-44 C 92,-36 88,-28 78,-24 C 62,-18 40,-24 24,-34 C 10,-42 -10,-40 -30,-40 Z" fill="url(#skin)"/>
     <path d="M 24,-34 C 40,-26 62,-20 78,-24 C 70,-30 50,-34 36,-40 Z" fill="#cf9d80" opacity="0.6"/>
-    <circle cx="58" cy="-68" r="22" fill="url(#blush)"/>
+    <circle cx="58" cy="-68" r="26" fill="url(#blush)"/>
     <!-- The ear: its outer shape, the rolled rim along its back edge, and the hollow inside. -->
     <path d="M -4,-120 C -18,-121 -24,-108 -22,-94 C -20,-82 -14,-74 -6,-76 C 0,-78 2,-86 1,-94 C 4,-104 4,-116 -4,-120 Z" fill="#e4b49a"/>
     <path d="M -4,-116 C -15,-116 -19,-106 -18,-95 C -17,-86 -13,-80 -8,-80" fill="none" stroke="#f3cdb6" stroke-width="3" stroke-linecap="round"/>
     <path d="M -6,-108 C -12,-106 -13,-96 -10,-90 C -7,-86 -3,-88 -3,-94 C -2,-100 -2,-106 -6,-108 Z" fill="#c98f74"/>
     <path d="M -2,-90 C 0,-88 0,-85 -2,-83" fill="none" stroke="#b27a60" stroke-width="2" stroke-linecap="round"/>
     <path d="M 52,-103 C 58,-110 70,-110 77,-104 C 70,-98 58,-98 52,-103 Z" fill="#fbf6f0"/>
-    <circle cx="68" cy="-104" r="6.5" fill="#3f78b8"/>
-    <circle cx="68" cy="-104" r="6.5" fill="none" stroke="#24466d" stroke-width="1.5"/>
-    <circle cx="69" cy="-104" r="3" fill="#162033"/>
+    <circle cx="68" cy="-104" r="6.5" fill="#7d97a6"/>
+    <circle cx="68" cy="-104" r="6.5" fill="none" stroke="#4d6472" stroke-width="1.5"/>
+    <circle cx="69" cy="-104" r="3" fill="#1c2328"/>
     <circle cx="71" cy="-106.5" r="1.7" fill="#ffffff"/>
     <path d="M 49,-104 C 57,-115 72,-114 80,-105" fill="none" stroke="#4a3326" stroke-width="3.5" stroke-linecap="round"/>
     <path d="M 79,-106 L 85,-110 M 76,-109 L 80,-114" stroke="#4a3326" stroke-width="2" stroke-linecap="round"/>
     <path d="M 52,-113 C 60,-119 72,-118 79,-112" fill="none" stroke="#c99478" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
     <path d="M 55,-100 C 62,-97 70,-97 75,-100" fill="none" stroke="#b98468" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
-    <path d="M 46,-124 C 58,-132 74,-131 85,-124" fill="none" stroke="#b08640" stroke-width="5" stroke-linecap="round"/>
+    <path d="M 46,-124 C 58,-132 74,-131 85,-124" fill="none" stroke="#a88050" stroke-width="5" stroke-linecap="round"/>
     <path d="M 96,-78 C 99,-76 99,-74 96,-73" fill="none" stroke="#b98468" stroke-width="2" stroke-linecap="round"/>
     <!-- Lips: the upper lip, a fuller lower lip with a touch of light on it, and the line
          where they meet, turning in at the corner of the mouth. -->
@@ -358,18 +368,20 @@
     <path d="M 85,-55 C 89,-55 93,-55 94,-53 C 93,-49 89,-47 86,-48 C 87,-50 86,-53 85,-55 Z" fill="#cf8578"/>
     <path d="M 88,-51 C 89,-50 91,-50 92,-51" fill="none" stroke="#f2b3a6" stroke-width="1.5" stroke-linecap="round" opacity="0.8"/>
     <path d="M 81,-57 C 85,-56 91,-56 95,-57" fill="none" stroke="#8f4a40" stroke-width="1.6" stroke-linecap="round"/>
-    <!-- Hair: a soft mass over the top and back, a swept fringe, and highlights. -->
-    <path d="M 84,-140 C 82,-176 50,-206 6,-206 C -50,-206 -92,-170 -92,-118 C -92,-82 -78,-56 -56,-40 C -50,-60 -40,-78 -22,-84 C -14,-104 -10,-128 4,-140 C 24,-152 52,-150 84,-140 Z" fill="url(#hair)"/>
-    <!-- The fringe: three tapered locks swept forward across the forehead, each with its own
-         light edge, instead of one hard wedge. -->
-    <path d="M 84,-162 C 70,-150 56,-132 30,-123 C 52,-124 70,-132 86,-146 Z" fill="#cfa452"/>
-    <path d="M 86,-150 C 80,-138 70,-126 52,-118 C 68,-118 82,-126 89,-138 Z" fill="#d9b25e"/>
-    <path d="M 88,-140 C 86,-130 82,-122 72,-116 C 82,-117 89,-124 91,-132 Z" fill="#c79a4a"/>
-    <path d="M 80,-154 C 68,-140 56,-130 40,-124 M 84,-144 C 78,-134 70,-126 58,-120" fill="none" stroke="#f7e3a6" stroke-width="2" stroke-linecap="round" opacity="0.75"/>
-    <path d="M -64,-168 C -36,-198 18,-202 58,-182 C 18,-194 -30,-190 -64,-168 Z M -80,-128 C -66,-170 -24,-192 22,-188 C -22,-184 -60,-166 -80,-128 Z M -84,-96 C -86,-132 -60,-162 -26,-172 C -56,-156 -76,-130 -84,-96 Z" fill="#fff6d8" opacity="0.6"/>
-    <path d="M -70,-70 C -78,-100 -70,-130 -50,-150 M -40,-90 C -36,-120 -16,-140 10,-150" fill="none" stroke="#9e7a35" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
-    <path d="M -92,-118 C -92,-82 -78,-56 -56,-40" fill="none" stroke="#bcd6ef" stroke-width="4" stroke-linecap="round" opacity="0.55"/>
-    <ellipse cx="-78" cy="-148" rx="9" ry="12" fill="#8c3a1d" transform="rotate(-30 -78 -148)"/>
+    <!-- Hair, matched to the real Em: honey-blonde, parted in
+         the middle and worn down, straight past the shoulders, with no fringe. In profile the
+         hair runs back from the hairline over the crown, and a curtain falls past the ear and
+         the cheek. The long hair behind the shoulders is part_ponytail, so it can swing. -->
+    <path d="M 82,-146 C 80,-180 48,-208 4,-208 C -52,-208 -94,-172 -94,-118 C -94,-82 -80,-54 -58,-38 C -52,-58 -44,-74 -30,-80 C -22,-104 -6,-134 24,-146 C 42,-152 64,-152 82,-146 Z" fill="url(#hair)"/>
+    <!-- The curtain: straight hair falling from the parting, over the ear and past the jaw. -->
+    <path d="M 78,-152 C 46,-148 26,-124 20,-94 C 15,-68 18,-44 28,-22 C 6,-20 -16,-24 -30,-30 C -40,-62 -38,-118 -10,-148 C 18,-166 56,-164 78,-152 Z" fill="url(#hair)"/>
+    <path d="M 62,-150 C 34,-140 22,-116 18,-90 C 15,-66 18,-46 24,-30" fill="none" stroke="#f3dca0" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+    <path d="M 40,-148 C 10,-130 2,-96 4,-60 M 16,-152 C -12,-130 -18,-92 -14,-40" fill="none" stroke="#84612c" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+    <!-- The hairline at the forehead, softened where the parting starts. -->
+    <path d="M 84,-150 C 76,-158 66,-160 56,-156" fill="none" stroke="#b8894a" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+    <path d="M -64,-168 C -36,-198 18,-204 58,-186 C 18,-196 -30,-192 -64,-168 Z M -80,-128 C -66,-170 -24,-194 22,-190 C -22,-186 -60,-168 -80,-128 Z M -86,-96 C -88,-132 -62,-162 -28,-172 C -58,-156 -78,-130 -86,-96 Z" fill="#f8e6b8" opacity="0.55"/>
+    <path d="M -72,-68 C -80,-100 -72,-130 -52,-152 M -42,-88 C -38,-120 -18,-142 8,-152" fill="none" stroke="#84612c" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+    <path d="M -94,-118 C -94,-82 -80,-54 -58,-38" fill="none" stroke="#bcd6ef" stroke-width="4" stroke-linecap="round" opacity="0.55"/>
   </g><path d="M 5.1,-706.7 C -8.1,-684.4 -25.2,-604.6 -19.1,-561.5 C -13.1,-518.4 25.2,-464 41.2,-448.2 C 57.2,-432.4 79.1,-446.9 76.7,-466.6 C 74.3,-486.3 29.4,-528.3 26.6,-566.4 C 23.8,-604.5 63.5,-671.8 59.9,-695.2 C 56.3,-718.6 18.3,-729 5.1,-706.7 Z" fill="#0c2322" opacity="0.4" transform="translate(-9,7)"/><path d="M 5.1,-706.7 C -8.1,-684.4 -25.2,-604.6 -19.1,-561.5 C -13.1,-518.4 25.2,-464 41.2,-448.2 C 57.2,-432.4 79.1,-446.9 76.7,-466.6 C 74.3,-486.3 29.4,-528.3 26.6,-566.4 C 23.8,-604.5 63.5,-671.8 59.9,-695.2 C 56.3,-718.6 18.3,-729 5.1,-706.7 Z" fill="url(#sleeve_lit)" stroke="#0f2a29" stroke-width="4" stroke-linejoin="round"/><g transform="translate(57.1,-461) rotate(-27.4)"><ellipse cx="0" cy="2" rx="21" ry="8" fill="#0c2322"/><path d="M -14,0 C -17,14 -16,28 -12,38 C -10,43 -6,46 -1,46 C 2,48 6,47 8,44 C 12,42 14,36 12,30 C 13,27 13,25 12,24 C 16,22 19,17 18,11 C 17,6 15,2 14,0 Z" fill="url(#skin)" stroke="#b9836a" stroke-width="1.6" stroke-linejoin="round"/><path d="M 10,7 C 18,10 21,20 16,27 C 14,28 12,27 11,25 C 12,20 11,15 9,12 Z" fill="#edc4aa" stroke="#b9836a" stroke-width="1.4" stroke-linejoin="round"/><path d="M -9,30 C -6,37 0,41 7,40 M -4,34 C -2,40 2,44 5,45 M -12,22 C -11,26 -10,29 -8,31" fill="none" stroke="#c48d72" stroke-width="1.8" stroke-linecap="round" opacity="0.8"/><path d="M -13,6 C -15,16 -14,26 -11,34" fill="none" stroke="#b07d64" stroke-width="2.5" stroke-linecap="round" opacity="0.35"/><path d="M -22,-6 C -22,4 22,4 22,-6 L 21,-12 C 21,-4 -21,-4 -21,-12 Z" fill="#1f4c4b"/><path d="M -20,-4 C -10,1 10,1 20,-4" fill="none" stroke="#5aa59f" stroke-width="2" stroke-linecap="round" opacity="0.5"/></g></g></g>
   <g id="frame_4" transform="translate(2860,990)"><g filter="url(#grain_soft)"><g filter="url(#far_side)"><path d="M 1.7,-711.8 C -12.6,-690.4 -31.2,-613.1 -29.8,-569.3 C -28.5,-525.4 -3.3,-466.8 9.6,-448.7 C 22.6,-430.6 46.8,-440.5 47.8,-460.6 C 48.9,-480.7 14.8,-529.8 16.2,-569.3 C 17.5,-608.7 58.2,-673.8 55.8,-697.5 C 53.4,-721.3 15.9,-733.2 1.7,-711.8 Z" fill="#23514f" stroke="#0f2a29" stroke-width="4" stroke-linejoin="round"/><g transform="translate(27.6,-458.5) rotate(-17.3)"><ellipse cx="0" cy="2" rx="21" ry="8" fill="#0c2322"/><path d="M -14,0 C -17,14 -16,28 -12,38 C -10,43 -6,46 -1,46 C 2,48 6,47 8,44 C 12,42 14,36 12,30 C 13,27 13,25 12,24 C 16,22 19,17 18,11 C 17,6 15,2 14,0 Z" fill="url(#skin)" stroke="#b9836a" stroke-width="1.6" stroke-linejoin="round"/><path d="M 10,7 C 18,10 21,20 16,27 C 14,28 12,27 11,25 C 12,20 11,15 9,12 Z" fill="#edc4aa" stroke="#b9836a" stroke-width="1.4" stroke-linejoin="round"/><path d="M -9,30 C -6,37 0,41 7,40 M -4,34 C -2,40 2,44 5,45 M -12,22 C -11,26 -10,29 -8,31" fill="none" stroke="#c48d72" stroke-width="1.8" stroke-linecap="round" opacity="0.8"/><path d="M -13,6 C -15,16 -14,26 -11,34" fill="none" stroke="#b07d64" stroke-width="2.5" stroke-linecap="round" opacity="0.35"/><path d="M -22,-6 C -22,4 22,4 22,-6 L 21,-12 C 21,-4 -21,-4 -21,-12 Z" fill="#1f4c4b"/><path d="M -20,-4 C -10,1 10,1 20,-4" fill="none" stroke="#5aa59f" stroke-width="2" stroke-linecap="round" opacity="0.5"/></g></g><g filter="url(#far_side)"><path d="M -39.9,-428 C -49.7,-394.6 -14.2,-295.8 -18.7,-231.5 C -23.2,-167.3 -66.4,-76 -67.1,-42.3 C -67.8,-8.7 -40.6,0.8 -22.9,-29.7 C -5.2,-60.1 28.5,-157.9 38.9,-225 C 49.4,-292 53.1,-398.2 39.9,-432 C 26.8,-465.8 -30.2,-461.4 -39.9,-428 Z" fill="#2b3550" stroke="#161c2b" stroke-width="3" stroke-linejoin="round"/><path d="M -3.9,-232.3 Q 10.1,-220.3 24.1,-230.3" fill="none" stroke="#1a2030" stroke-width="3" opacity="0.5" stroke-linecap="round"/><g transform="translate(-45,-36) rotate(0)" filter="url(#grain)">
     <path d="M -28,-6 L 26,-6 C 40,0 66,8 76,20 C 80,28 78,36 70,36 L -30,36 C -34,24 -34,8 -28,-6 Z" fill="url(#leather)"/>
@@ -409,30 +421,31 @@
     <path d="M -14,-4 C -30,30 -40,90 -36,150 L -6,156 C -10,110 -2,50 14,4 Z" fill="url(#scarf)"/>
     <path d="M -34,150 L -36,166 M -26,152 L -26,168 M -16,153 L -14,168 M -8,154 L -5,168" stroke="#8a361a" stroke-width="3" stroke-linecap="round"/>
     <path d="M -20,20 C -28,60 -30,100 -26,140" fill="none" stroke="#6e2a14" stroke-width="2.5" opacity="0.5"/>
-  </g><g transform="translate(-43,-855.8) rotate(27.9)" filter="url(#grain)">
-    <path d="M -14,-6 C -40,30 -50,90 -30,150 C -22,172 -8,186 4,190 C -6,160 4,110 20,60 C 26,30 20,6 12,-6 Z" fill="url(#ponytail)"/>
-    <path d="M -4,10 C -24,50 -30,110 -14,160 M 8,20 C -6,60 -6,110 0,160" fill="none" stroke="#fff3cf" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
-    <path d="M -30,150 C -22,172 -8,186 4,190" fill="none" stroke="#bcd6ef" stroke-width="3" opacity="0.5"/>
+  </g><g transform="translate(-37.9,-833.5) rotate(18.8)" filter="url(#grain)">
+    <path d="M -10,-14 C -34,10 -44,70 -40,130 C -38,170 -30,200 -14,214 C -4,206 2,196 6,186 C 12,198 22,206 30,208 C 26,170 30,110 32,60 C 34,24 26,-4 12,-16 Z" fill="url(#ponytail)"/>
+    <path d="M -2,0 C -22,40 -28,110 -22,190 M 10,6 C 0,60 0,130 4,180 M 22,10 C 18,60 20,130 22,196" fill="none" stroke="#f3dca0" stroke-width="2.5" stroke-linecap="round" opacity="0.55"/>
+    <path d="M -30,60 C -34,110 -32,160 -20,200 M 14,40 C 10,100 12,150 14,190" fill="none" stroke="#7e5a28" stroke-width="2" stroke-linecap="round" opacity="0.45"/>
+    <path d="M -40,130 C -38,170 -30,200 -14,214" fill="none" stroke="#bcd6ef" stroke-width="3" opacity="0.5"/>
   </g><g transform="translate(28.7,-704.7) rotate(2.4)" filter="url(#grain)">
     <path d="M -26,14 C -24,-18 -22,-38 -18,-48 L 30,-48 C 32,-30 34,-12 38,14 Z" fill="#dcae92"/>
     <path d="M -30,-40 C -70,-60 -88,-110 -80,-150 C -72,-192 -20,-205 20,-200 C 60,-196 84,-170 86,-136 C 87,-124 84,-114 88,-106 C 90,-100 96,-94 104,-84 C 108,-79 103,-73 94,-73 C 92,-70 92,-67 94,-64 C 98,-62 97,-57 92,-55 C 96,-52 95,-46 90,-44 C 92,-36 88,-28 78,-24 C 62,-18 40,-24 24,-34 C 10,-42 -10,-40 -30,-40 Z" fill="url(#skin)"/>
     <path d="M 24,-34 C 40,-26 62,-20 78,-24 C 70,-30 50,-34 36,-40 Z" fill="#cf9d80" opacity="0.6"/>
-    <circle cx="58" cy="-68" r="22" fill="url(#blush)"/>
+    <circle cx="58" cy="-68" r="26" fill="url(#blush)"/>
     <!-- The ear: its outer shape, the rolled rim along its back edge, and the hollow inside. -->
     <path d="M -4,-120 C -18,-121 -24,-108 -22,-94 C -20,-82 -14,-74 -6,-76 C 0,-78 2,-86 1,-94 C 4,-104 4,-116 -4,-120 Z" fill="#e4b49a"/>
     <path d="M -4,-116 C -15,-116 -19,-106 -18,-95 C -17,-86 -13,-80 -8,-80" fill="none" stroke="#f3cdb6" stroke-width="3" stroke-linecap="round"/>
     <path d="M -6,-108 C -12,-106 -13,-96 -10,-90 C -7,-86 -3,-88 -3,-94 C -2,-100 -2,-106 -6,-108 Z" fill="#c98f74"/>
     <path d="M -2,-90 C 0,-88 0,-85 -2,-83" fill="none" stroke="#b27a60" stroke-width="2" stroke-linecap="round"/>
     <path d="M 52,-103 C 58,-110 70,-110 77,-104 C 70,-98 58,-98 52,-103 Z" fill="#fbf6f0"/>
-    <circle cx="68" cy="-104" r="6.5" fill="#3f78b8"/>
-    <circle cx="68" cy="-104" r="6.5" fill="none" stroke="#24466d" stroke-width="1.5"/>
-    <circle cx="69" cy="-104" r="3" fill="#162033"/>
+    <circle cx="68" cy="-104" r="6.5" fill="#7d97a6"/>
+    <circle cx="68" cy="-104" r="6.5" fill="none" stroke="#4d6472" stroke-width="1.5"/>
+    <circle cx="69" cy="-104" r="3" fill="#1c2328"/>
     <circle cx="71" cy="-106.5" r="1.7" fill="#ffffff"/>
     <path d="M 49,-104 C 57,-115 72,-114 80,-105" fill="none" stroke="#4a3326" stroke-width="3.5" stroke-linecap="round"/>
     <path d="M 79,-106 L 85,-110 M 76,-109 L 80,-114" stroke="#4a3326" stroke-width="2" stroke-linecap="round"/>
     <path d="M 52,-113 C 60,-119 72,-118 79,-112" fill="none" stroke="#c99478" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
     <path d="M 55,-100 C 62,-97 70,-97 75,-100" fill="none" stroke="#b98468" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
-    <path d="M 46,-124 C 58,-132 74,-131 85,-124" fill="none" stroke="#b08640" stroke-width="5" stroke-linecap="round"/>
+    <path d="M 46,-124 C 58,-132 74,-131 85,-124" fill="none" stroke="#a88050" stroke-width="5" stroke-linecap="round"/>
     <path d="M 96,-78 C 99,-76 99,-74 96,-73" fill="none" stroke="#b98468" stroke-width="2" stroke-linecap="round"/>
     <!-- Lips: the upper lip, a fuller lower lip with a touch of light on it, and the line
          where they meet, turning in at the corner of the mouth. -->
@@ -440,18 +453,20 @@
     <path d="M 85,-55 C 89,-55 93,-55 94,-53 C 93,-49 89,-47 86,-48 C 87,-50 86,-53 85,-55 Z" fill="#cf8578"/>
     <path d="M 88,-51 C 89,-50 91,-50 92,-51" fill="none" stroke="#f2b3a6" stroke-width="1.5" stroke-linecap="round" opacity="0.8"/>
     <path d="M 81,-57 C 85,-56 91,-56 95,-57" fill="none" stroke="#8f4a40" stroke-width="1.6" stroke-linecap="round"/>
-    <!-- Hair: a soft mass over the top and back, a swept fringe, and highlights. -->
-    <path d="M 84,-140 C 82,-176 50,-206 6,-206 C -50,-206 -92,-170 -92,-118 C -92,-82 -78,-56 -56,-40 C -50,-60 -40,-78 -22,-84 C -14,-104 -10,-128 4,-140 C 24,-152 52,-150 84,-140 Z" fill="url(#hair)"/>
-    <!-- The fringe: three tapered locks swept forward across the forehead, each with its own
-         light edge, instead of one hard wedge. -->
-    <path d="M 84,-162 C 70,-150 56,-132 30,-123 C 52,-124 70,-132 86,-146 Z" fill="#cfa452"/>
-    <path d="M 86,-150 C 80,-138 70,-126 52,-118 C 68,-118 82,-126 89,-138 Z" fill="#d9b25e"/>
-    <path d="M 88,-140 C 86,-130 82,-122 72,-116 C 82,-117 89,-124 91,-132 Z" fill="#c79a4a"/>
-    <path d="M 80,-154 C 68,-140 56,-130 40,-124 M 84,-144 C 78,-134 70,-126 58,-120" fill="none" stroke="#f7e3a6" stroke-width="2" stroke-linecap="round" opacity="0.75"/>
-    <path d="M -64,-168 C -36,-198 18,-202 58,-182 C 18,-194 -30,-190 -64,-168 Z M -80,-128 C -66,-170 -24,-192 22,-188 C -22,-184 -60,-166 -80,-128 Z M -84,-96 C -86,-132 -60,-162 -26,-172 C -56,-156 -76,-130 -84,-96 Z" fill="#fff6d8" opacity="0.6"/>
-    <path d="M -70,-70 C -78,-100 -70,-130 -50,-150 M -40,-90 C -36,-120 -16,-140 10,-150" fill="none" stroke="#9e7a35" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
-    <path d="M -92,-118 C -92,-82 -78,-56 -56,-40" fill="none" stroke="#bcd6ef" stroke-width="4" stroke-linecap="round" opacity="0.55"/>
-    <ellipse cx="-78" cy="-148" rx="9" ry="12" fill="#8c3a1d" transform="rotate(-30 -78 -148)"/>
+    <!-- Hair, matched to the real Em: honey-blonde, parted in
+         the middle and worn down, straight past the shoulders, with no fringe. In profile the
+         hair runs back from the hairline over the crown, and a curtain falls past the ear and
+         the cheek. The long hair behind the shoulders is part_ponytail, so it can swing. -->
+    <path d="M 82,-146 C 80,-180 48,-208 4,-208 C -52,-208 -94,-172 -94,-118 C -94,-82 -80,-54 -58,-38 C -52,-58 -44,-74 -30,-80 C -22,-104 -6,-134 24,-146 C 42,-152 64,-152 82,-146 Z" fill="url(#hair)"/>
+    <!-- The curtain: straight hair falling from the parting, over the ear and past the jaw. -->
+    <path d="M 78,-152 C 46,-148 26,-124 20,-94 C 15,-68 18,-44 28,-22 C 6,-20 -16,-24 -30,-30 C -40,-62 -38,-118 -10,-148 C 18,-166 56,-164 78,-152 Z" fill="url(#hair)"/>
+    <path d="M 62,-150 C 34,-140 22,-116 18,-90 C 15,-66 18,-46 24,-30" fill="none" stroke="#f3dca0" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+    <path d="M 40,-148 C 10,-130 2,-96 4,-60 M 16,-152 C -12,-130 -18,-92 -14,-40" fill="none" stroke="#84612c" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+    <!-- The hairline at the forehead, softened where the parting starts. -->
+    <path d="M 84,-150 C 76,-158 66,-160 56,-156" fill="none" stroke="#b8894a" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+    <path d="M -64,-168 C -36,-198 18,-204 58,-186 C 18,-196 -30,-192 -64,-168 Z M -80,-128 C -66,-170 -24,-194 22,-190 C -22,-186 -60,-168 -80,-128 Z M -86,-96 C -88,-132 -62,-162 -28,-172 C -58,-156 -78,-130 -86,-96 Z" fill="#f8e6b8" opacity="0.55"/>
+    <path d="M -72,-68 C -80,-100 -72,-130 -52,-152 M -42,-88 C -38,-120 -18,-142 8,-152" fill="none" stroke="#84612c" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+    <path d="M -94,-118 C -94,-82 -80,-54 -58,-38" fill="none" stroke="#bcd6ef" stroke-width="4" stroke-linecap="round" opacity="0.55"/>
   </g><path d="M 1.1,-709.3 C -11.2,-686.8 -22.2,-608.4 -17.4,-564.8 C -12.6,-521.1 16,-464.6 30.1,-447.5 C 44.2,-430.3 67.7,-441.7 67.4,-461.9 C 67.1,-482 30.3,-528.7 28.4,-568.4 C 26.6,-608.1 60.9,-676.5 56.4,-700 C 51.8,-723.5 13.4,-731.8 1.1,-709.3 Z" fill="#0c2322" opacity="0.4" transform="translate(-9,7)"/><path d="M 1.1,-709.3 C -11.2,-686.8 -22.2,-608.4 -17.4,-564.8 C -12.6,-521.1 16,-464.6 30.1,-447.5 C 44.2,-430.3 67.7,-441.7 67.4,-461.9 C 67.1,-482 30.3,-528.7 28.4,-568.4 C 26.6,-608.1 60.9,-676.5 56.4,-700 C 51.8,-723.5 13.4,-731.8 1.1,-709.3 Z" fill="url(#sleeve_lit)" stroke="#0f2a29" stroke-width="4" stroke-linejoin="round"/><g transform="translate(47.3,-458.4) rotate(-21.1)"><ellipse cx="0" cy="2" rx="21" ry="8" fill="#0c2322"/><path d="M -14,0 C -17,14 -16,28 -12,38 C -10,43 -6,46 -1,46 C 2,48 6,47 8,44 C 12,42 14,36 12,30 C 13,27 13,25 12,24 C 16,22 19,17 18,11 C 17,6 15,2 14,0 Z" fill="url(#skin)" stroke="#b9836a" stroke-width="1.6" stroke-linejoin="round"/><path d="M 10,7 C 18,10 21,20 16,27 C 14,28 12,27 11,25 C 12,20 11,15 9,12 Z" fill="#edc4aa" stroke="#b9836a" stroke-width="1.4" stroke-linejoin="round"/><path d="M -9,30 C -6,37 0,41 7,40 M -4,34 C -2,40 2,44 5,45 M -12,22 C -11,26 -10,29 -8,31" fill="none" stroke="#c48d72" stroke-width="1.8" stroke-linecap="round" opacity="0.8"/><path d="M -13,6 C -15,16 -14,26 -11,34" fill="none" stroke="#b07d64" stroke-width="2.5" stroke-linecap="round" opacity="0.35"/><path d="M -22,-6 C -22,4 22,4 22,-6 L 21,-12 C 21,-4 -21,-4 -21,-12 Z" fill="#1f4c4b"/><path d="M -20,-4 C -10,1 10,1 20,-4" fill="none" stroke="#5aa59f" stroke-width="2" stroke-linecap="round" opacity="0.5"/></g></g></g>
   <g id="frame_5" transform="translate(3500,990)"><g filter="url(#grain_soft)"><g filter="url(#far_side)"><path d="M -2.7,-713 C -15.9,-691.1 -28.7,-614.1 -27.2,-570.2 C -25.7,-526.2 -5.8,-467.6 6.3,-449 C 18.3,-430.5 42.9,-438.8 45,-459 C 47.1,-479.2 17.7,-529.9 18.8,-570.3 C 20,-610.8 55.7,-677.7 52.1,-701.5 C 48.5,-725.3 10.5,-734.9 -2.7,-713 Z" fill="#23514f" stroke="#0f2a29" stroke-width="4" stroke-linejoin="round"/><g transform="translate(24.6,-457.9) rotate(-14.4)"><ellipse cx="0" cy="2" rx="21" ry="8" fill="#0c2322"/><path d="M -14,0 C -17,14 -16,28 -12,38 C -10,43 -6,46 -1,46 C 2,48 6,47 8,44 C 12,42 14,36 12,30 C 13,27 13,25 12,24 C 16,22 19,17 18,11 C 17,6 15,2 14,0 Z" fill="url(#skin)" stroke="#b9836a" stroke-width="1.6" stroke-linejoin="round"/><path d="M 10,7 C 18,10 21,20 16,27 C 14,28 12,27 11,25 C 12,20 11,15 9,12 Z" fill="#edc4aa" stroke="#b9836a" stroke-width="1.4" stroke-linejoin="round"/><path d="M -9,30 C -6,37 0,41 7,40 M -4,34 C -2,40 2,44 5,45 M -12,22 C -11,26 -10,29 -8,31" fill="none" stroke="#c48d72" stroke-width="1.8" stroke-linecap="round" opacity="0.8"/><path d="M -13,6 C -15,16 -14,26 -11,34" fill="none" stroke="#b07d64" stroke-width="2.5" stroke-linecap="round" opacity="0.35"/><path d="M -22,-6 C -22,4 22,4 22,-6 L 21,-12 C 21,-4 -21,-4 -21,-12 Z" fill="#1f4c4b"/><path d="M -20,-4 C -10,1 10,1 20,-4" fill="none" stroke="#5aa59f" stroke-width="2" stroke-linecap="round" opacity="0.5"/></g></g><g filter="url(#far_side)"><path d="M -40,-432 C -51.2,-398.9 -22.4,-298.8 -26.9,-233.7 C -31.5,-168.6 -68.1,-75.2 -67.4,-41.4 C -66.6,-7.5 -39,0.4 -22.6,-30.6 C -6.3,-61.6 20.3,-160.1 30.7,-227.2 C 41.2,-294.2 51.8,-398.6 40,-432.8 C 28.2,-466.9 -28.8,-465.2 -40,-432 Z" fill="#2b3550" stroke="#161c2b" stroke-width="3" stroke-linejoin="round"/><path d="M -12.1,-234.4 Q 1.9,-222.4 15.9,-232.4" fill="none" stroke="#1a2030" stroke-width="3" opacity="0.5" stroke-linecap="round"/><g transform="translate(-45,-36) rotate(1.6)" filter="url(#grain)">
     <path d="M -28,-6 L 26,-6 C 40,0 66,8 76,20 C 80,28 78,36 70,36 L -30,36 C -34,24 -34,8 -28,-6 Z" fill="url(#leather)"/>
@@ -491,30 +506,31 @@
     <path d="M -14,-4 C -30,30 -40,90 -36,150 L -6,156 C -10,110 -2,50 14,4 Z" fill="url(#scarf)"/>
     <path d="M -34,150 L -36,166 M -26,152 L -26,168 M -16,153 L -14,168 M -8,154 L -5,168" stroke="#8a361a" stroke-width="3" stroke-linecap="round"/>
     <path d="M -20,20 C -28,60 -30,100 -26,140" fill="none" stroke="#6e2a14" stroke-width="2.5" opacity="0.5"/>
-  </g><g transform="translate(-48,-857.9) rotate(24.2)" filter="url(#grain)">
-    <path d="M -14,-6 C -40,30 -50,90 -30,150 C -22,172 -8,186 4,190 C -6,160 4,110 20,60 C 26,30 20,6 12,-6 Z" fill="url(#ponytail)"/>
-    <path d="M -4,10 C -24,50 -30,110 -14,160 M 8,20 C -6,60 -6,110 0,160" fill="none" stroke="#fff3cf" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
-    <path d="M -30,150 C -22,172 -8,186 4,190" fill="none" stroke="#bcd6ef" stroke-width="3" opacity="0.5"/>
+  </g><g transform="translate(-42.8,-835.7) rotate(15.1)" filter="url(#grain)">
+    <path d="M -10,-14 C -34,10 -44,70 -40,130 C -38,170 -30,200 -14,214 C -4,206 2,196 6,186 C 12,198 22,206 30,208 C 26,170 30,110 32,60 C 34,24 26,-4 12,-16 Z" fill="url(#ponytail)"/>
+    <path d="M -2,0 C -22,40 -28,110 -22,190 M 10,6 C 0,60 0,130 4,180 M 22,10 C 18,60 20,130 22,196" fill="none" stroke="#f3dca0" stroke-width="2.5" stroke-linecap="round" opacity="0.55"/>
+    <path d="M -30,60 C -34,110 -32,160 -20,200 M 14,40 C 10,100 12,150 14,190" fill="none" stroke="#7e5a28" stroke-width="2" stroke-linecap="round" opacity="0.45"/>
+    <path d="M -40,130 C -38,170 -30,200 -14,214" fill="none" stroke="#bcd6ef" stroke-width="3" opacity="0.5"/>
   </g><g transform="translate(24.7,-707.2) rotate(2.1)" filter="url(#grain)">
     <path d="M -26,14 C -24,-18 -22,-38 -18,-48 L 30,-48 C 32,-30 34,-12 38,14 Z" fill="#dcae92"/>
     <path d="M -30,-40 C -70,-60 -88,-110 -80,-150 C -72,-192 -20,-205 20,-200 C 60,-196 84,-170 86,-136 C 87,-124 84,-114 88,-106 C 90,-100 96,-94 104,-84 C 108,-79 103,-73 94,-73 C 92,-70 92,-67 94,-64 C 98,-62 97,-57 92,-55 C 96,-52 95,-46 90,-44 C 92,-36 88,-28 78,-24 C 62,-18 40,-24 24,-34 C 10,-42 -10,-40 -30,-40 Z" fill="url(#skin)"/>
     <path d="M 24,-34 C 40,-26 62,-20 78,-24 C 70,-30 50,-34 36,-40 Z" fill="#cf9d80" opacity="0.6"/>
-    <circle cx="58" cy="-68" r="22" fill="url(#blush)"/>
+    <circle cx="58" cy="-68" r="26" fill="url(#blush)"/>
     <!-- The ear: its outer shape, the rolled rim along its back edge, and the hollow inside. -->
     <path d="M -4,-120 C -18,-121 -24,-108 -22,-94 C -20,-82 -14,-74 -6,-76 C 0,-78 2,-86 1,-94 C 4,-104 4,-116 -4,-120 Z" fill="#e4b49a"/>
     <path d="M -4,-116 C -15,-116 -19,-106 -18,-95 C -17,-86 -13,-80 -8,-80" fill="none" stroke="#f3cdb6" stroke-width="3" stroke-linecap="round"/>
     <path d="M -6,-108 C -12,-106 -13,-96 -10,-90 C -7,-86 -3,-88 -3,-94 C -2,-100 -2,-106 -6,-108 Z" fill="#c98f74"/>
     <path d="M -2,-90 C 0,-88 0,-85 -2,-83" fill="none" stroke="#b27a60" stroke-width="2" stroke-linecap="round"/>
     <path d="M 52,-103 C 58,-110 70,-110 77,-104 C 70,-98 58,-98 52,-103 Z" fill="#fbf6f0"/>
-    <circle cx="68" cy="-104" r="6.5" fill="#3f78b8"/>
-    <circle cx="68" cy="-104" r="6.5" fill="none" stroke="#24466d" stroke-width="1.5"/>
-    <circle cx="69" cy="-104" r="3" fill="#162033"/>
+    <circle cx="68" cy="-104" r="6.5" fill="#7d97a6"/>
+    <circle cx="68" cy="-104" r="6.5" fill="none" stroke="#4d6472" stroke-width="1.5"/>
+    <circle cx="69" cy="-104" r="3" fill="#1c2328"/>
     <circle cx="71" cy="-106.5" r="1.7" fill="#ffffff"/>
     <path d="M 49,-104 C 57,-115 72,-114 80,-105" fill="none" stroke="#4a3326" stroke-width="3.5" stroke-linecap="round"/>
     <path d="M 79,-106 L 85,-110 M 76,-109 L 80,-114" stroke="#4a3326" stroke-width="2" stroke-linecap="round"/>
     <path d="M 52,-113 C 60,-119 72,-118 79,-112" fill="none" stroke="#c99478" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
     <path d="M 55,-100 C 62,-97 70,-97 75,-100" fill="none" stroke="#b98468" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
-    <path d="M 46,-124 C 58,-132 74,-131 85,-124" fill="none" stroke="#b08640" stroke-width="5" stroke-linecap="round"/>
+    <path d="M 46,-124 C 58,-132 74,-131 85,-124" fill="none" stroke="#a88050" stroke-width="5" stroke-linecap="round"/>
     <path d="M 96,-78 C 99,-76 99,-74 96,-73" fill="none" stroke="#b98468" stroke-width="2" stroke-linecap="round"/>
     <!-- Lips: the upper lip, a fuller lower lip with a touch of light on it, and the line
          where they meet, turning in at the corner of the mouth. -->
@@ -522,18 +538,20 @@
     <path d="M 85,-55 C 89,-55 93,-55 94,-53 C 93,-49 89,-47 86,-48 C 87,-50 86,-53 85,-55 Z" fill="#cf8578"/>
     <path d="M 88,-51 C 89,-50 91,-50 92,-51" fill="none" stroke="#f2b3a6" stroke-width="1.5" stroke-linecap="round" opacity="0.8"/>
     <path d="M 81,-57 C 85,-56 91,-56 95,-57" fill="none" stroke="#8f4a40" stroke-width="1.6" stroke-linecap="round"/>
-    <!-- Hair: a soft mass over the top and back, a swept fringe, and highlights. -->
-    <path d="M 84,-140 C 82,-176 50,-206 6,-206 C -50,-206 -92,-170 -92,-118 C -92,-82 -78,-56 -56,-40 C -50,-60 -40,-78 -22,-84 C -14,-104 -10,-128 4,-140 C 24,-152 52,-150 84,-140 Z" fill="url(#hair)"/>
-    <!-- The fringe: three tapered locks swept forward across the forehead, each with its own
-         light edge, instead of one hard wedge. -->
-    <path d="M 84,-162 C 70,-150 56,-132 30,-123 C 52,-124 70,-132 86,-146 Z" fill="#cfa452"/>
-    <path d="M 86,-150 C 80,-138 70,-126 52,-118 C 68,-118 82,-126 89,-138 Z" fill="#d9b25e"/>
-    <path d="M 88,-140 C 86,-130 82,-122 72,-116 C 82,-117 89,-124 91,-132 Z" fill="#c79a4a"/>
-    <path d="M 80,-154 C 68,-140 56,-130 40,-124 M 84,-144 C 78,-134 70,-126 58,-120" fill="none" stroke="#f7e3a6" stroke-width="2" stroke-linecap="round" opacity="0.75"/>
-    <path d="M -64,-168 C -36,-198 18,-202 58,-182 C 18,-194 -30,-190 -64,-168 Z M -80,-128 C -66,-170 -24,-192 22,-188 C -22,-184 -60,-166 -80,-128 Z M -84,-96 C -86,-132 -60,-162 -26,-172 C -56,-156 -76,-130 -84,-96 Z" fill="#fff6d8" opacity="0.6"/>
-    <path d="M -70,-70 C -78,-100 -70,-130 -50,-150 M -40,-90 C -36,-120 -16,-140 10,-150" fill="none" stroke="#9e7a35" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
-    <path d="M -92,-118 C -92,-82 -78,-56 -56,-40" fill="none" stroke="#bcd6ef" stroke-width="4" stroke-linecap="round" opacity="0.55"/>
-    <ellipse cx="-78" cy="-148" rx="9" ry="12" fill="#8c3a1d" transform="rotate(-30 -78 -148)"/>
+    <!-- Hair, matched to the real Em: honey-blonde, parted in
+         the middle and worn down, straight past the shoulders, with no fringe. In profile the
+         hair runs back from the hairline over the crown, and a curtain falls past the ear and
+         the cheek. The long hair behind the shoulders is part_ponytail, so it can swing. -->
+    <path d="M 82,-146 C 80,-180 48,-208 4,-208 C -52,-208 -94,-172 -94,-118 C -94,-82 -80,-54 -58,-38 C -52,-58 -44,-74 -30,-80 C -22,-104 -6,-134 24,-146 C 42,-152 64,-152 82,-146 Z" fill="url(#hair)"/>
+    <!-- The curtain: straight hair falling from the parting, over the ear and past the jaw. -->
+    <path d="M 78,-152 C 46,-148 26,-124 20,-94 C 15,-68 18,-44 28,-22 C 6,-20 -16,-24 -30,-30 C -40,-62 -38,-118 -10,-148 C 18,-166 56,-164 78,-152 Z" fill="url(#hair)"/>
+    <path d="M 62,-150 C 34,-140 22,-116 18,-90 C 15,-66 18,-46 24,-30" fill="none" stroke="#f3dca0" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+    <path d="M 40,-148 C 10,-130 2,-96 4,-60 M 16,-152 C -12,-130 -18,-92 -14,-40" fill="none" stroke="#84612c" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+    <!-- The hairline at the forehead, softened where the parting starts. -->
+    <path d="M 84,-150 C 76,-158 66,-160 56,-156" fill="none" stroke="#b8894a" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+    <path d="M -64,-168 C -36,-198 18,-204 58,-186 C 18,-196 -30,-192 -64,-168 Z M -80,-128 C -66,-170 -24,-194 22,-190 C -22,-186 -60,-168 -80,-128 Z M -86,-96 C -88,-132 -62,-162 -28,-172 C -58,-156 -78,-130 -86,-96 Z" fill="#f8e6b8" opacity="0.55"/>
+    <path d="M -72,-68 C -80,-100 -72,-130 -52,-152 M -42,-88 C -38,-120 -18,-142 8,-152" fill="none" stroke="#84612c" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+    <path d="M -94,-118 C -94,-82 -80,-54 -58,-38" fill="none" stroke="#bcd6ef" stroke-width="4" stroke-linecap="round" opacity="0.55"/>
   </g><path d="M -3.1,-711 C -14.7,-688.3 -21.5,-610.9 -17.3,-567 C -13.1,-523.2 9.4,-465.9 22.3,-448 C 35.3,-430.2 59.5,-439.6 60.5,-460 C 61.6,-480.3 29.9,-529.5 28.6,-570.1 C 27.2,-610.6 57.7,-679.9 52.4,-703.4 C 47.1,-726.9 8.5,-733.8 -3.1,-711 Z" fill="#0c2322" opacity="0.4" transform="translate(-9,7)"/><path d="M -3.1,-711 C -14.7,-688.3 -21.5,-610.9 -17.3,-567 C -13.1,-523.2 9.4,-465.9 22.3,-448 C 35.3,-430.2 59.5,-439.6 60.5,-460 C 61.6,-480.3 29.9,-529.5 28.6,-570.1 C 27.2,-610.6 57.7,-679.9 52.4,-703.4 C 47.1,-726.9 8.5,-733.8 -3.1,-711 Z" fill="url(#sleeve_lit)" stroke="#0f2a29" stroke-width="4" stroke-linejoin="round"/><g transform="translate(40.2,-457.8) rotate(-17.3)"><ellipse cx="0" cy="2" rx="21" ry="8" fill="#0c2322"/><path d="M -14,0 C -17,14 -16,28 -12,38 C -10,43 -6,46 -1,46 C 2,48 6,47 8,44 C 12,42 14,36 12,30 C 13,27 13,25 12,24 C 16,22 19,17 18,11 C 17,6 15,2 14,0 Z" fill="url(#skin)" stroke="#b9836a" stroke-width="1.6" stroke-linejoin="round"/><path d="M 10,7 C 18,10 21,20 16,27 C 14,28 12,27 11,25 C 12,20 11,15 9,12 Z" fill="#edc4aa" stroke="#b9836a" stroke-width="1.4" stroke-linejoin="round"/><path d="M -9,30 C -6,37 0,41 7,40 M -4,34 C -2,40 2,44 5,45 M -12,22 C -11,26 -10,29 -8,31" fill="none" stroke="#c48d72" stroke-width="1.8" stroke-linecap="round" opacity="0.8"/><path d="M -13,6 C -15,16 -14,26 -11,34" fill="none" stroke="#b07d64" stroke-width="2.5" stroke-linecap="round" opacity="0.35"/><path d="M -22,-6 C -22,4 22,4 22,-6 L 21,-12 C 21,-4 -21,-4 -21,-12 Z" fill="#1f4c4b"/><path d="M -20,-4 C -10,1 10,1 20,-4" fill="none" stroke="#5aa59f" stroke-width="2" stroke-linecap="round" opacity="0.5"/></g></g></g>
   <g id="frame_6" transform="translate(4140,990)"><g filter="url(#grain_soft)"><g filter="url(#far_side)"><path d="M -7.3,-714.6 C -20.2,-692.6 -30.6,-615.9 -29.4,-571.9 C -28.2,-527.8 -11.7,-469.1 -0.3,-450.3 C 11,-431.5 35.9,-438.6 38.8,-458.8 C 41.6,-479.1 15.1,-530.9 16.6,-571.7 C 18.1,-612.6 51.6,-680.1 47.6,-704 C 43.7,-727.8 5.5,-736.6 -7.3,-714.6 Z" fill="#23514f" stroke="#0f2a29" stroke-width="4" stroke-linejoin="round"/><g transform="translate(18.4,-458.5) rotate(-12.3)"><ellipse cx="0" cy="2" rx="21" ry="8" fill="#0c2322"/><path d="M -14,0 C -17,14 -16,28 -12,38 C -10,43 -6,46 -1,46 C 2,48 6,47 8,44 C 12,42 14,36 12,30 C 13,27 13,25 12,24 C 16,22 19,17 18,11 C 17,6 15,2 14,0 Z" fill="url(#skin)" stroke="#b9836a" stroke-width="1.6" stroke-linejoin="round"/><path d="M 10,7 C 18,10 21,20 16,27 C 14,28 12,27 11,25 C 12,20 11,15 9,12 Z" fill="#edc4aa" stroke="#b9836a" stroke-width="1.4" stroke-linejoin="round"/><path d="M -9,30 C -6,37 0,41 7,40 M -4,34 C -2,40 2,44 5,45 M -12,22 C -11,26 -10,29 -8,31" fill="none" stroke="#c48d72" stroke-width="1.8" stroke-linecap="round" opacity="0.8"/><path d="M -13,6 C -15,16 -14,26 -11,34" fill="none" stroke="#b07d64" stroke-width="2.5" stroke-linecap="round" opacity="0.35"/><path d="M -22,-6 C -22,4 22,4 22,-6 L 21,-12 C 21,-4 -21,-4 -21,-12 Z" fill="#1f4c4b"/><path d="M -20,-4 C -10,1 10,1 20,-4" fill="none" stroke="#5aa59f" stroke-width="2" stroke-linecap="round" opacity="0.5"/></g></g><g filter="url(#far_side)"><path d="M -40,-435.8 C -52.7,-402.9 -31.7,-301.6 -36.3,-235.7 C -40.9,-169.8 -69.9,-74.3 -67.6,-40.3 C -65.3,-6.3 -37.2,-0.2 -22.4,-31.7 C -7.6,-63.2 10.9,-162.3 21.3,-229.2 C 31.7,-296.1 50.2,-398.4 40,-432.8 C 29.8,-467.3 -27.3,-468.6 -40,-435.8 Z" fill="#2b3550" stroke="#161c2b" stroke-width="3" stroke-linejoin="round"/><path d="M -21.5,-236.5 Q -7.5,-224.5 6.5,-234.5" fill="none" stroke="#1a2030" stroke-width="3" opacity="0.5" stroke-linecap="round"/><g transform="translate(-45,-36) rotate(1.4)" filter="url(#grain)">
     <path d="M -28,-6 L 26,-6 C 40,0 66,8 76,20 C 80,28 78,36 70,36 L -30,36 C -34,24 -34,8 -28,-6 Z" fill="url(#leather)"/>
@@ -573,30 +591,31 @@
     <path d="M -14,-4 C -30,30 -40,90 -36,150 L -6,156 C -10,110 -2,50 14,4 Z" fill="url(#scarf)"/>
     <path d="M -34,150 L -36,166 M -26,152 L -26,168 M -16,153 L -14,168 M -8,154 L -5,168" stroke="#8a361a" stroke-width="3" stroke-linecap="round"/>
     <path d="M -20,20 C -28,60 -30,100 -26,140" fill="none" stroke="#6e2a14" stroke-width="2.5" opacity="0.5"/>
-  </g><g transform="translate(-53.5,-859.5) rotate(20.7)" filter="url(#grain)">
-    <path d="M -14,-6 C -40,30 -50,90 -30,150 C -22,172 -8,186 4,190 C -6,160 4,110 20,60 C 26,30 20,6 12,-6 Z" fill="url(#ponytail)"/>
-    <path d="M -4,10 C -24,50 -30,110 -14,160 M 8,20 C -6,60 -6,110 0,160" fill="none" stroke="#fff3cf" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
-    <path d="M -30,150 C -22,172 -8,186 4,190" fill="none" stroke="#bcd6ef" stroke-width="3" opacity="0.5"/>
+  </g><g transform="translate(-48.1,-837.3) rotate(11.5)" filter="url(#grain)">
+    <path d="M -10,-14 C -34,10 -44,70 -40,130 C -38,170 -30,200 -14,214 C -4,206 2,196 6,186 C 12,198 22,206 30,208 C 26,170 30,110 32,60 C 34,24 26,-4 12,-16 Z" fill="url(#ponytail)"/>
+    <path d="M -2,0 C -22,40 -28,110 -22,190 M 10,6 C 0,60 0,130 4,180 M 22,10 C 18,60 20,130 22,196" fill="none" stroke="#f3dca0" stroke-width="2.5" stroke-linecap="round" opacity="0.55"/>
+    <path d="M -30,60 C -34,110 -32,160 -20,200 M 14,40 C 10,100 12,150 14,190" fill="none" stroke="#7e5a28" stroke-width="2" stroke-linecap="round" opacity="0.45"/>
+    <path d="M -40,130 C -38,170 -30,200 -14,214" fill="none" stroke="#bcd6ef" stroke-width="3" opacity="0.5"/>
   </g><g transform="translate(20.2,-709.3) rotate(1.7)" filter="url(#grain)">
     <path d="M -26,14 C -24,-18 -22,-38 -18,-48 L 30,-48 C 32,-30 34,-12 38,14 Z" fill="#dcae92"/>
     <path d="M -30,-40 C -70,-60 -88,-110 -80,-150 C -72,-192 -20,-205 20,-200 C 60,-196 84,-170 86,-136 C 87,-124 84,-114 88,-106 C 90,-100 96,-94 104,-84 C 108,-79 103,-73 94,-73 C 92,-70 92,-67 94,-64 C 98,-62 97,-57 92,-55 C 96,-52 95,-46 90,-44 C 92,-36 88,-28 78,-24 C 62,-18 40,-24 24,-34 C 10,-42 -10,-40 -30,-40 Z" fill="url(#skin)"/>
     <path d="M 24,-34 C 40,-26 62,-20 78,-24 C 70,-30 50,-34 36,-40 Z" fill="#cf9d80" opacity="0.6"/>
-    <circle cx="58" cy="-68" r="22" fill="url(#blush)"/>
+    <circle cx="58" cy="-68" r="26" fill="url(#blush)"/>
     <!-- The ear: its outer shape, the rolled rim along its back edge, and the hollow inside. -->
     <path d="M -4,-120 C -18,-121 -24,-108 -22,-94 C -20,-82 -14,-74 -6,-76 C 0,-78 2,-86 1,-94 C 4,-104 4,-116 -4,-120 Z" fill="#e4b49a"/>
     <path d="M -4,-116 C -15,-116 -19,-106 -18,-95 C -17,-86 -13,-80 -8,-80" fill="none" stroke="#f3cdb6" stroke-width="3" stroke-linecap="round"/>
     <path d="M -6,-108 C -12,-106 -13,-96 -10,-90 C -7,-86 -3,-88 -3,-94 C -2,-100 -2,-106 -6,-108 Z" fill="#c98f74"/>
     <path d="M -2,-90 C 0,-88 0,-85 -2,-83" fill="none" stroke="#b27a60" stroke-width="2" stroke-linecap="round"/>
     <path d="M 52,-103 C 58,-110 70,-110 77,-104 C 70,-98 58,-98 52,-103 Z" fill="#fbf6f0"/>
-    <circle cx="68" cy="-104" r="6.5" fill="#3f78b8"/>
-    <circle cx="68" cy="-104" r="6.5" fill="none" stroke="#24466d" stroke-width="1.5"/>
-    <circle cx="69" cy="-104" r="3" fill="#162033"/>
+    <circle cx="68" cy="-104" r="6.5" fill="#7d97a6"/>
+    <circle cx="68" cy="-104" r="6.5" fill="none" stroke="#4d6472" stroke-width="1.5"/>
+    <circle cx="69" cy="-104" r="3" fill="#1c2328"/>
     <circle cx="71" cy="-106.5" r="1.7" fill="#ffffff"/>
     <path d="M 49,-104 C 57,-115 72,-114 80,-105" fill="none" stroke="#4a3326" stroke-width="3.5" stroke-linecap="round"/>
     <path d="M 79,-106 L 85,-110 M 76,-109 L 80,-114" stroke="#4a3326" stroke-width="2" stroke-linecap="round"/>
     <path d="M 52,-113 C 60,-119 72,-118 79,-112" fill="none" stroke="#c99478" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
     <path d="M 55,-100 C 62,-97 70,-97 75,-100" fill="none" stroke="#b98468" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
-    <path d="M 46,-124 C 58,-132 74,-131 85,-124" fill="none" stroke="#b08640" stroke-width="5" stroke-linecap="round"/>
+    <path d="M 46,-124 C 58,-132 74,-131 85,-124" fill="none" stroke="#a88050" stroke-width="5" stroke-linecap="round"/>
     <path d="M 96,-78 C 99,-76 99,-74 96,-73" fill="none" stroke="#b98468" stroke-width="2" stroke-linecap="round"/>
     <!-- Lips: the upper lip, a fuller lower lip with a touch of light on it, and the line
          where they meet, turning in at the corner of the mouth. -->
@@ -604,18 +623,20 @@
     <path d="M 85,-55 C 89,-55 93,-55 94,-53 C 93,-49 89,-47 86,-48 C 87,-50 86,-53 85,-55 Z" fill="#cf8578"/>
     <path d="M 88,-51 C 89,-50 91,-50 92,-51" fill="none" stroke="#f2b3a6" stroke-width="1.5" stroke-linecap="round" opacity="0.8"/>
     <path d="M 81,-57 C 85,-56 91,-56 95,-57" fill="none" stroke="#8f4a40" stroke-width="1.6" stroke-linecap="round"/>
-    <!-- Hair: a soft mass over the top and back, a swept fringe, and highlights. -->
-    <path d="M 84,-140 C 82,-176 50,-206 6,-206 C -50,-206 -92,-170 -92,-118 C -92,-82 -78,-56 -56,-40 C -50,-60 -40,-78 -22,-84 C -14,-104 -10,-128 4,-140 C 24,-152 52,-150 84,-140 Z" fill="url(#hair)"/>
-    <!-- The fringe: three tapered locks swept forward across the forehead, each with its own
-         light edge, instead of one hard wedge. -->
-    <path d="M 84,-162 C 70,-150 56,-132 30,-123 C 52,-124 70,-132 86,-146 Z" fill="#cfa452"/>
-    <path d="M 86,-150 C 80,-138 70,-126 52,-118 C 68,-118 82,-126 89,-138 Z" fill="#d9b25e"/>
-    <path d="M 88,-140 C 86,-130 82,-122 72,-116 C 82,-117 89,-124 91,-132 Z" fill="#c79a4a"/>
-    <path d="M 80,-154 C 68,-140 56,-130 40,-124 M 84,-144 C 78,-134 70,-126 58,-120" fill="none" stroke="#f7e3a6" stroke-width="2" stroke-linecap="round" opacity="0.75"/>
-    <path d="M -64,-168 C -36,-198 18,-202 58,-182 C 18,-194 -30,-190 -64,-168 Z M -80,-128 C -66,-170 -24,-192 22,-188 C -22,-184 -60,-166 -80,-128 Z M -84,-96 C -86,-132 -60,-162 -26,-172 C -56,-156 -76,-130 -84,-96 Z" fill="#fff6d8" opacity="0.6"/>
-    <path d="M -70,-70 C -78,-100 -70,-130 -50,-150 M -40,-90 C -36,-120 -16,-140 10,-150" fill="none" stroke="#9e7a35" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
-    <path d="M -92,-118 C -92,-82 -78,-56 -56,-40" fill="none" stroke="#bcd6ef" stroke-width="4" stroke-linecap="round" opacity="0.55"/>
-    <ellipse cx="-78" cy="-148" rx="9" ry="12" fill="#8c3a1d" transform="rotate(-30 -78 -148)"/>
+    <!-- Hair, matched to the real Em: honey-blonde, parted in
+         the middle and worn down, straight past the shoulders, with no fringe. In profile the
+         hair runs back from the hairline over the crown, and a curtain falls past the ear and
+         the cheek. The long hair behind the shoulders is part_ponytail, so it can swing. -->
+    <path d="M 82,-146 C 80,-180 48,-208 4,-208 C -52,-208 -94,-172 -94,-118 C -94,-82 -80,-54 -58,-38 C -52,-58 -44,-74 -30,-80 C -22,-104 -6,-134 24,-146 C 42,-152 64,-152 82,-146 Z" fill="url(#hair)"/>
+    <!-- The curtain: straight hair falling from the parting, over the ear and past the jaw. -->
+    <path d="M 78,-152 C 46,-148 26,-124 20,-94 C 15,-68 18,-44 28,-22 C 6,-20 -16,-24 -30,-30 C -40,-62 -38,-118 -10,-148 C 18,-166 56,-164 78,-152 Z" fill="url(#hair)"/>
+    <path d="M 62,-150 C 34,-140 22,-116 18,-90 C 15,-66 18,-46 24,-30" fill="none" stroke="#f3dca0" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+    <path d="M 40,-148 C 10,-130 2,-96 4,-60 M 16,-152 C -12,-130 -18,-92 -14,-40" fill="none" stroke="#84612c" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+    <!-- The hairline at the forehead, softened where the parting starts. -->
+    <path d="M 84,-150 C 76,-158 66,-160 56,-156" fill="none" stroke="#b8894a" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+    <path d="M -64,-168 C -36,-198 18,-204 58,-186 C 18,-196 -30,-192 -64,-168 Z M -80,-128 C -66,-170 -24,-194 22,-190 C -22,-186 -60,-168 -80,-128 Z M -86,-96 C -88,-132 -62,-162 -28,-172 C -58,-156 -78,-130 -86,-96 Z" fill="#f8e6b8" opacity="0.55"/>
+    <path d="M -72,-68 C -80,-100 -72,-130 -52,-152 M -42,-88 C -38,-120 -18,-142 8,-152" fill="none" stroke="#84612c" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+    <path d="M -94,-118 C -94,-82 -80,-54 -58,-38" fill="none" stroke="#bcd6ef" stroke-width="4" stroke-linecap="round" opacity="0.55"/>
   </g><path d="M -7.6,-712.6 C -18.9,-689.7 -23.4,-612.8 -19.4,-568.9 C -15.4,-525 3.8,-467.4 16.2,-449.3 C 28.5,-431.1 53,-439.5 54.7,-459.9 C 56.5,-480.3 27.6,-530.6 26.5,-571.6 C 25.4,-612.6 53.7,-682.5 48,-705.9 C 42.3,-729.4 3.6,-735.4 -7.6,-712.6 Z" fill="#0c2322" opacity="0.4" transform="translate(-9,7)"/><path d="M -7.6,-712.6 C -18.9,-689.7 -23.4,-612.8 -19.4,-568.9 C -15.4,-525 3.8,-467.4 16.2,-449.3 C 28.5,-431.1 53,-439.5 54.7,-459.9 C 56.5,-480.3 27.6,-530.6 26.5,-571.6 C 25.4,-612.6 53.7,-682.5 48,-705.9 C 42.3,-729.4 3.6,-735.4 -7.6,-712.6 Z" fill="url(#sleeve_lit)" stroke="#0f2a29" stroke-width="4" stroke-linejoin="round"/><g transform="translate(34.4,-458.4) rotate(-15.4)"><ellipse cx="0" cy="2" rx="21" ry="8" fill="#0c2322"/><path d="M -14,0 C -17,14 -16,28 -12,38 C -10,43 -6,46 -1,46 C 2,48 6,47 8,44 C 12,42 14,36 12,30 C 13,27 13,25 12,24 C 16,22 19,17 18,11 C 17,6 15,2 14,0 Z" fill="url(#skin)" stroke="#b9836a" stroke-width="1.6" stroke-linejoin="round"/><path d="M 10,7 C 18,10 21,20 16,27 C 14,28 12,27 11,25 C 12,20 11,15 9,12 Z" fill="#edc4aa" stroke="#b9836a" stroke-width="1.4" stroke-linejoin="round"/><path d="M -9,30 C -6,37 0,41 7,40 M -4,34 C -2,40 2,44 5,45 M -12,22 C -11,26 -10,29 -8,31" fill="none" stroke="#c48d72" stroke-width="1.8" stroke-linecap="round" opacity="0.8"/><path d="M -13,6 C -15,16 -14,26 -11,34" fill="none" stroke="#b07d64" stroke-width="2.5" stroke-linecap="round" opacity="0.35"/><path d="M -22,-6 C -22,4 22,4 22,-6 L 21,-12 C 21,-4 -21,-4 -21,-12 Z" fill="#1f4c4b"/><path d="M -20,-4 C -10,1 10,1 20,-4" fill="none" stroke="#5aa59f" stroke-width="2" stroke-linecap="round" opacity="0.5"/></g></g></g>
   <g id="frame_7" transform="translate(4780,990)"><g filter="url(#grain_soft)"><g filter="url(#far_side)"><path d="M -11,-716 C -23.9,-694 -34.3,-617.6 -33.6,-573.5 C -32.9,-529.5 -17.8,-470.6 -6.7,-451.6 C 4.3,-432.6 29.3,-439.2 32.5,-459.4 C 35.7,-479.6 10.5,-531.9 12.4,-572.9 C 14.3,-613.8 47.9,-681.3 44,-705.1 C 40.1,-729 2,-737.9 -11,-716 Z" fill="#23514f" stroke="#0f2a29" stroke-width="4" stroke-linejoin="round"/><g transform="translate(12.1,-459.4) rotate(-11.3)"><ellipse cx="0" cy="2" rx="21" ry="8" fill="#0c2322"/><path d="M -14,0 C -17,14 -16,28 -12,38 C -10,43 -6,46 -1,46 C 2,48 6,47 8,44 C 12,42 14,36 12,30 C 13,27 13,25 12,24 C 16,22 19,17 18,11 C 17,6 15,2 14,0 Z" fill="url(#skin)" stroke="#b9836a" stroke-width="1.6" stroke-linejoin="round"/><path d="M 10,7 C 18,10 21,20 16,27 C 14,28 12,27 11,25 C 12,20 11,15 9,12 Z" fill="#edc4aa" stroke="#b9836a" stroke-width="1.4" stroke-linejoin="round"/><path d="M -9,30 C -6,37 0,41 7,40 M -4,34 C -2,40 2,44 5,45 M -12,22 C -11,26 -10,29 -8,31" fill="none" stroke="#c48d72" stroke-width="1.8" stroke-linecap="round" opacity="0.8"/><path d="M -13,6 C -15,16 -14,26 -11,34" fill="none" stroke="#b07d64" stroke-width="2.5" stroke-linecap="round" opacity="0.35"/><path d="M -22,-6 C -22,4 22,4 22,-6 L 21,-12 C 21,-4 -21,-4 -21,-12 Z" fill="#1f4c4b"/><path d="M -20,-4 C -10,1 10,1 20,-4" fill="none" stroke="#5aa59f" stroke-width="2" stroke-linecap="round" opacity="0.5"/></g></g><g filter="url(#far_side)"><path d="M -39.8,-439.1 C -54.3,-406.8 -42.3,-304.3 -47,-237.6 C -51.6,-170.9 -71.9,-73.2 -67.8,-39.1 C -63.7,-5 -35.3,-0.9 -22.2,-32.9 C -9.1,-64.9 0.3,-164.6 10.7,-231.1 C 21,-297.6 48.3,-397.3 39.8,-432 C 31.4,-466.6 -25.4,-471.5 -39.8,-439.1 Z" fill="#2b3550" stroke="#161c2b" stroke-width="3" stroke-linejoin="round"/><path d="M -32.1,-238.4 Q -18.1,-226.4 -4.1,-236.4" fill="none" stroke="#1a2030" stroke-width="3" opacity="0.5" stroke-linecap="round"/><g transform="translate(-45,-36) rotate(0.5)" filter="url(#grain)">
     <path d="M -28,-6 L 26,-6 C 40,0 66,8 76,20 C 80,28 78,36 70,36 L -30,36 C -34,24 -34,8 -28,-6 Z" fill="url(#leather)"/>
@@ -655,30 +676,31 @@
     <path d="M -14,-4 C -30,30 -40,90 -36,150 L -6,156 C -10,110 -2,50 14,4 Z" fill="url(#scarf)"/>
     <path d="M -34,150 L -36,166 M -26,152 L -26,168 M -16,153 L -14,168 M -8,154 L -5,168" stroke="#8a361a" stroke-width="3" stroke-linecap="round"/>
     <path d="M -20,20 C -28,60 -30,100 -26,140" fill="none" stroke="#6e2a14" stroke-width="2.5" opacity="0.5"/>
-  </g><g transform="translate(-57.9,-860.4) rotate(18.1)" filter="url(#grain)">
-    <path d="M -14,-6 C -40,30 -50,90 -30,150 C -22,172 -8,186 4,190 C -6,160 4,110 20,60 C 26,30 20,6 12,-6 Z" fill="url(#ponytail)"/>
-    <path d="M -4,10 C -24,50 -30,110 -14,160 M 8,20 C -6,60 -6,110 0,160" fill="none" stroke="#fff3cf" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
-    <path d="M -30,150 C -22,172 -8,186 4,190" fill="none" stroke="#bcd6ef" stroke-width="3" opacity="0.5"/>
+  </g><g transform="translate(-52.5,-838.2) rotate(8.9)" filter="url(#grain)">
+    <path d="M -10,-14 C -34,10 -44,70 -40,130 C -38,170 -30,200 -14,214 C -4,206 2,196 6,186 C 12,198 22,206 30,208 C 26,170 30,110 32,60 C 34,24 26,-4 12,-16 Z" fill="url(#ponytail)"/>
+    <path d="M -2,0 C -22,40 -28,110 -22,190 M 10,6 C 0,60 0,130 4,180 M 22,10 C 18,60 20,130 22,196" fill="none" stroke="#f3dca0" stroke-width="2.5" stroke-linecap="round" opacity="0.55"/>
+    <path d="M -30,60 C -34,110 -32,160 -20,200 M 14,40 C 10,100 12,150 14,190" fill="none" stroke="#7e5a28" stroke-width="2" stroke-linecap="round" opacity="0.45"/>
+    <path d="M -40,130 C -38,170 -30,200 -14,214" fill="none" stroke="#bcd6ef" stroke-width="3" opacity="0.5"/>
   </g><g transform="translate(16.5,-710.6) rotate(1.4)" filter="url(#grain)">
     <path d="M -26,14 C -24,-18 -22,-38 -18,-48 L 30,-48 C 32,-30 34,-12 38,14 Z" fill="#dcae92"/>
     <path d="M -30,-40 C -70,-60 -88,-110 -80,-150 C -72,-192 -20,-205 20,-200 C 60,-196 84,-170 86,-136 C 87,-124 84,-114 88,-106 C 90,-100 96,-94 104,-84 C 108,-79 103,-73 94,-73 C 92,-70 92,-67 94,-64 C 98,-62 97,-57 92,-55 C 96,-52 95,-46 90,-44 C 92,-36 88,-28 78,-24 C 62,-18 40,-24 24,-34 C 10,-42 -10,-40 -30,-40 Z" fill="url(#skin)"/>
     <path d="M 24,-34 C 40,-26 62,-20 78,-24 C 70,-30 50,-34 36,-40 Z" fill="#cf9d80" opacity="0.6"/>
-    <circle cx="58" cy="-68" r="22" fill="url(#blush)"/>
+    <circle cx="58" cy="-68" r="26" fill="url(#blush)"/>
     <!-- The ear: its outer shape, the rolled rim along its back edge, and the hollow inside. -->
     <path d="M -4,-120 C -18,-121 -24,-108 -22,-94 C -20,-82 -14,-74 -6,-76 C 0,-78 2,-86 1,-94 C 4,-104 4,-116 -4,-120 Z" fill="#e4b49a"/>
     <path d="M -4,-116 C -15,-116 -19,-106 -18,-95 C -17,-86 -13,-80 -8,-80" fill="none" stroke="#f3cdb6" stroke-width="3" stroke-linecap="round"/>
     <path d="M -6,-108 C -12,-106 -13,-96 -10,-90 C -7,-86 -3,-88 -3,-94 C -2,-100 -2,-106 -6,-108 Z" fill="#c98f74"/>
     <path d="M -2,-90 C 0,-88 0,-85 -2,-83" fill="none" stroke="#b27a60" stroke-width="2" stroke-linecap="round"/>
     <path d="M 52,-103 C 58,-110 70,-110 77,-104 C 70,-98 58,-98 52,-103 Z" fill="#fbf6f0"/>
-    <circle cx="68" cy="-104" r="6.5" fill="#3f78b8"/>
-    <circle cx="68" cy="-104" r="6.5" fill="none" stroke="#24466d" stroke-width="1.5"/>
-    <circle cx="69" cy="-104" r="3" fill="#162033"/>
+    <circle cx="68" cy="-104" r="6.5" fill="#7d97a6"/>
+    <circle cx="68" cy="-104" r="6.5" fill="none" stroke="#4d6472" stroke-width="1.5"/>
+    <circle cx="69" cy="-104" r="3" fill="#1c2328"/>
     <circle cx="71" cy="-106.5" r="1.7" fill="#ffffff"/>
     <path d="M 49,-104 C 57,-115 72,-114 80,-105" fill="none" stroke="#4a3326" stroke-width="3.5" stroke-linecap="round"/>
     <path d="M 79,-106 L 85,-110 M 76,-109 L 80,-114" stroke="#4a3326" stroke-width="2" stroke-linecap="round"/>
     <path d="M 52,-113 C 60,-119 72,-118 79,-112" fill="none" stroke="#c99478" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
     <path d="M 55,-100 C 62,-97 70,-97 75,-100" fill="none" stroke="#b98468" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
-    <path d="M 46,-124 C 58,-132 74,-131 85,-124" fill="none" stroke="#b08640" stroke-width="5" stroke-linecap="round"/>
+    <path d="M 46,-124 C 58,-132 74,-131 85,-124" fill="none" stroke="#a88050" stroke-width="5" stroke-linecap="round"/>
     <path d="M 96,-78 C 99,-76 99,-74 96,-73" fill="none" stroke="#b98468" stroke-width="2" stroke-linecap="round"/>
     <!-- Lips: the upper lip, a fuller lower lip with a touch of light on it, and the line
          where they meet, turning in at the corner of the mouth. -->
@@ -686,18 +708,20 @@
     <path d="M 85,-55 C 89,-55 93,-55 94,-53 C 93,-49 89,-47 86,-48 C 87,-50 86,-53 85,-55 Z" fill="#cf8578"/>
     <path d="M 88,-51 C 89,-50 91,-50 92,-51" fill="none" stroke="#f2b3a6" stroke-width="1.5" stroke-linecap="round" opacity="0.8"/>
     <path d="M 81,-57 C 85,-56 91,-56 95,-57" fill="none" stroke="#8f4a40" stroke-width="1.6" stroke-linecap="round"/>
-    <!-- Hair: a soft mass over the top and back, a swept fringe, and highlights. -->
-    <path d="M 84,-140 C 82,-176 50,-206 6,-206 C -50,-206 -92,-170 -92,-118 C -92,-82 -78,-56 -56,-40 C -50,-60 -40,-78 -22,-84 C -14,-104 -10,-128 4,-140 C 24,-152 52,-150 84,-140 Z" fill="url(#hair)"/>
-    <!-- The fringe: three tapered locks swept forward across the forehead, each with its own
-         light edge, instead of one hard wedge. -->
-    <path d="M 84,-162 C 70,-150 56,-132 30,-123 C 52,-124 70,-132 86,-146 Z" fill="#cfa452"/>
-    <path d="M 86,-150 C 80,-138 70,-126 52,-118 C 68,-118 82,-126 89,-138 Z" fill="#d9b25e"/>
-    <path d="M 88,-140 C 86,-130 82,-122 72,-116 C 82,-117 89,-124 91,-132 Z" fill="#c79a4a"/>
-    <path d="M 80,-154 C 68,-140 56,-130 40,-124 M 84,-144 C 78,-134 70,-126 58,-120" fill="none" stroke="#f7e3a6" stroke-width="2" stroke-linecap="round" opacity="0.75"/>
-    <path d="M -64,-168 C -36,-198 18,-202 58,-182 C 18,-194 -30,-190 -64,-168 Z M -80,-128 C -66,-170 -24,-192 22,-188 C -22,-184 -60,-166 -80,-128 Z M -84,-96 C -86,-132 -60,-162 -26,-172 C -56,-156 -76,-130 -84,-96 Z" fill="#fff6d8" opacity="0.6"/>
-    <path d="M -70,-70 C -78,-100 -70,-130 -50,-150 M -40,-90 C -36,-120 -16,-140 10,-150" fill="none" stroke="#9e7a35" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
-    <path d="M -92,-118 C -92,-82 -78,-56 -56,-40" fill="none" stroke="#bcd6ef" stroke-width="4" stroke-linecap="round" opacity="0.55"/>
-    <ellipse cx="-78" cy="-148" rx="9" ry="12" fill="#8c3a1d" transform="rotate(-30 -78 -148)"/>
+    <!-- Hair, matched to the real Em: honey-blonde, parted in
+         the middle and worn down, straight past the shoulders, with no fringe. In profile the
+         hair runs back from the hairline over the crown, and a curtain falls past the ear and
+         the cheek. The long hair behind the shoulders is part_ponytail, so it can swing. -->
+    <path d="M 82,-146 C 80,-180 48,-208 4,-208 C -52,-208 -94,-172 -94,-118 C -94,-82 -80,-54 -58,-38 C -52,-58 -44,-74 -30,-80 C -22,-104 -6,-134 24,-146 C 42,-152 64,-152 82,-146 Z" fill="url(#hair)"/>
+    <!-- The curtain: straight hair falling from the parting, over the ear and past the jaw. -->
+    <path d="M 78,-152 C 46,-148 26,-124 20,-94 C 15,-68 18,-44 28,-22 C 6,-20 -16,-24 -30,-30 C -40,-62 -38,-118 -10,-148 C 18,-166 56,-164 78,-152 Z" fill="url(#hair)"/>
+    <path d="M 62,-150 C 34,-140 22,-116 18,-90 C 15,-66 18,-46 24,-30" fill="none" stroke="#f3dca0" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+    <path d="M 40,-148 C 10,-130 2,-96 4,-60 M 16,-152 C -12,-130 -18,-92 -14,-40" fill="none" stroke="#84612c" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+    <!-- The hairline at the forehead, softened where the parting starts. -->
+    <path d="M 84,-150 C 76,-158 66,-160 56,-156" fill="none" stroke="#b8894a" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+    <path d="M -64,-168 C -36,-198 18,-204 58,-186 C 18,-196 -30,-192 -64,-168 Z M -80,-128 C -66,-170 -24,-194 22,-190 C -22,-186 -60,-168 -80,-128 Z M -86,-96 C -88,-132 -62,-162 -28,-172 C -58,-156 -78,-130 -86,-96 Z" fill="#f8e6b8" opacity="0.55"/>
+    <path d="M -72,-68 C -80,-100 -72,-130 -52,-152 M -42,-88 C -38,-120 -18,-142 8,-152" fill="none" stroke="#84612c" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+    <path d="M -94,-118 C -94,-82 -80,-54 -58,-38" fill="none" stroke="#bcd6ef" stroke-width="4" stroke-linecap="round" opacity="0.55"/>
   </g><path d="M -11.3,-713.7 C -22.4,-690.9 -26.3,-614 -22.4,-570.1 C -18.5,-526.2 -0.1,-468.6 12.1,-450.4 C 24.3,-432.1 48.9,-440.3 50.8,-460.7 C 52.7,-481.1 24.6,-531.7 23.5,-572.8 C 22.4,-613.9 50.1,-683.9 44.3,-707.4 C 38.5,-730.8 -0.2,-736.6 -11.3,-713.7 Z" fill="#0c2322" opacity="0.4" transform="translate(-9,7)"/><path d="M -11.3,-713.7 C -22.4,-690.9 -26.3,-614 -22.4,-570.1 C -18.5,-526.2 -0.1,-468.6 12.1,-450.4 C 24.3,-432.1 48.9,-440.3 50.8,-460.7 C 52.7,-481.1 24.6,-531.7 23.5,-572.8 C 22.4,-613.9 50.1,-683.9 44.3,-707.4 C 38.5,-730.8 -0.2,-736.6 -11.3,-713.7 Z" fill="url(#sleeve_lit)" stroke="#0f2a29" stroke-width="4" stroke-linejoin="round"/><g transform="translate(30.4,-459.4) rotate(-14.9)"><ellipse cx="0" cy="2" rx="21" ry="8" fill="#0c2322"/><path d="M -14,0 C -17,14 -16,28 -12,38 C -10,43 -6,46 -1,46 C 2,48 6,47 8,44 C 12,42 14,36 12,30 C 13,27 13,25 12,24 C 16,22 19,17 18,11 C 17,6 15,2 14,0 Z" fill="url(#skin)" stroke="#b9836a" stroke-width="1.6" stroke-linejoin="round"/><path d="M 10,7 C 18,10 21,20 16,27 C 14,28 12,27 11,25 C 12,20 11,15 9,12 Z" fill="#edc4aa" stroke="#b9836a" stroke-width="1.4" stroke-linejoin="round"/><path d="M -9,30 C -6,37 0,41 7,40 M -4,34 C -2,40 2,44 5,45 M -12,22 C -11,26 -10,29 -8,31" fill="none" stroke="#c48d72" stroke-width="1.8" stroke-linecap="round" opacity="0.8"/><path d="M -13,6 C -15,16 -14,26 -11,34" fill="none" stroke="#b07d64" stroke-width="2.5" stroke-linecap="round" opacity="0.35"/><path d="M -22,-6 C -22,4 22,4 22,-6 L 21,-12 C 21,-4 -21,-4 -21,-12 Z" fill="#1f4c4b"/><path d="M -20,-4 C -10,1 10,1 20,-4" fill="none" stroke="#5aa59f" stroke-width="2" stroke-linecap="round" opacity="0.5"/></g></g></g>
   <g id="frame_8" transform="translate(300,2050)"><g filter="url(#grain_soft)"><g filter="url(#far_side)"><path d="M -12.4,-716.6 C -25.5,-694.7 -36.3,-618.3 -35.9,-574.3 C -35.4,-530.2 -20.5,-471.3 -9.6,-452.2 C 1.3,-433.1 26.3,-439.6 29.6,-459.8 C 32.9,-480 8,-532.4 10.1,-573.4 C 12.3,-614.3 46.2,-681.6 42.4,-705.4 C 38.7,-729.3 0.6,-738.4 -12.4,-716.6 Z" fill="#23514f" stroke="#0f2a29" stroke-width="4" stroke-linejoin="round"/><g transform="translate(9.2,-459.9) rotate(-11)"><ellipse cx="0" cy="2" rx="21" ry="8" fill="#0c2322"/><path d="M -14,0 C -17,14 -16,28 -12,38 C -10,43 -6,46 -1,46 C 2,48 6,47 8,44 C 12,42 14,36 12,30 C 13,27 13,25 12,24 C 16,22 19,17 18,11 C 17,6 15,2 14,0 Z" fill="url(#skin)" stroke="#b9836a" stroke-width="1.6" stroke-linejoin="round"/><path d="M 10,7 C 18,10 21,20 16,27 C 14,28 12,27 11,25 C 12,20 11,15 9,12 Z" fill="#edc4aa" stroke="#b9836a" stroke-width="1.4" stroke-linejoin="round"/><path d="M -9,30 C -6,37 0,41 7,40 M -4,34 C -2,40 2,44 5,45 M -12,22 C -11,26 -10,29 -8,31" fill="none" stroke="#c48d72" stroke-width="1.8" stroke-linecap="round" opacity="0.8"/><path d="M -13,6 C -15,16 -14,26 -11,34" fill="none" stroke="#b07d64" stroke-width="2.5" stroke-linecap="round" opacity="0.35"/><path d="M -22,-6 C -22,4 22,4 22,-6 L 21,-12 C 21,-4 -21,-4 -21,-12 Z" fill="#1f4c4b"/><path d="M -20,-4 C -10,1 10,1 20,-4" fill="none" stroke="#5aa59f" stroke-width="2" stroke-linecap="round" opacity="0.5"/></g></g><g filter="url(#far_side)"><path d="M -39.8,-439.6 C -54.3,-407.2 -42.3,-304.8 -46.9,-238.1 C -51.6,-171.3 -71.9,-73.3 -67.8,-39.1 C -63.7,-4.9 -35.3,-0.8 -22.2,-32.9 C -9.1,-65 0.4,-165 10.7,-231.6 C 21,-298.2 48.3,-397.7 39.8,-432.4 C 31.4,-467.1 -25.4,-472 -39.8,-439.6 Z" fill="#2b3550" stroke="#161c2b" stroke-width="3" stroke-linejoin="round"/><path d="M -32.1,-238.8 Q -18.1,-226.8 -4.1,-236.8" fill="none" stroke="#1a2030" stroke-width="3" opacity="0.5" stroke-linecap="round"/><g transform="translate(-45,-36) rotate(0)" filter="url(#grain)">
     <path d="M -28,-6 L 26,-6 C 40,0 66,8 76,20 C 80,28 78,36 70,36 L -30,36 C -34,24 -34,8 -28,-6 Z" fill="url(#leather)"/>
@@ -737,30 +761,31 @@
     <path d="M -14,-4 C -30,30 -40,90 -36,150 L -6,156 C -10,110 -2,50 14,4 Z" fill="url(#scarf)"/>
     <path d="M -34,150 L -36,166 M -26,152 L -26,168 M -16,153 L -14,168 M -8,154 L -5,168" stroke="#8a361a" stroke-width="3" stroke-linecap="round"/>
     <path d="M -20,20 C -28,60 -30,100 -26,140" fill="none" stroke="#6e2a14" stroke-width="2.5" opacity="0.5"/>
-  </g><g transform="translate(-59.8,-860.7) rotate(17.2)" filter="url(#grain)">
-    <path d="M -14,-6 C -40,30 -50,90 -30,150 C -22,172 -8,186 4,190 C -6,160 4,110 20,60 C 26,30 20,6 12,-6 Z" fill="url(#ponytail)"/>
-    <path d="M -4,10 C -24,50 -30,110 -14,160 M 8,20 C -6,60 -6,110 0,160" fill="none" stroke="#fff3cf" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
-    <path d="M -30,150 C -22,172 -8,186 4,190" fill="none" stroke="#bcd6ef" stroke-width="3" opacity="0.5"/>
+  </g><g transform="translate(-54.2,-838.5) rotate(8)" filter="url(#grain)">
+    <path d="M -10,-14 C -34,10 -44,70 -40,130 C -38,170 -30,200 -14,214 C -4,206 2,196 6,186 C 12,198 22,206 30,208 C 26,170 30,110 32,60 C 34,24 26,-4 12,-16 Z" fill="url(#ponytail)"/>
+    <path d="M -2,0 C -22,40 -28,110 -22,190 M 10,6 C 0,60 0,130 4,180 M 22,10 C 18,60 20,130 22,196" fill="none" stroke="#f3dca0" stroke-width="2.5" stroke-linecap="round" opacity="0.55"/>
+    <path d="M -30,60 C -34,110 -32,160 -20,200 M 14,40 C 10,100 12,150 14,190" fill="none" stroke="#7e5a28" stroke-width="2" stroke-linecap="round" opacity="0.45"/>
+    <path d="M -40,130 C -38,170 -30,200 -14,214" fill="none" stroke="#bcd6ef" stroke-width="3" opacity="0.5"/>
   </g><g transform="translate(15,-711) rotate(1.2)" filter="url(#grain)">
     <path d="M -26,14 C -24,-18 -22,-38 -18,-48 L 30,-48 C 32,-30 34,-12 38,14 Z" fill="#dcae92"/>
     <path d="M -30,-40 C -70,-60 -88,-110 -80,-150 C -72,-192 -20,-205 20,-200 C 60,-196 84,-170 86,-136 C 87,-124 84,-114 88,-106 C 90,-100 96,-94 104,-84 C 108,-79 103,-73 94,-73 C 92,-70 92,-67 94,-64 C 98,-62 97,-57 92,-55 C 96,-52 95,-46 90,-44 C 92,-36 88,-28 78,-24 C 62,-18 40,-24 24,-34 C 10,-42 -10,-40 -30,-40 Z" fill="url(#skin)"/>
     <path d="M 24,-34 C 40,-26 62,-20 78,-24 C 70,-30 50,-34 36,-40 Z" fill="#cf9d80" opacity="0.6"/>
-    <circle cx="58" cy="-68" r="22" fill="url(#blush)"/>
+    <circle cx="58" cy="-68" r="26" fill="url(#blush)"/>
     <!-- The ear: its outer shape, the rolled rim along its back edge, and the hollow inside. -->
     <path d="M -4,-120 C -18,-121 -24,-108 -22,-94 C -20,-82 -14,-74 -6,-76 C 0,-78 2,-86 1,-94 C 4,-104 4,-116 -4,-120 Z" fill="#e4b49a"/>
     <path d="M -4,-116 C -15,-116 -19,-106 -18,-95 C -17,-86 -13,-80 -8,-80" fill="none" stroke="#f3cdb6" stroke-width="3" stroke-linecap="round"/>
     <path d="M -6,-108 C -12,-106 -13,-96 -10,-90 C -7,-86 -3,-88 -3,-94 C -2,-100 -2,-106 -6,-108 Z" fill="#c98f74"/>
     <path d="M -2,-90 C 0,-88 0,-85 -2,-83" fill="none" stroke="#b27a60" stroke-width="2" stroke-linecap="round"/>
     <path d="M 52,-103 C 58,-110 70,-110 77,-104 C 70,-98 58,-98 52,-103 Z" fill="#fbf6f0"/>
-    <circle cx="68" cy="-104" r="6.5" fill="#3f78b8"/>
-    <circle cx="68" cy="-104" r="6.5" fill="none" stroke="#24466d" stroke-width="1.5"/>
-    <circle cx="69" cy="-104" r="3" fill="#162033"/>
+    <circle cx="68" cy="-104" r="6.5" fill="#7d97a6"/>
+    <circle cx="68" cy="-104" r="6.5" fill="none" stroke="#4d6472" stroke-width="1.5"/>
+    <circle cx="69" cy="-104" r="3" fill="#1c2328"/>
     <circle cx="71" cy="-106.5" r="1.7" fill="#ffffff"/>
     <path d="M 49,-104 C 57,-115 72,-114 80,-105" fill="none" stroke="#4a3326" stroke-width="3.5" stroke-linecap="round"/>
     <path d="M 79,-106 L 85,-110 M 76,-109 L 80,-114" stroke="#4a3326" stroke-width="2" stroke-linecap="round"/>
     <path d="M 52,-113 C 60,-119 72,-118 79,-112" fill="none" stroke="#c99478" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
     <path d="M 55,-100 C 62,-97 70,-97 75,-100" fill="none" stroke="#b98468" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
-    <path d="M 46,-124 C 58,-132 74,-131 85,-124" fill="none" stroke="#b08640" stroke-width="5" stroke-linecap="round"/>
+    <path d="M 46,-124 C 58,-132 74,-131 85,-124" fill="none" stroke="#a88050" stroke-width="5" stroke-linecap="round"/>
     <path d="M 96,-78 C 99,-76 99,-74 96,-73" fill="none" stroke="#b98468" stroke-width="2" stroke-linecap="round"/>
     <!-- Lips: the upper lip, a fuller lower lip with a touch of light on it, and the line
          where they meet, turning in at the corner of the mouth. -->
@@ -768,17 +793,19 @@
     <path d="M 85,-55 C 89,-55 93,-55 94,-53 C 93,-49 89,-47 86,-48 C 87,-50 86,-53 85,-55 Z" fill="#cf8578"/>
     <path d="M 88,-51 C 89,-50 91,-50 92,-51" fill="none" stroke="#f2b3a6" stroke-width="1.5" stroke-linecap="round" opacity="0.8"/>
     <path d="M 81,-57 C 85,-56 91,-56 95,-57" fill="none" stroke="#8f4a40" stroke-width="1.6" stroke-linecap="round"/>
-    <!-- Hair: a soft mass over the top and back, a swept fringe, and highlights. -->
-    <path d="M 84,-140 C 82,-176 50,-206 6,-206 C -50,-206 -92,-170 -92,-118 C -92,-82 -78,-56 -56,-40 C -50,-60 -40,-78 -22,-84 C -14,-104 -10,-128 4,-140 C 24,-152 52,-150 84,-140 Z" fill="url(#hair)"/>
-    <!-- The fringe: three tapered locks swept forward across the forehead, each with its own
-         light edge, instead of one hard wedge. -->
-    <path d="M 84,-162 C 70,-150 56,-132 30,-123 C 52,-124 70,-132 86,-146 Z" fill="#cfa452"/>
-    <path d="M 86,-150 C 80,-138 70,-126 52,-118 C 68,-118 82,-126 89,-138 Z" fill="#d9b25e"/>
-    <path d="M 88,-140 C 86,-130 82,-122 72,-116 C 82,-117 89,-124 91,-132 Z" fill="#c79a4a"/>
-    <path d="M 80,-154 C 68,-140 56,-130 40,-124 M 84,-144 C 78,-134 70,-126 58,-120" fill="none" stroke="#f7e3a6" stroke-width="2" stroke-linecap="round" opacity="0.75"/>
-    <path d="M -64,-168 C -36,-198 18,-202 58,-182 C 18,-194 -30,-190 -64,-168 Z M -80,-128 C -66,-170 -24,-192 22,-188 C -22,-184 -60,-166 -80,-128 Z M -84,-96 C -86,-132 -60,-162 -26,-172 C -56,-156 -76,-130 -84,-96 Z" fill="#fff6d8" opacity="0.6"/>
-    <path d="M -70,-70 C -78,-100 -70,-130 -50,-150 M -40,-90 C -36,-120 -16,-140 10,-150" fill="none" stroke="#9e7a35" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
-    <path d="M -92,-118 C -92,-82 -78,-56 -56,-40" fill="none" stroke="#bcd6ef" stroke-width="4" stroke-linecap="round" opacity="0.55"/>
-    <ellipse cx="-78" cy="-148" rx="9" ry="12" fill="#8c3a1d" transform="rotate(-30 -78 -148)"/>
+    <!-- Hair, matched to the real Em: honey-blonde, parted in
+         the middle and worn down, straight past the shoulders, with no fringe. In profile the
+         hair runs back from the hairline over the crown, and a curtain falls past the ear and
+         the cheek. The long hair behind the shoulders is part_ponytail, so it can swing. -->
+    <path d="M 82,-146 C 80,-180 48,-208 4,-208 C -52,-208 -94,-172 -94,-118 C -94,-82 -80,-54 -58,-38 C -52,-58 -44,-74 -30,-80 C -22,-104 -6,-134 24,-146 C 42,-152 64,-152 82,-146 Z" fill="url(#hair)"/>
+    <!-- The curtain: straight hair falling from the parting, over the ear and past the jaw. -->
+    <path d="M 78,-152 C 46,-148 26,-124 20,-94 C 15,-68 18,-44 28,-22 C 6,-20 -16,-24 -30,-30 C -40,-62 -38,-118 -10,-148 C 18,-166 56,-164 78,-152 Z" fill="url(#hair)"/>
+    <path d="M 62,-150 C 34,-140 22,-116 18,-90 C 15,-66 18,-46 24,-30" fill="none" stroke="#f3dca0" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+    <path d="M 40,-148 C 10,-130 2,-96 4,-60 M 16,-152 C -12,-130 -18,-92 -14,-40" fill="none" stroke="#84612c" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+    <!-- The hairline at the forehead, softened where the parting starts. -->
+    <path d="M 84,-150 C 76,-158 66,-160 56,-156" fill="none" stroke="#b8894a" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+    <path d="M -64,-168 C -36,-198 18,-204 58,-186 C 18,-196 -30,-192 -64,-168 Z M -80,-128 C -66,-170 -24,-194 22,-190 C -22,-186 -60,-168 -80,-128 Z M -86,-96 C -88,-132 -62,-162 -28,-172 C -58,-156 -78,-130 -86,-96 Z" fill="#f8e6b8" opacity="0.55"/>
+    <path d="M -72,-68 C -80,-100 -72,-130 -52,-152 M -42,-88 C -38,-120 -18,-142 8,-152" fill="none" stroke="#84612c" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+    <path d="M -94,-118 C -94,-82 -80,-54 -58,-38" fill="none" stroke="#bcd6ef" stroke-width="4" stroke-linecap="round" opacity="0.55"/>
   </g><path d="M -12.8,-714.2 C -23.9,-691.3 -27.9,-614.5 -24,-570.6 C -20.1,-526.7 -1.5,-469.1 10.7,-450.8 C 22.9,-432.6 47.4,-440.8 49.3,-461.2 C 51.2,-481.6 23,-532.2 21.9,-573.3 C 20.9,-614.4 48.6,-684.3 42.8,-707.8 C 37,-731.3 -1.7,-737.1 -12.8,-714.2 Z" fill="#0c2322" opacity="0.4" transform="translate(-9,7)"/><path d="M -12.8,-714.2 C -23.9,-691.3 -27.9,-614.5 -24,-570.6 C -20.1,-526.7 -1.5,-469.1 10.7,-450.8 C 22.9,-432.6 47.4,-440.8 49.3,-461.2 C 51.2,-481.6 23,-532.2 21.9,-573.3 C 20.9,-614.4 48.6,-684.3 42.8,-707.8 C 37,-731.3 -1.7,-737.1 -12.8,-714.2 Z" fill="url(#sleeve_lit)" stroke="#0f2a29" stroke-width="4" stroke-linejoin="round"/><g transform="translate(29,-459.9) rotate(-15)"><ellipse cx="0" cy="2" rx="21" ry="8" fill="#0c2322"/><path d="M -14,0 C -17,14 -16,28 -12,38 C -10,43 -6,46 -1,46 C 2,48 6,47 8,44 C 12,42 14,36 12,30 C 13,27 13,25 12,24 C 16,22 19,17 18,11 C 17,6 15,2 14,0 Z" fill="url(#skin)" stroke="#b9836a" stroke-width="1.6" stroke-linejoin="round"/><path d="M 10,7 C 18,10 21,20 16,27 C 14,28 12,27 11,25 C 12,20 11,15 9,12 Z" fill="#edc4aa" stroke="#b9836a" stroke-width="1.4" stroke-linejoin="round"/><path d="M -9,30 C -6,37 0,41 7,40 M -4,34 C -2,40 2,44 5,45 M -12,22 C -11,26 -10,29 -8,31" fill="none" stroke="#c48d72" stroke-width="1.8" stroke-linecap="round" opacity="0.8"/><path d="M -13,6 C -15,16 -14,26 -11,34" fill="none" stroke="#b07d64" stroke-width="2.5" stroke-linecap="round" opacity="0.35"/><path d="M -22,-6 C -22,4 22,4 22,-6 L 21,-12 C 21,-4 -21,-4 -21,-12 Z" fill="#1f4c4b"/><path d="M -20,-4 C -10,1 10,1 20,-4" fill="none" stroke="#5aa59f" stroke-width="2" stroke-linecap="round" opacity="0.5"/></g></g></g>
 </svg>
