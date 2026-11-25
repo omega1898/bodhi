@@ -20,6 +20,9 @@
          exactly the code Unity runs. -->
     <Compile Include="../../rules/Runtime/**/*.cs" Link="Rules/%(RecursiveDir)%(Filename)%(Extension)" />
     <Compile Include="../../look/Runtime/**/*.cs" Link="Look/%(RecursiveDir)%(Filename)%(Extension)" />
+    <!-- The game's plain C# helpers (subtitles, zones, save files), which use the rules but
+         not Unity, so they are tested here too. -->
+    <Compile Include="../../game/Logic/**/*.cs" Link="Game/%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 
   <ItemGroup>
