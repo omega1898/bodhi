@@ -20,6 +20,7 @@ namespace Bodhi.Game
     public class ChapterDirector : MonoBehaviour
     {
         public const string dog_name = "Bodhi";      // He. The name filled into {dog}.
+        public const Story game_story = Story.christmas;  // The story this game tells.
         public const float longest_frame_seconds = 0.1f;  // A long hitch plays as a short one.
         public const double autopilot_arrived = 10;  // A story walk is over this close to its spot.
         public const double guest_set_off = 60, guest_stop = 24, guest_behind = 56, guest_speed_scale = 0.8;
@@ -65,7 +66,7 @@ namespace Bodhi.Game
             hud = new GameHud(transform, controls);
             titles = new TitleScreens(transform, camera_rig.view);
             game_audio = gameObject.AddComponent<GameAudio>();
-            session = new GameSession(new SaveFiles(Path.Combine(Application.persistentDataPath, "saves")), dog_name, Story.christmas);
+            session = new GameSession(new SaveFiles(Path.Combine(Application.persistentDataPath, "saves")), dog_name, game_story);
             home_screen = new HomeScreen(transform, session, dog_name);
             check_today();
             show_title();

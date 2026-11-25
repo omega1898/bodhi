@@ -8,7 +8,7 @@
 //   0.3  the picture fades up: the camera is looking up at a starry sky and the green aurora.
 //   2.6  the camera tilts slowly down, past snowy mountains, to the snowfield where Em and Bodhi
 //        are building a snowman (what they do is SnowmanPlay's job, not this file's).
-//   5.6  the name "Bodhi" fades in, then "Until We Find Home" under it.
+//   5.6  the name "Bodhi" fades in, then "A Light in the Window" under it.
 //   7.6  New Game and Continue fade in.
 //   8.6  settled: the two of them keep playing in the snow for as long as the title shows.
 // A tap before 8.6 skips straight to the settled screen, never to a blank one.
@@ -23,7 +23,7 @@ namespace Bodhi.Game
         public double sky_opacity;          // The starry sky and the aurora.
         public double camera_tilt;          // 0 looking up at the aurora, 1 settled on the snowfield.
         public double title_opacity;        // The name "Bodhi".
-        public double subtitle_opacity;     // "Until We Find Home".
+        public double subtitle_opacity;     // "A Light in the Window".
         public double buttons_opacity;      // New Game and Continue.
         public bool buttons_ready;          // True once the buttons show enough to be pressed.
         public bool is_skippable;           // True while a tap would skip to the settled screen.
@@ -43,7 +43,7 @@ namespace Bodhi.Game
 
         // The title's words.
         public const string title_text = "Bodhi";
-        public const string subtitle_text = "Until We Find Home";
+        public const string subtitle_text = "A Light in the Window";  // The Christmas story's name.
 
         // Times beyond this (nearly four months) are treated as this, so numbers stay small.
         public const double longest_seconds = 1e7;
