@@ -539,28 +539,77 @@ Then the title card *Chapter Seven: Tam's Sled*, 19 December.
 
 Follow the smell of the big animals. / Turn the calf back into her pen. / Pull the gate rope shut. / Bark for help. Biscuit can't go on. / Follow the prints uphill. / Open the field gate. / Whistle for {dog}. / (the reunion: go to him, kneel, hold him; the collar goes back on as it ends) / Go into Tam's kitchen.
 
-### Chapter Seven: Tam's Sled (19 December)
+### Chapter Seven: Tam's Sled (19 December), in full
 
-*Underneath:* the two guilts meet and forgive each other over a bad phone line. And Tam tells the story of 1974, five lines long, the only time he talks about it.
+Written in full on 25 November 2026, when the chapter was built. The chapter's question: *can they get Biscuit home over the mountains before the storm?* This chapter decides to try.
 
-| Beat | Voice | Line |
+*Underneath:* a day of ordinary love after five days of fear, and two confessions. Over a bad phone line, Mina admits she never latched the log store, and Em answers with her own small guilt, the notch. Neither of them is forgiven, exactly: they simply put the guilt down together. Then Tam tells the story he has never told, five lines long, looking at the stove and not at Em. The sled on his wall has been waiting fifty years for a job. And the line he ends on is the one the whole second half rests on: *"Snow forgets, lass. A nose remembers."*
+
+#### Morning (Em and Bodhi)
+
+| # | Beat | Voice | Caption |
+|---|---|---|---|
+| 1 | Waking (film) | Em | He slept on my feet and woke every hour to check they were still there. |
+| 2 | | B | Her feet. Still here. Sleep. Check. Still here. |
+| 3 | The towel | Em | Five days of hill came out of his curls: ice, burrs, half a pine cone. |
+| 4 | His paws | Em | Ice balls between his toes, hard as marbles. He let me pick out every one. |
+| 5 | | Em | He has never let me touch his feet. He let me then. |
+| 6 | Breakfast | Em | Tam fed us both. Porridge for me. For him, something Tam wouldn't name. |
+| 7 | A cuddle | Em | He leaned on me so hard I had to brace my feet. |
+
+#### The phone (Em)
+
+| # | Beat | Voice | Caption |
+|---|---|---|---|
+| 8 | Ama (film) | Em | Ama rang on Tam's wall phone. Mina had kept the lamp lit every night. |
+| 9 | | Em | She wouldn't go to bed until both of them were home. |
+| 10 | Mina | Em | Then Mina, very small on the line: 'It was me. The log store. I didn't latch it.' |
+| 11 | | Em | 'I let his collar out a notch,' I told her. 'Latches slip. So do collars.' |
+| 12 | | Em | 'Do I keep the lamp on?' 'Every night,' I said. 'Until we're home.' |
+
+#### Tam
+
+| # | Beat | Voice | Caption |
+|---|---|---|---|
+| 13 | The way (film) | Em | 'Drovers' path goes over the top to Hollin,' said Tam. 'Three days, with him.' |
+| 14 | | Em | 'Go now, or you're here till the thaw.' |
+| 15 | Moss | Em | Then, looking at the stove and not at me, Tam told me about Moss. |
+| 16 | | Em | 'Christmas 'seventy-four. I was twelve, and daft, and I went back for a calf.' |
+| 17 | | Em | 'The Long White came down. Three nights in the bothy.' |
+| 18 | | Em | 'Moss lay on me so I'd not freeze.' |
+| 19 | | Em | 'Then she brought me down off the hill in the dark, nose to the old path.' |
+| 20 | | Em | 'Every window in Hollin was lit. That's what we walked to.' |
+| 21 | | Em | 'Snow forgets, lass. A nose remembers.' |
+
+#### The sled
+
+| # | Beat | Voice | Caption |
+|---|---|---|---|
+| 22 | Off the wall | Em | He took his father's sled down off the wall. 'She's been wanting a job,' he said. |
+| 23 | The pin | B | Straw. Mice. Old iron, small and cold. Here. |
+| 24 | Fitted | Em | One pin, and the runner sat true. |
+| 25 | The harness | Em | A small harness, soft with fifty years of saddle soap. |
+| 26 | Practice | B | Straps. Weight behind. Heavy. Then not heavy. Then running! |
+| 27 | | Em | He took to it like he'd been born in a harness. Tam pretended not to be impressed. |
+| 28 | The gate | Em | Clementine tried to come too. Tam had to sit on the gate. |
+| 29 | | Em | At noon we set out up the drovers' path, Biscuit riding on a sheepskin. |
+| 30 | The first slope | Em | I pushed and he pulled, and the sled went up the hill like it remembered how. |
+| 31 | Closes (film) | Em | At the first cairn I looked back. Tam waved with his whole arm. |
+| 32 | | Em | Then the snow came down, and the farm was gone. |
+
+Then the title card *Chapter Eight: Blackwater*, 20 December.
+
+#### Keepsakes
+
+| Keepsake | Found by | Text |
 |---|---|---|
-| Opens | Em | He slept on my feet and woke every hour to check they were still there. |
-| | B | Her feet. Still here. Sleep. Check. Still here. |
-| The phone | Em | Mina had kept the lamp lit every night. She wouldn't sleep till they were home. |
-| The latch | Em | 'It was me,' Mina said. 'The log store. I didn't latch it.' |
-| | Em | 'I let his collar out a notch,' I told her. 'Latches slip. So do collars.' |
-| The way | Em | 'Drovers' path goes over the top to Hollin,' said Tam. 'Three days, with him.' |
-| | Em | 'Go now, or you're here till the thaw.' |
-| Moss (film) | Em | 'Christmas 'seventy-four. I was twelve, and daft, and I went back for a calf.' |
-| | Em | 'The Long White came down. Three nights in the bothy.' |
-| | Em | 'Moss lay on me so I'd not freeze.' |
-| | Em | 'Then she brought me down off the hill in the dark, nose to the old path.' |
-| | Em | 'Every window in Hollin was lit. That's what we walked to.' |
-| | Em | 'Snow forgets, lass. A nose remembers.' |
-| The sled | Em | He took his father's sled down off the wall. 'She's been wanting a job,' he said. |
-| Closes | Em | At the first cairn I looked back. Tam waved with his whole arm. |
-| | Em | Then the snow came down, and the farm was gone. |
+| The initials under the sled seat | Em | Carved under the sled seat: 'A. R. 1951'. Tam's father, who made it. |
+| Clementine's first bell | Bodhi | In the barn, a tiny bell on a nail: Clementine's first, too small for her now. |
+| The list in Tam's kitchen | Em | A list on Tam's kitchen wall: 'Hay. Lichen. Ring Jean on Sunday.' |
+
+#### Objectives, in order
+
+Look after him: towel, paws, breakfast, a cuddle. / Answer Tam's phone. / Ask Tam the way home. / Switch to {dog}. Find the runner pin in the straw. / Fit the pin to the runner. / Put {dog} in the harness. / Switch to {dog}. Pull the empty sled. / Say goodbye, and set out. / Pull together up the first slope.
 
 ### Chapter Eight: Blackwater (20 December)
 
