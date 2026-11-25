@@ -1,0 +1,19 @@
+{
+    "name": "Bodhi.Game",
+    "rootNamespace": "Bodhi.Game",
+    "references": [
+        "Bodhi.Game.Logic",
+        "Bodhi.Rules",
+        "Unity.InputSystem",
+        "UnityEngine.UI"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -36,6 +36,11 @@ jobs:
       - name: Check the rules compile for Unity
         run: dotnet build rules_dotnet/Bodhi.Rules.UnityCheck --nologo
 
+      # Compile the Unity scene scripts against stand-ins for Unity's own types. This catches
+      # typos and wrong calls; only Unity itself proves they compile for real.
+      - name: Check the scene scripts against Unity stand-ins
+        run: dotnet build rules_dotnet/Bodhi.Game.RuntimeStubCheck --nologo
+
       # Break-it tests for the tool that turns the browser chapters into C# data.
       - name: Check the chapter exporter refuses bad data
         run: node rules_dotnet/tools/export_chapters_test.js
