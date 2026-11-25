@@ -2,6 +2,7 @@
 // voice with his name filled in, each holds for its time and fades in and out, a tap moves on,
 // holding skips them all, and broken input never crashes or gets stuck.
 using Bodhi.Game;
+using Bodhi.Rules;
 using NUnit.Framework;
 
 namespace Bodhi.Rules.Tests
@@ -30,6 +31,36 @@ namespace Bodhi.Rules.Tests
                 Assert.That(card.picture, Is.Not.Null);
             }
             Assert.That(cards[cards.Length - 1].text, Is.EqualTo("He fell asleep before we reached the end of the road."));
+        }
+
+        // The Christmas story opens with the prologue about Tam on the moor, then Em's own cards,
+        // ending the morning he woke her to see the snow (docs/christmas_script.md, section 2).
+        [Test]
+        public void the_christmas_cards_tell_the_prologue_then_em()
+        {
+            var cards = BackStory.cards_for(Story.christmas);
+            Assert.That(cards.Length, Is.EqualTo(13));
+            Assert.That(cards[0].text, Does.Contain("Tam Rennie's hill"));
+            Assert.That(cards[7].text, Is.EqualTo("The night of the blizzard, I whistled for him. He didn't come."));
+            Assert.That(cards[12].text, Is.EqualTo("On the fourteenth of December, he woke me up to show me."));
+            Assert.That(BackStory.cards_for(Story.flood), Is.EqualTo(BackStory.cards));
+            var story = new BackStory("Bodhi", Story.christmas);
+            Assert.That(story.text, Is.EqualTo(cards[0].text));
+        }
+
+        // Every Christmas card fits one line of a phone, and stays up long enough to read: four
+        // words a second, plus its fades in and out.
+        [Test]
+        public void every_christmas_card_can_be_read_in_time()
+        {
+            foreach (var card in BackStory.cards_for(Story.christmas))
+            {
+                string text = StoryText.personalize(card.text, "Bodhi");
+                int words = text.Split(' ').Length;
+                Assert.That(text.Length, Is.LessThanOrEqualTo(90), text);
+                Assert.That(card.hold_seconds, Is.GreaterThanOrEqualTo(words / 4.0 + BackStory.fade_seconds * 2), text);
+                Assert.That(card.picture, Is.Not.Empty, text);
+            }
         }
 
         // The first card shows straight away, fading in; his name is filled in.

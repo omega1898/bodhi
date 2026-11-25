@@ -1,7 +1,9 @@
-// Purpose: the back story told on New Game, before the first chapter: a few caption cards in
-// Em's voice (first person, past tense, short sentences; docs/story.md, "Back story"). Each card
-// fades in, holds, and fades out, then the next comes. A tap moves on; holding a finger down
-// skips them all. The scene passes time in and draws `text`, `picture` and `card_opacity`.
+// Purpose: the back story told on New Game, before the first chapter: caption cards, one story's
+// set at a time. The flood story's are in Em's voice (docs/story.md, "Back story"); the Christmas
+// story's start with a prologue told by a storyteller about old Tam on the moor, then Em's own
+// opening (docs/christmas_script.md, section 2). Each card fades in, holds, and fades out, then
+// the next comes. A tap moves on; holding a finger down skips them all. The scene passes time in
+// and draws `text`, `picture` and `card_opacity`.
 using System;
 using Bodhi.Rules;
 
@@ -41,7 +43,31 @@ namespace Bodhi.Game
             new BackStoryCard("He fell asleep before we reached the end of the road.", 4.5, "asleep"),
         };
 
-        readonly BackStoryCard[] story_cards = cards;
+        // The Christmas story's cards: the prologue, "The Herder", then Em's opening.
+        public static BackStoryCard[] christmas_cards => new[]
+        {
+            new BackStoryCard("The night before the first snow, the reindeer on Tam Rennie's hill would not settle.", 5.5, "moor_dusk"),
+            new BackStoryCard("One by one they turned their tails to the north. Then all thirty, as one animal.", 5.5, "herd_turning"),
+            new BackStoryCard("Tam had seen them do that once before. He had been twelve.", 4.5, "tam_at_gate"),
+            new BackStoryCard("The winter of the Long White. The winter a dog called Moss brought him home.", 5.0, "old_photo"),
+            new BackStoryCard("Down in Hollin, a few windows still kept a lamp lit. Out of habit, mostly.", 5.0, "valley_lights"),
+            new BackStoryCard("Tam lit his own. 'A light for the hill,' he said, though there was no one to hear.", 6.0, "tam_window"),
+            new BackStoryCard("Fifty years the hill had waited. It had been patient long enough.", 5.0, "black"),
+            new BackStoryCard("The night of the blizzard, I whistled for him. He didn't come.", 5.0, "black"),
+            new BackStoryCard("Hollin sits at the head of the valley, where the road gives up and the hill begins.", 5.5, "valley_dawn"),
+            new BackStoryCard("Ours was the last cabin, under the pines. The porch creaked in two places.", 5.0, "cabin"),
+            new BackStoryCard("{dog} was nine months old. Big paws. Bigger opinions.", 4.0, "asleep_by_stove"),
+            new BackStoryCard("He had never seen snow.", 3.5, "window_flakes"),
+            new BackStoryCard("On the fourteenth of December, he woke me up to show me.", 4.5, "window_morning"),
+        };
+
+        // A story's cards: the Christmas story's, or the flood story's.
+        public static BackStoryCard[] cards_for(Story story)
+        {
+            return story == Story.christmas ? christmas_cards : cards;
+        }
+
+        readonly BackStoryCard[] story_cards;
         readonly string dog_name;
         double seconds_on_card = 0;
 
@@ -73,10 +99,16 @@ namespace Bodhi.Game
             }
         }
 
-        // Makes the story, filling {dog} with this name (Bodhi if none is given).
-        public BackStory(string dog_name)
+        // Makes the flood story's back story, filling {dog} with this name (Bodhi if none is given).
+        public BackStory(string dog_name) : this(dog_name, Story.flood)
+        {
+        }
+
+        // Makes this story's back story, filling {dog} with this name (Bodhi if none is given).
+        public BackStory(string dog_name, Story story)
         {
             this.dog_name = string.IsNullOrEmpty(dog_name) ? "Bodhi" : dog_name;
+            story_cards = cards_for(story);
         }
 
         // Moves time on; a card whose time is up gives way to the next. Times that aren't above

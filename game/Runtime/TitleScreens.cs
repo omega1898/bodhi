@@ -21,7 +21,7 @@ namespace Bodhi.Game
 
         readonly Font font;            // Body text: Atkinson Hyperlegible, made to be easy to read.
         readonly Font title_font;      // The name: Young Serif.
-        readonly Font subtitle_font;   // "Until We Find Home": Newsreader italic.
+        readonly Font subtitle_font;   // "A Light in the Window": Newsreader italic.
         readonly Sprite rounded;       // A rounded panel for the buttons.
         readonly RectTransform canvas;
         readonly TitleWorld world;             // The 3D scene behind the title.
@@ -122,7 +122,7 @@ namespace Bodhi.Game
         public void show_back_story(string dog_name, Action finished)
         {
             hide();
-            story = new BackStory(dog_name);
+            story = new BackStory(dog_name, ChapterDirector.game_story);
             seconds_held = 0;
             on_back_story_finished = finished;
             back_story_screen.SetActive(true);
@@ -225,6 +225,18 @@ namespace Bodhi.Game
                 case "photo": return new Color(0.36f, 0.3f, 0.22f);
                 case "road": return new Color(0.28f, 0.3f, 0.24f);
                 case "asleep": return new Color(0.2f, 0.16f, 0.24f);
+                // The Christmas prologue: dusk on the moor, then the valley and the cabin.
+                case "moor_dusk": return new Color(0.2f, 0.24f, 0.36f);
+                case "herd_turning": return new Color(0.16f, 0.2f, 0.32f);
+                case "tam_at_gate": return new Color(0.3f, 0.22f, 0.14f);
+                case "old_photo": return new Color(0.34f, 0.3f, 0.24f);
+                case "valley_lights": return new Color(0.1f, 0.13f, 0.24f);
+                case "tam_window": return new Color(0.38f, 0.26f, 0.12f);
+                case "valley_dawn": return new Color(0.42f, 0.5f, 0.62f);
+                case "cabin": return new Color(0.26f, 0.32f, 0.36f);
+                case "asleep_by_stove": return new Color(0.36f, 0.22f, 0.12f);
+                case "window_flakes": return new Color(0.3f, 0.36f, 0.48f);
+                case "window_morning": return new Color(0.56f, 0.62f, 0.72f);
                 default: return Color.black;
             }
         }
