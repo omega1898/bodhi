@@ -11,6 +11,7 @@ namespace Bodhi.Game
             {
                 first_snow(),
                 lamp_in_window(),
+                kell_bridge(),
             };
         }
 
@@ -21,6 +22,7 @@ namespace Bodhi.Game
             {
                 case "first_snow": return first_snow();
                 case "lamp_in_window": return lamp_in_window();
+                case "kell_bridge": return kell_bridge();
                 default: return null;
             }
         }

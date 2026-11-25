@@ -280,27 +280,67 @@ Then the title card *Chapter Three: Kell Bridge*, 15 December.
 
 Follow Biscuit's scent. Sniff when the wind takes it. / Dig Biscuit out. / Lie close to Biscuit. Keep him warm. / Turn up the lamp. / Whistle for {dog} from the porch. / Lead Biscuit down the hill. Wait for him. / Nudge Biscuit up. / Lead him to the light. / Climb the logs onto the lorry. / Find something to eat. / Go to her light, or stay with Biscuit. / Search the lane.
 
-### Chapter Three: Kell Bridge (15 December)
+### Chapter Three: Kell Bridge (15 December), in full
 
-*Underneath:* why Biscuit walks away from home. He isn't lost, not to him. He is going back to Strand, where he lived when he was young. Old dogs go back to where they were young. Bodhi turns his back on home to go with him.
+Written in full on 25 November 2026, when the chapter was built. The chapter's question: *which way will the dogs go, and will Em know?*
 
-| Beat | Voice | Line |
+*Underneath:* one place, an hour apart. The player plays the dogs' morning first, then plays Em reading every trace the player has just left: the prints, the licked bowl, the curl on the nail. The player always knows more than Em. Nell is the first stranger who helps, and the first to see what Bodhi has become: "The young one stood between me and the old one." And Biscuit isn't lost, not to himself. He is walking back to Strand, where he was young. Bodhi turns his back on home to go with him.
+
+#### The morning (Bodhi)
+
+| # | Beat | Voice | Caption |
+|---|---|---|---|
+| 1 | Waking (film) | B | The floor stops. Bacon. Lake. Men's voices. Down. Now. |
+| 2 | | B | The old dog, asleep. Nose in his ear. Up. Down. Now. |
+| 3 | Off the lorry | B | Down the logs. Snow. Cold. Bacon, so close it hurts. |
+| 4 | Nell | B | A door. A woman, all wool and frying. A bowl, set down. She steps back. |
+| 5 | | B | Wait. Wait. She goes in. |
+| 6 | Found by nose | B | Sausage ends. Something black and crumbly that tastes of iron. Water. |
+| 7 | | B | The old dog first, this time. |
+| 8 | The crew | B | Boots. Big boots. Engines waking. Hide. |
+| 9 | The woodshed | B | Under the wood. Dark. Pine and dust, and mice, long ago. |
+| 10 | Gone | B | Engines, going. Boots, gone. Quiet. |
+| 11 | The lake wind | B | On the wind, up the lake: pine smoke, the lane, her. Home is up. |
+| 12 | | B | Behind: the old dog, going down. Down the road. Doesn't look back. |
+| 13 | The choice | B | Up is home. Down is the old dog. |
+| 14 | | B | Down, then. |
+
+#### An hour later (Em)
+
+| # | Beat | Voice | Caption |
+|---|---|---|---|
+| 15 | Arriving | Em | An hour later, Ama's car came round the last bend above Kell Bridge. |
+| 16 | | Em | On a tree net in the yard that morning: three ginger curls. The order book said Strand. |
+| 17 | The drive | Em | I'd given Mina my spare key. 'Keep the lamp lit. In case he finds his own way.' |
+| 18 | | Em | 'I'd do it again,' Ama said, halfway down. 'I know,' I said. That was all of it. |
+| 19 | The prints | Em | Two sets of prints by the road. One big and slow. One small, and bouncing. |
+| 20 | The bowl | Em | By the woodshed, a bowl licked so clean it shone. |
+| 21 | The curl | Em | On a nail in the woodshed door: one ginger curl. |
+| 22 | | Em | I'd know it anywhere. |
+| 23 | Nell (film) | Em | 'Two of them,' said Nell. 'A ginger one, no collar, and an old soldier.' |
+| 24 | | Em | She'd left them sausage ends and the heel of a black pudding. Both gone. |
+| 25 | | Em | 'Wouldn't come to me,' she said. 'The young one stood between me and the old one.' |
+| 26 | | Em | His name tag was still in the post. That was why nobody had rung. |
+| 27 | The poster | N | 'LOST: {dog}, 9 months, ginger curls, very friendly. With an old grey dog, Biscuit.' |
+| 28 | | Em | Nell taped it in her window, next to the cat. |
+| 29 | The end of the prints (film) | Em | Ama looked down the road a long time. 'We lived in Strand,' she said, |
+| 30 | | Em | 'when Biscuit was young. He's not lost, Em. He's going home.' |
+| 31 | Closes | Em | Two sets of prints going down the road, away from home. |
+| 32 | | Em | Every few steps, the small ones turned to face the valley. Then went on. |
+
+Then the title card *Chapter Four: Strand*, 16 December.
+
+#### Keepsakes
+
+| Keepsake | Found by | Text |
 |---|---|---|
-| Opens | B | The floor stops. Bacon. Lake. Men's voices. Down. Now. |
-| Up the lake | B | On the wind, up the lake: pine smoke, the lane, her. Home is up. |
-| | B | The old dog goes down. Down the road. Doesn't look back. |
-| The choice | B | Up is home. Down is the old dog. |
-| | B | Down, then. |
-| The yard | Em | On a tree net in the yard: three ginger curls. The order book said Strand. |
-| The key | Em | I gave Mina my spare key. 'Keep the lamp lit. In case he finds his own way.' |
-| The car | Em | 'I'd do it again,' Ama said, halfway down. 'I know,' I said. That was all of it. |
-| Nell | Em | 'Two of them,' said Nell. 'A ginger one, no collar, and an old soldier.' |
-| | Em | She'd left them sausage ends and the heel of a black pudding. Both gone. |
-| The tag | Em | His name tag was still in the post. That was why nobody had rung. |
-| Strand | Em | Ama looked down the road a long time. 'We lived in Strand,' she said, |
-| | Em | 'when Biscuit was young. He's not lost, Em. He's going home.' |
-| Closes | Em | Two sets of prints going down the road, away from home. |
-| | Em | Every few steps, the small ones turned to face the valley. Then went on. |
+| Nell's noticeboard | Em | Nell's noticeboard: 'FOUND: one cat, very rude. Ask inside.' The cat was asleep on the counter. |
+| The dog bed under the depot bench | Bodhi | Under the depot bench, a dog bed with a blanket folded in it. Its dog was out on the plough. |
+| The card on the counter | Em | A card on Nell's counter: 'To the plough crew, for keeping the road open. Love, Class 3.' |
+
+#### Objectives, in order
+
+Get Biscuit down off the lorry. / Find what she left. Sniff for it. / Hide in the woodshed. / Find which way is home. / Follow Biscuit. / Look for signs of them. / Ask in the café. / Put up a poster in Nell's window. / Follow the prints.
 
 ### Chapter Four: Strand (16 December)
 
