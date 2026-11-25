@@ -79,4 +79,77 @@ check('only wait_for steps become checkpoints', function () {
     assert.deepStrictEqual(JSON.parse(JSON.stringify(exporter.read_checkpoints(source))), [['a', 'b']]);
 });
 
+// A small, valid stage to change one thing at a time.
+function good_stage() {
+    const chapter = good_chapter();
+    chapter.scenery = { sky_top: '#fff', rain: 0.3, art: { far: 'far.svg' }, mid: null, wet: true };
+    chapter.start = { human: [10, 90], dog: [20, 90] };
+    chapter.solids = [{ kind: 'floor', x: 0, y: 90, w: 100, h: 10 }, { id: 'gate', kind: 'gate', x: 50, y: 60, w: 6, h: 30, blocks: 'dog' }];
+    chapter.water = [{ id: 'pond', x: 60, y: 80, w: 20, h: 20, flow: -40, mud: true }];
+    chapter.props = [{ kind: 'lamp', x: 5, y: 5, radius: 200, until: 'pulled', marks: [[18, 'a mark']] }];
+    chapter.rules[0].camera = { x: 1, y: 2, zoom: 1.5 };
+    chapter.rules[0].water = [{ id: 'pond', top: 70 }];
+    chapter.rules[0].scent = null;
+    chapter.rules[0].carry = { dog: 'glove' };
+    chapter.rules[0].face = { guest: -3 };
+    chapter.aftermath.scene = 'bedtime';
+    return chapter;
+}
+
+check('a valid stage exports every drawing field', function () {
+    const code = exporter.export_stage(good_stage(), 0);
+    assert.match(code, /public static ChapterStage test_chapter\(\)/);
+    assert.match(code, /StageSetting\.of_text\("art\.far", "far\.svg"\)/);
+    assert.match(code, /StageSetting\.of_nothing\("mid"\)/);
+    assert.match(code, /StageSetting\.of_flag\("wet", true\)/);
+    assert.match(code, /human_start_x = 10, human_start_feet_y = 90/);
+    assert.match(code, /blocks = SolidBlocks\.dog/);
+    assert.match(code, /flow = -40, mud = true/);
+    assert.match(code, /until = new string\[\] \{ "pulled" \}/);
+    assert.match(code, /StageSetting\.of_number\("marks\.0\.0", 18\), StageSetting\.of_text\("marks\.0\.1", "a mark"\)/);
+    assert.match(code, /camera = CameraChange\.hold, camera_x = 1, camera_y = 2, camera_zoom = 1\.5/);
+    assert.match(code, /water_id = "pond", top = 70/);
+    assert.match(code, /scent = ScentChange\.clear/);
+    assert.match(code, /carry = CarryChange\.carry, carry_item = "glove"/);
+    assert.match(code, /who = StageWho\.guest, direction = -1/);
+    assert.match(code, /sprite = "lever"/);
+    assert.match(code, /scene = "bedtime"/);
+});
+
+check('an unknown field inside a drawing field stops the stage export', function () {
+    const bad_camera = good_stage();
+    bad_camera.rules[0].camera.tilt = 3;
+    assert.throws(function () { exporter.export_stage(bad_camera, 0); }, /tilt/);
+    const bad_solid = good_stage();
+    bad_solid.solids[0].bouncy = true;
+    assert.throws(function () { exporter.export_stage(bad_solid, 0); }, /bouncy/);
+    const bad_who = good_stage();
+    bad_who.rules[0].place = { cat: [1, 2] };
+    assert.throws(function () { exporter.export_stage(bad_who, 0); }, /cat/);
+    const bad_guest = good_stage();
+    bad_guest.rules[0].guest = 'dance';
+    assert.throws(function () { exporter.export_stage(bad_guest, 0); }, /dance/);
+});
+
+check('a missing start or a broken place stops the stage export', function () {
+    const no_start = good_stage();
+    delete no_start.start.dog;
+    assert.throws(function () { exporter.export_stage(no_start, 0); }, /start\.dog/);
+    const bad_place = good_stage();
+    bad_place.rules[0].place = { human: [1] };
+    assert.throws(function () { exporter.export_stage(bad_place, 0); }, /\[x, y\]/);
+    const bad_prop = good_stage();
+    bad_prop.props[0].until = [''];
+    assert.throws(function () { exporter.export_stage(bad_prop, 0); }, /event name/);
+    const kindless = good_stage();
+    delete kindless.props[0].kind;
+    assert.throws(function () { exporter.export_stage(kindless, 0); }, /kind/);
+});
+
+check('text in a prop cannot break out of its C# string', function () {
+    const chapter = good_stage();
+    chapter.props[0].text = '"); System.IO.File.Delete("x';
+    assert.match(exporter.export_stage(chapter, 0), /of_text\("text", "\\"\); System\.IO\.File\.Delete\(\\"x"\)/);
+});
+
 console.log('All export_chapters checks passed.');

@@ -12,6 +12,9 @@ The Unity side of the game: everything between the rules (`rules/`, which decide
   - `LayoutSpace`: chapter layout positions (the browser game's units, y down) as Unity metres (y up), and back.
   - `CharacterMotion`: how she and Bodhi walk, jog, turn, jump and fall, from the browser game's numbers.
   - `CompanionSteering`: where the one you aren't playing walks: beside you, to you in a reunion, or a little ahead.
+  - `ChapterStage`: what a chapter looks like: its floors, water, props, where they start, and what each story rule does on screen.
+  - `Chapters/`: the twelve chapters' stages, generated from `prototype/web/js/levels.js` by `node rules_dotnet/tools/export_chapters.js`. Don't edit them by hand.
+  - `StageTracker`: keeps the scene in step with the story (darkness, floods, the camera, who's hidden), including after Continue.
 - Coming next: the scripts that sit on objects in the scenes and connect them to the rules.
 
 ## Adding it to the Unity project
