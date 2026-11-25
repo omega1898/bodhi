@@ -134,6 +134,22 @@ namespace Bodhi.Rules.Tests
             }
         }
 
+        // Spec R6.2: each reunion is earned by both of them, one act by her and one by Bodhi.
+        [TestCaseSource(nameof(chapter_ids))]
+        public void every_reunion_needs_both_of_them(string id)
+        {
+            var script = chapter(id);
+            foreach (var rule in script.rules.Where(rule => rule.reunion))
+            {
+                var doers = rule.when_all
+                    .Select(event_name => script.things.FirstOrDefault(thing => thing.event_name == event_name))
+                    .Where(thing => thing != null)
+                    .Select(thing => thing.who)
+                    .Distinct();
+                Assert.That(doers, Is.EquivalentTo(new[] { Character.human, Character.dog }), id);
+            }
+        }
+
         // In this story Bodhi is nine months old in every chapter, the same size throughout.
         [TestCaseSource(nameof(chapter_ids))]
         public void bodhi_is_nine_months_old_throughout(string id)
@@ -310,6 +326,42 @@ namespace Bodhi.Rules.Tests
                 run.pass_time(0.25);
             }
             Assert.That(run.has_happened("one_bark"), Is.False, "no bark without a whistle at the recess");
+        }
+
+        // Chapter Six is the midpoint: the first reunion of the story, after which he follows
+        // her again, and the collar goes back on only once they are together.
+        [Test]
+        public void chapter_six_reunites_them_and_the_collar_goes_back_on()
+        {
+            var run = ChapterRobot.play(ChristmasChapters.reindeer_hill(), skip_films: false);
+            var order = run.event_order.ToList();
+            Assert.That(ChristmasChapters.reindeer_hill().rules.Count(rule => rule.reunion), Is.EqualTo(1));
+            Assert.That(order.IndexOf("reunion_complete"), Is.GreaterThan(order.IndexOf("he_heard")));
+            Assert.That(order.IndexOf("puppy_book_line"), Is.GreaterThan(order.IndexOf("reunion_complete")), "the collar goes back on as the reunion ends");
+            Assert.That(run.dog_follows, Is.True, "together again");
+        }
+
+        // Break it: her whistle before the gate is open doesn't bring him; the reunion waits for
+        // both acts, his gate rope and her gate.
+        [Test]
+        public void chapter_six_reunion_waits_for_the_gate()
+        {
+            var run = new ChapterRun(ChristmasChapters.reindeer_hill());
+            ChapterRobot.finish(run, skip_films: true, stop_when: playing => playing.has_happened("saw_yard_light"));
+            run.pass_time(2);  // Past the rest between two whistles, in case the robot has just whistled.
+            run.call();
+            Assert.That(run.has_happened("human_called_during_near_contact"), Is.True, "she has whistled");
+            for (int step = 0; step < 40; step++)
+            {
+                run.pass_time(0.25);
+            }
+            Assert.That(run.reunion_stage, Is.EqualTo(ReunionStage.none), "the gate is still shut");
+            Assert.That(run.use("field_gate_opened", true), Is.True);
+            for (int step = 0; step < 20; step++)
+            {
+                run.pass_time(0.25);
+            }
+            Assert.That(run.reunion_stage, Is.EqualTo(ReunionStage.approach), "the earlier whistle counts once the gate is open");
         }
 
         // Break it: each call gives a fresh copy, so one playthrough can't change another's chapter.

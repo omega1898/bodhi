@@ -16,6 +16,7 @@ namespace Bodhi.Rules
                 kell_bridge(),
                 strand(),
                 lantern_train(),
+                reindeer_hill(),
             };
         }
     }

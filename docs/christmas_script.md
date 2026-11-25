@@ -469,30 +469,75 @@ Then the title card *Chapter Six: The Reindeer Hill*, 17 December, night.
 
 Follow the railway up the valley. / Help Biscuit round the fallen tree. / Board the Lantern Train. / Lead Biscuit across the viaduct. / Get Biscuit into the recess in the wall! / Run back to the recess. / Whistle into the forest.
 
-### Chapter Six: The Reindeer Hill (17 December, night)
+### Chapter Six: The Reindeer Hill (17 December, night), in full
 
-*Underneath:* the old herder knows the old dog. Biscuit was born in Tam's barn, the pup of his collie Bess, and given to a nurse from Strand thirteen years ago. In a Long White, old herd dogs go out to bring the stock in. That is why Biscuit went out into the storm.
+Written in full on 25 November 2026, when the chapter was built. The chapter's question: *will they finally meet?* It answers yes, at the midpoint, and asks a harder one.
 
-| Beat | Voice | Line |
+*Underneath:* the old herder knows the old dog. Biscuit was born in Tam's barn, a pup of his collie Bess, and an old herd dog goes out in a Long White to bring the stock in. That is why he went out into the storm at all, eleven chapters' worth of trouble from one good instinct. Something old wakes in Bodhi too, when he turns the calf. The reunion is earned by both of them: he pens the calf, she forces the iced gate. Then the collar goes back on, the right notch this time, and the puppy book's forgotten line finally gets read. Thirty reindeer watch it all. And the radio says the words Tam has been dreading since the prologue.
+
+#### The hill (Bodhi)
+
+| # | Beat | Voice | Caption |
+|---|---|---|---|
+| 1 | Climbing (film) | B | Trees. Dark. Then big animals. Moss and breath. Not dogs. |
+| 2 | | B | The old dog stumbles. Gets up. Stumbles. Up, old dog. Nearly. |
+| 3 | The pens | B | Wood. Bells. Thirty big animals, breathing, all of them watching. |
+| 4 | | B | One small one, white face, outside the fence. Going the wrong way. |
+| 5 | Herding | B | Something old wakes up in the legs. Low. Wide. Round her. |
+| 6 | | B | Round. Round. In. |
+| 7 | The gate rope | B | Rope in the teeth. Pull. The gate swings. Click. |
+| 8 | | B | The small one inside. All the big ones, watching. Good. |
+| 9 | The bark (film) | B | Bark. Bark. A door. A light, swinging. A man who smells of animals and smoke. |
+| 10 | Tam | Em | Tam told me later what he found: two dogs and a calf, all safe in his pen. |
+| 11 | | Em | 'Well,' he'd said, with the torch on them. 'Who taught you that?' |
+| 12 | | Em | He carried Biscuit in to his stove like a lamb. |
+
+#### The climb (Em)
+
+| # | Beat | Voice | Caption |
+|---|---|---|---|
+| 13 | Climbing | Em | I followed the prints uphill until my lantern was the only light there was. |
+| 14 | The yard light | Em | Then a yard light, above the trees. And above that, the sky caught fire. Green. |
+| 15 | The gate | Em | The field gate was iced shut. I put my shoulder to it. |
+| 16 | The whistle | Em | I whistled. Not hope, by then. Habit. |
+| 17 | | B | Her whistle. Real. Close. Not wind. |
+| 18 | | B | Run. |
+
+#### The reunion (both)
+
+| # | Beat | Voice | Caption |
+|---|---|---|---|
+| 19 | The embrace | Em | He hit me so hard we both went over in the snow. |
+| 20 | The collar | Em | I buckled his collar back on. The right notch, this time. The bell rang. |
+| 21 | | Em | I cried at a bell. |
+| 22 | | Em | I remembered the line I'd underlined: 'Check the collar after a bath. Wet curls shrink.' |
+
+#### Tam's kitchen
+
+| # | Beat | Voice | Caption |
+|---|---|---|---|
+| 23 | The stove (film) | Em | In Tam's kitchen Biscuit lay by the stove. Tam lifted his chin to the light. |
+| 24 | | Em | 'I know you,' he said. 'You're Bess's. Born in that barn, thirteen year back.' |
+| 25 | | Em | 'In a Long White an old herd dog goes out to bring them in. He can't help it.' |
+| 26 | | Em | I buckled Biscuit's blue collar on him. 'I said I'd bring him home in this.' |
+| 27 | The radio | Em | 'Roads closed above Kell Bridge,' said Valley Radio. 'The line is shut at Skelder.' |
+| 28 | | Em | 'And a warning for Christmas Eve.' Tam turned it off. 'Long White,' he said. |
+| 29 | Closes | Em | Hollin was cut off. Christmas was a week away. |
+| 30 | | Em | And Biscuit couldn't walk. |
+
+Then the title card *Chapter Seven: Tam's Sled*, 19 December.
+
+#### Keepsakes
+
+| Keepsake | Found by | Text |
 |---|---|---|
-| Opens | B | Trees. Dark. Then big animals. Moss and breath. Not dogs. |
-| The calf | B | A small one, white face, going the wrong way. Round her. Round. In. |
-| Tam | Em | 'Well,' said Tam, with the torch on them. 'Who taught you that?' |
-| The old dog | Em | He lifted Biscuit's chin to the light. 'I know you,' he said. 'You're Bess's.' |
-| | Em | 'Born in that barn. I gave him to a nurse from Strand, thirteen year back.' |
-| | Em | 'In a Long White, an old herd dog goes out to bring them in. He can't help it.' |
-| The climb | Em | I followed the prints uphill until my lantern was the only light there was. |
-| | Em | Then a yard light, above the trees. And above that, the sky caught fire. Green. |
-| The whistle | Em | I whistled. Not hope, by then. Habit. |
-| | B | Her whistle. Real. Close. Not wind. |
-| Reunion | Em | He hit me so hard we both went over in the snow. |
-| The collar | Em | I buckled his collar back on. The right notch, this time. The bell rang. |
-| | Em | I cried at a bell. |
-| The book | Em | My puppy book's underlined line: 'Check the collar after a bath. Wet curls shrink.' |
-| The radio | Em | 'Roads closed above Kell Bridge,' said Valley Radio. 'The line is shut at Skelder.' |
-| | Em | 'And a warning for Christmas Eve.' Tam turned it off. 'Long White,' he said. |
-| Closes | Em | Hollin was cut off. Christmas was a week away. |
-| | Em | And Biscuit couldn't walk. |
+| The antler in the snow | Bodhi | An antler shed in the snow, gnawed smooth by fifty years of herding dogs. He added his own marks. |
+| Tam's herd book | Em | Tam's herd book: every reindeer named for fifty years, first in his father's hand, then his. |
+| The photograph on Tam's wall | Em | A photograph by Tam's door: a boy and a collie in deep snow. On the back: 'Moss. Winter '74.' |
+
+#### Objectives, in order
+
+Follow the smell of the big animals. / Turn the calf back into her pen. / Pull the gate rope shut. / Bark for help. Biscuit can't go on. / Follow the prints uphill. / Open the field gate. / Whistle for {dog}. / (the reunion: go to him, kneel, hold him; the collar goes back on as it ends) / Go into Tam's kitchen.
 
 ### Chapter Seven: Tam's Sled (19 December)
 

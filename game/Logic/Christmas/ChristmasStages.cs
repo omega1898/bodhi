@@ -14,6 +14,7 @@ namespace Bodhi.Game
                 kell_bridge(),
                 strand(),
                 lantern_train(),
+                reindeer_hill(),
             };
         }
 
@@ -27,6 +28,7 @@ namespace Bodhi.Game
                 case "kell_bridge": return kell_bridge();
                 case "strand": return strand();
                 case "lantern_train": return lantern_train();
+                case "reindeer_hill": return reindeer_hill();
                 default: return null;
             }
         }
