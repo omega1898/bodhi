@@ -281,6 +281,37 @@ namespace Bodhi.Rules.Tests
             Assert.That(run.cutscene_playing, Is.True, "the earlier whistle counts once six o'clock comes");
         }
 
+        // Chapter Five's ending: back at the recess, her whistle into the forest is answered by
+        // one bark, and that ends the chapter.
+        [Test]
+        public void chapter_five_ends_on_one_bark()
+        {
+            var run = new ChapterRun(ChristmasChapters.lantern_train());
+            ChapterRobot.finish(run, skip_films: false, stop_when: playing => playing.has_happened("recess_reached"));
+            Assert.That(run.objective, Is.EqualTo("Whistle into the forest."));
+            Assert.That(run.call(), Is.True);
+            ChapterRobot.finish(run, skip_films: false);
+            Assert.That(run.is_complete, Is.True);
+            Assert.That(run.event_order.ToList().IndexOf("one_bark"), Is.GreaterThan(run.event_order.ToList().IndexOf("recess_reached")));
+        }
+
+        // Break it: a whistle on the platform at Strand doesn't count as the whistle into the
+        // forest. Reaching the recess still waits for her to whistle again.
+        [Test]
+        public void a_whistle_at_the_station_does_not_answer_the_forest()
+        {
+            var run = new ChapterRun(ChristmasChapters.lantern_train());
+            ChapterRobot.finish(run, skip_films: true, stop_when: playing => playing.has_happened("kofis_mum_rang"));
+            Assert.That(run.call(), Is.True);
+            ChapterRobot.finish(run, skip_films: true, stop_when: playing => playing.has_happened("ran_back"));
+            Assert.That(run.report_zone("recess_reached", true, false), Is.True);
+            for (int step = 0; step < 120; step++)
+            {
+                run.pass_time(0.25);
+            }
+            Assert.That(run.has_happened("one_bark"), Is.False, "no bark without a whistle at the recess");
+        }
+
         // Break it: each call gives a fresh copy, so one playthrough can't change another's chapter.
         [Test]
         public void each_copy_of_a_chapter_is_separate()
