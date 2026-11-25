@@ -34,7 +34,7 @@ namespace Bodhi.Game
         readonly Image dog_drawing, her_drawing;
         readonly Text title, subtitle;
         readonly CanvasGroup title_buttons;
-        readonly Button continue_button, memory_box_button;
+        readonly Button continue_button, memory_box_button, home_button;
         readonly GameObject back_story_screen, memory_box_screen;
         readonly Image back_story_backdrop, hold_ring;
         readonly Text back_story_text, memory_box_text;
@@ -43,7 +43,7 @@ namespace Bodhi.Game
         BackStory story;
         double seconds_since_opening, seconds_held;
         float stage_units_per_sprite_unit = 0;     // Worked out from Em's first drawing.
-        Action on_new_game, on_continue, on_memory_box, on_back_story_finished, on_memory_box_closed;
+        Action on_new_game, on_continue, on_memory_box, on_home, on_back_story_finished, on_memory_box_closed;
 
         // Builds every screen, hidden, on a canvas just under the HUD's.
         public TitleScreens(Transform parent)
@@ -90,9 +90,10 @@ namespace Bodhi.Game
             buttons_holder.transform.SetParent(canvas, false);
             stretch(buttons_holder.GetComponent<RectTransform>(), 0, 0, 1, 1);
             title_buttons = buttons_holder.AddComponent<CanvasGroup>();
-            make_button(buttons_holder.transform, "New Game", 0.2f, 0.12f, () => on_new_game?.Invoke());
-            continue_button = make_button(buttons_holder.transform, "Continue", 0.5f, 0.12f, () => on_continue?.Invoke());
-            memory_box_button = make_button(buttons_holder.transform, "Memory box", 0.8f, 0.12f, () => on_memory_box?.Invoke());
+            make_button(buttons_holder.transform, "New Game", 0.14f, 0.12f, () => on_new_game?.Invoke());
+            continue_button = make_button(buttons_holder.transform, "Continue", 0.38f, 0.12f, () => on_continue?.Invoke());
+            home_button = make_button(buttons_holder.transform, "Home", 0.62f, 0.12f, () => on_home?.Invoke());
+            memory_box_button = make_button(buttons_holder.transform, "Memory box", 0.86f, 0.12f, () => on_memory_box?.Invoke());
 
             back_story_screen = make_image(canvas, "back story", Color.black, 0, 0, 1, 1).gameObject;
             back_story_backdrop = make_image(back_story_screen.transform, "picture", Color.clear, 0, 0, 1, 1);
@@ -110,15 +111,18 @@ namespace Bodhi.Game
             hide();
         }
 
-        // Starts the opening, which settles on the title with its buttons.
-        public void show_opening(bool has_save, Action new_game, Action continue_game, Action memory_box)
+        // Starts the opening, which settles on the title with its buttons. Continue, Home and
+        // the memory box show only when there's a saved year.
+        public void show_opening(bool has_save, Action new_game, Action continue_game, Action memory_box, Action home)
         {
             hide();
             SpriteLibrary.prepare(new[] { "her", "bodhi" });
             on_new_game = new_game;
             on_continue = continue_game;
             on_memory_box = memory_box;
+            on_home = home;
             continue_button.gameObject.SetActive(has_save);
+            home_button.gameObject.SetActive(has_save);
             memory_box_button.gameObject.SetActive(has_save);
             opening = new OpeningTitle();
             seconds_since_opening = 0;
@@ -323,8 +327,8 @@ namespace Bodhi.Game
             return color;
         }
 
-        // A soft round dot, made once in code, for paw prints and the hold ring.
-        static Sprite round_sprite()
+        // A soft round dot, made in code, for paw prints, the hold ring and the ball at home.
+        public static Sprite round_sprite()
         {
             const int size = 32;
             var picture = new Texture2D(size, size, TextureFormat.RGBA32, false);
@@ -344,7 +348,7 @@ namespace Bodhi.Game
         Button make_button(Transform parent, string label, float x, float y, Action on_click)
         {
             var image = make_image(parent, label, new Color(1, 1, 1, 0.14f), x, y, x, y);
-            image.rectTransform.sizeDelta = new Vector2(300, 64);
+            image.rectTransform.sizeDelta = new Vector2(270, 64);  // Four fit across with gaps.
             var button = image.gameObject.AddComponent<Button>();
             button.onClick.AddListener(() => on_click());
             var words = make_text(image.transform, "label", 30, 0, 0, 1, 1);

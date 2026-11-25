@@ -1,7 +1,7 @@
 // Purpose: everything drawn on top of the game: the story lines (subtitles), the current goal,
 // the words over the "use" button, a film's big caption, the night's darkness, fades and
-// lightning, the touch buttons on a phone, and the pause, after-chapter and end-of-year
-// screens. It is built in code with Unity's UI (uGUI) and its built-in font, so it needs no
+// lightning, the touch buttons on a phone, the heart pop when care grows the bond, and the
+// pause, after-chapter and end-of-year screens. It is built in code with Unity's UI (uGUI) and its built-in font, so it needs no
 // imported assets; an artist's fonts and panels replace the plain ones later. The title lives in TitleScreens.
 //
 // It shows what it's told and reports button presses; ChapterDirector decides everything else.
@@ -19,6 +19,7 @@ namespace Bodhi.Game
     {
         public const float fade_seconds = 1.2f;
         public const float flash_seconds = 0.25f;
+        public const float bond_note_seconds = 3f;  // How long a heart pop stays; it fades in its last second.
 
         static readonly Color her_color = new Color(0.98f, 0.95f, 0.88f);
         static readonly Color dog_color = new Color(1f, 0.85f, 0.55f);
@@ -27,13 +28,14 @@ namespace Bodhi.Game
         readonly PlayerControls controls;
         readonly Font font;
         readonly RectTransform canvas;
-        readonly Text subtitle, objective, prompt, caption;
+        readonly Text subtitle, objective, prompt, caption, bond_note;
         readonly Image darkness, fade, flash;
         readonly GameObject touch_buttons;
         readonly GameObject pause_screen, aftermath_screen, year_end_screen;
         readonly Text aftermath_text, year_end_text;
-        Action on_resume, on_next;
-        float fade_left, flash_left;
+        readonly Button aftermath_home_button, year_end_home_button;
+        Action on_resume, on_next, on_go_home;
+        float fade_left, flash_left, bond_note_left;
 
         // Builds the whole overlay and the EventSystem that lets taps and clicks reach it.
         public GameHud(Transform parent, PlayerControls controls)
@@ -60,6 +62,8 @@ namespace Bodhi.Game
             subtitle = make_text(canvas, "subtitle", 28, TextAnchor.LowerCenter, 0.12f, 0.14f, 0.88f, 0.3f);
             prompt = make_text(canvas, "prompt", 22, TextAnchor.MiddleCenter, 0.5f, 0.5f, 0.5f, 0.5f);
             prompt.rectTransform.sizeDelta = new Vector2(360, 40);
+            bond_note = make_text(canvas, "bond note", 26, TextAnchor.UpperRight, 0.55f, 0.6f, 0.98f, 0.86f);
+            add_shadow(bond_note);
             add_shadow(subtitle);
             add_shadow(prompt);
             add_shadow(caption);
@@ -74,10 +78,12 @@ namespace Bodhi.Game
 
             aftermath_screen = make_screen("aftermath", new Color(0.05f, 0.05f, 0.07f, 0.94f));
             aftermath_text = make_text(aftermath_screen.transform, "lines", 26, TextAnchor.MiddleCenter, 0.12f, 0.3f, 0.88f, 0.85f);
-            make_button(aftermath_screen.transform, "Next", 0.5f, 0.18f, () => on_next?.Invoke());
+            make_button(aftermath_screen.transform, "Next", 0.38f, 0.18f, () => on_next?.Invoke());
+            aftermath_home_button = make_button(aftermath_screen.transform, "Go home", 0.62f, 0.18f, () => on_go_home?.Invoke());
 
             year_end_screen = make_screen("year end", new Color(0.05f, 0.05f, 0.07f, 1f));
             year_end_text = make_text(year_end_screen.transform, "lines", 30, TextAnchor.MiddleCenter, 0.12f, 0.25f, 0.88f, 0.8f);
+            year_end_home_button = make_button(year_end_screen.transform, "Go home", 0.5f, 0.15f, () => on_go_home?.Invoke());
 
             fade = make_image(canvas, "fade", Color.clear, 0, 0, 1, 1);
             fade.raycastTarget = false;
@@ -93,21 +99,44 @@ namespace Bodhi.Game
             pause_screen.SetActive(paused);
         }
 
-        // The quiet screen after a chapter: its lines, then Next.
-        public void show_aftermath(string text, Action next)
+        // The quiet screen after a chapter: its lines, then Next, or Go home (left out when
+        // `go_home` is null).
+        public void show_aftermath(string text, Action next, Action go_home)
         {
             hide_screens();
             on_next = next;
+            on_go_home = go_home;
             aftermath_text.text = text ?? "";
+            aftermath_home_button.gameObject.SetActive(go_home != null);
             aftermath_screen.SetActive(true);
         }
 
-        // The end of the year.
-        public void show_year_end(string text)
+        // The end of the year, with Go home (left out when `go_home` is null).
+        public void show_year_end(string text, Action go_home)
         {
             hide_screens();
+            on_go_home = go_home;
             year_end_text.text = text ?? "";
+            year_end_home_button.gameObject.SetActive(go_home != null);
             year_end_screen.SetActive(true);
+        }
+
+        // The heart pop when care grows the bond ("♥ +2"), with any lines worth celebrating
+        // under it ("Bodhi learned Sit!"). Top right, gone after a few seconds. Nothing to show
+        // leaves the last one alone.
+        public void show_bond_note(string heart_pop, string lines)
+        {
+            string text = heart_pop ?? "";
+            if (!string.IsNullOrEmpty(lines))
+            {
+                text = text == "" ? lines : text + "\n" + lines;
+            }
+            if (text == "")
+            {
+                return;
+            }
+            bond_note.text = text;
+            bond_note_left = bond_note_seconds;
         }
 
         // Hides the pause, after-chapter and end-of-year screens.
@@ -171,11 +200,13 @@ namespace Bodhi.Game
             flash_left = flash_seconds;
         }
 
-        // Each frame: the fade and the flash wear off.
+        // Each frame: the fade, the flash and the heart pop wear off.
         public void update(float delta_seconds)
         {
             fade_left = Mathf.Max(0, fade_left - delta_seconds);
             flash_left = Mathf.Max(0, flash_left - delta_seconds);
+            bond_note_left = Mathf.Max(0, bond_note_left - delta_seconds);
+            bond_note.color = new Color(her_color.r, her_color.g, her_color.b, Mathf.Clamp01(bond_note_left));
             fade.color = new Color(0, 0, 0, fade_left / fade_seconds);
             flash.color = new Color(1, 1, 1, 0.8f * flash_left / flash_seconds);
         }

@@ -137,7 +137,13 @@ namespace Bodhi.Rules
         public int level_number => level_for(points);
 
         // The current level's name, e.g. "Best friends".
-        public string level_name => levels[level_number - 1].name;
+        public string level_name => level_name_for(level_number);
+
+        // Any level's name, from 1 to highest_level ("Friends" for 2), or null for no such level.
+        public static string level_name_for(int level)
+        {
+            return level >= 1 && level <= levels.Length ? levels[level - 1].name : null;
+        }
 
         // How far from this level to the next, 0 to 1. The top level reads as full (1).
         public double progress_to_next_level

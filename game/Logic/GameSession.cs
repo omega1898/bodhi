@@ -4,6 +4,10 @@
 // play or a new goal), every 30 seconds, and when the phone hides the game. It handles the title
 // screen's New Game and Continue, and moving on to the next chapter.
 //
+// It also looks after the year-long bond and the home days: the scene tells it the date, opens
+// home from the title, and reports care given and tasks done. Each change to the year is saved
+// straight away, so a task done or a bond point earned is never lost.
+//
 // The scene still decides everything about space: where the characters stand, and whether this
 // is a safe spot to save (both on the ground). It passes those in each frame.
 using System;
@@ -23,6 +27,9 @@ namespace Bodhi.Game
         ChapterBeat last_beat;
         Character last_controlled;
         string last_objective;
+        int today = 0;                  // The phone's date as a day count; 0 until the scene says.
+        bool year_open = false;         // A year is loaded (New Game, Continue or Home), so changes are saved.
+        string last_saved_year;         // The year's text as last written, so an unchanged year isn't rewritten.
 
         // The year being played.
         public Campaign campaign { get; private set; } = new Campaign();
@@ -64,7 +71,13 @@ namespace Bodhi.Game
         public void new_game()
         {
             campaign = new Campaign();
-            files.write(campaign_slot, campaign.to_text());
+            year_open = true;
+            if (today > 0)
+            {
+                campaign.set_today(today);
+            }
+            last_saved_year = null;
+            save_year();
             start_chapter();
         }
 
@@ -73,11 +86,7 @@ namespace Bodhi.Game
         // usable year save at all, it's a new game.
         public void continue_game()
         {
-            campaign = new Campaign();  // A failed load leaves it like this: a new year.
-            if (!load_campaign(files.read(campaign_slot)))
-            {
-                load_campaign(files.read_backup(campaign_slot));
-            }
+            load_year();
             ChapterRun resumed = resume_chapter(files.read(chapter_slot)) ?? resume_chapter(files.read_backup(chapter_slot));
             if (resumed == null)
             {
@@ -166,7 +175,7 @@ namespace Bodhi.Game
         void finish_chapter()
         {
             campaign.finish_chapter(run);
-            files.write(campaign_slot, campaign.to_text());
+            save_year();
             files.erase(chapter_slot);
             chapter_finished = true;
         }
@@ -212,6 +221,148 @@ namespace Bodhi.Game
                 return year;
             }
             return new Campaign();
+        }
+
+        // The phone's local date as a whole number of days since 1 January in year 1, the day
+        // number the rules use. The same all day long; one more after midnight.
+        public static int day_number(DateTime local_time)
+        {
+            return (int)(local_time.Date.Ticks / TimeSpan.TicksPerDay);
+        }
+
+        // The scene says what day it is: at start-up, on Continue, when the phone shows the game
+        // again, and about once a minute so midnight rolls over. A broken day is refused and not
+        // remembered. A later day brings new home tasks and is saved; an earlier one (the clock
+        // turned back) changes nothing. Before a year is open the day is only remembered, and
+        // used when New Game, Continue or Home opens one.
+        public DayChange set_today(int day)
+        {
+            if (day < 1 || day > BondJourney.largest_day)
+            {
+                return DayChange.refused_bad_day;
+            }
+            today = day;
+            var change = campaign.set_today(day);
+            if (change == DayChange.new_day_started && year_open)
+            {
+                save_year();
+            }
+            return change;
+        }
+
+        // Home from the title: opens the saved year (or its backup, or a new year if neither
+        // loads) without starting a chapter, and moves it on to today. After a chapter the year
+        // is already open, so this only checks the date.
+        public void open_home()
+        {
+            if (!year_open)
+            {
+                load_year();  // Also moves it on to today.
+            }
+            else if (today > 0)
+            {
+                set_today(today);
+            }
+        }
+
+        // Care given in a chapter (a meal, a towel, a cuddle): grows the bond and saves the year.
+        // Counts on the last day given. Nothing before a year is open.
+        public BondChange record_care(BondCareKind kind)
+        {
+            if (!year_open)
+            {
+                return new BondChange();
+            }
+            var change = campaign.journey.record_care(kind, campaign.home.day);
+            if (change.counted)
+            {
+                save_year();
+            }
+            return change;
+        }
+
+        // One of today's home tasks, done: grows the bond, ticks the task and saves the year.
+        // Refused (not counted) for a task that isn't one of today's, or is already done, so a
+        // second tap never counts twice. Fetch is played with fetch_caught instead.
+        public HomeResult do_home_task(HomeTask task)
+        {
+            if (!year_open || !is_offered_today(task) || campaign.home.is_done(task))
+            {
+                return new HomeResult();
+            }
+            var result = campaign.home.do_task(task, campaign.journey);
+            if (result.counted)
+            {
+                save_year();
+            }
+            return result;
+        }
+
+        // He caught the ball at home: the run of catches grows, it counts as play, five in a row
+        // finish the fetch task, and the year is saved.
+        public HomeResult fetch_caught()
+        {
+            if (!year_open)
+            {
+                return new HomeResult();
+            }
+            var result = campaign.home.fetch_caught(campaign.journey);
+            save_year();
+            return result;
+        }
+
+        // The ball was missed at home: the run of catches starts again. The records stay, so
+        // there is nothing new to save.
+        public void fetch_missed()
+        {
+            if (year_open)
+            {
+                campaign.home.fetch_missed();
+            }
+        }
+
+        // True if this task is one of today's three.
+        bool is_offered_today(HomeTask task)
+        {
+            foreach (var offered in campaign.home.tasks_today)
+            {
+                if (offered == task)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // Loads the year from its newest save, else its backup, else starts a new year, and
+        // marks it open so changes are saved. Then moves it on to today, if the date is known.
+        void load_year()
+        {
+            campaign = new Campaign();  // A failed load leaves it like this: a new year.
+            if (!load_campaign(files.read(campaign_slot)))
+            {
+                load_campaign(files.read_backup(campaign_slot));
+            }
+            year_open = true;
+            last_saved_year = null;     // Write the next change even if the newest file was damaged.
+            if (today > 0)
+            {
+                set_today(today);
+            }
+        }
+
+        // Writes the year, unless it's exactly as last written.
+        void save_year()
+        {
+            string text = campaign.to_text();
+            if (text == last_saved_year)
+            {
+                return;
+            }
+            if (files.write(campaign_slot, text))
+            {
+                last_saved_year = text;
+            }
         }
 
         // Loads the year from a save's text, counting a damaged one. False if there was none.

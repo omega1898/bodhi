@@ -8,7 +8,7 @@ The Unity side of the game: everything between the rules (`rules/`, which decide
   - `SubtitlePacer`: which story line is on screen and for how long, ported from the browser game.
   - `ZoneOccupancy`: who is standing in a story zone, counting each character's colliders.
   - `SaveFiles`: the saves on the phone, written so a phone dying mid-save never loses the last good one.
-  - `GameSession`: the one object the scene talks to: New Game, Continue, autosave and the next chapter.
+  - `GameSession`: the one object the scene talks to: New Game, Continue, autosave and the next chapter; also the date, opening home from the title, home tasks, fetch catches and care given in a chapter, each saved straight away.
   - `LayoutSpace`: chapter layout positions (the browser game's units, y down) as Unity metres (y up), and back.
   - `CharacterMotion`: how she and Bodhi walk, jog, turn, jump and fall, from the browser game's numbers.
   - `CompanionSteering`: where the one you aren't playing walks: beside you, to you in a reunion, where the story sends him, after the ball and back, or a little ahead.
@@ -25,12 +25,15 @@ The Unity side of the game: everything between the rules (`rules/`, which decide
   - `OpeningTitle`: the start-up animation as a timeline: at any moment, how strongly the sky, house, door light, paw prints, name and buttons show, where Bodhi and Em stand and which drawing each shows, and the camera's zoom. A tap skips to the settled title.
   - `BackStory`: the caption cards in her voice told on New Game before Coming Home: tap to move on, hold to skip them all.
   - `MemoryBox`: the memory box screen: every chapter with its keepsakes (memories once found, hints while missing), totals for the year, and replaying a finished chapter without moving the year on.
+  - `FetchGame`: the fetch game at home as timing rules: the ball arcs from her to him, a tap while it's in his reach is a catch, too early or letting it land is a miss, and each catch in a row makes the next throw a little faster, up to a limit.
+  - `BondFeedback`: the words about the bond and home days: the heart pop, "Bodhi learned Sit!", the new level, today's tasks with their progress, the streak and the fetch record.
 - `Runtime/`: the Unity scripts. They decide nothing themselves; they ask `Logic/` and draw the answer.
-  - `ChapterDirector`: the one script the scene needs. It makes everything else and plays every chapter in turn.
+  - `ChapterDirector`: the one script the scene needs. It makes everything else and plays every chapter in turn, opens home from the title and after each chapter, records care given in a chapter, and tells the session the date (at start-up, on Continue, when the phone shows the game again, and once a minute).
   - `ChapterLevel`: builds a chapter's place (sky, floors, water, props, markers) from its stage, and keeps it in step with the story.
   - `CharacterBody`: draws her, Bodhi or the visiting dog where `CharacterMover` says, with the hand-drawn animation frames.
   - `SpriteLibrary`: loads the animation pictures when a chapter loads (never mid-chapter) and lets go of the ones it doesn't need.
   - `CameraRig`: follows the player smoothly, a little ahead, inside the chapter; holds film shots; shakes.
+  - `HomeScreen`: home between and after chapters: Em and Bodhi, the bond's level and its bar, the streak, today's three tasks with a button each, and the fetch game.
   - `GameHud`, `TouchButton`: subtitles, the goal, the button prompt, captions, darkness, fades, touch buttons and the title, pause, after-chapter and end-of-year screens.
   - `PlayerControls`: keyboard, game controller and touch buttons, read the same way.
   - `GreyBox`: plain coloured boxes for everything not drawn yet (and for a character whose pictures are missing).

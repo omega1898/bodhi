@@ -110,6 +110,12 @@ A whole year of story alone takes them to about Family; looking after him at hom
 
 Between and after chapters there is always something small to do at home (`rules/Runtime/HomeDay.cs`). Each day offers three tasks, the same three for everyone on that date: brush him, give him his dinner, a walk round the block, dry him after the garden, a cuddle, find the hidden ball as Bodhi, play fetch until he catches five in a row, practise a trick he knows, or teach him a new one once he's ready. Each grows the bond. Doing all three on days in a row builds a streak; missing a day only starts the streak again, and never takes anything away. The fetch game keeps his best run of catches, ever and today.
 
+**Getting home.** Once there is a saved year, the title offers **Home** beside Continue. After each chapter's quiet aftermath the player can **Go home** instead of going straight on, and home then offers the next chapter. At the end of the year, home is where they keep coming back to.
+
+**A day at home.** Em and Bodhi stand in the front room (Bodhi as old as he is in the story). At the top: the bond's level, a bar toward the next one, his tricks and the streak. On the right: today's three tasks, each with one button (Brush, Feed, Walk, Cuddle, Teach...). Each press grows the bond with a small heart pop, and a task once done shows done. Fetch opens a little game: Em throws, the ball arcs over, and a tap on **Catch!** while it glows gold is a catch; each catch in a row makes the next throw a touch quicker. When all three are done, Bodhi's tail hasn't stopped, and home says he'll see you tomorrow. The date is the phone's own; the tasks change at midnight, even with the game open.
+
+In chapters too, feeding him, towelling him and a cuddle show the same heart pop, and the aftermath says what the chapter added to the bond.
+
 ## Keepsakes (why players replay)
 
 Each chapter hides three keepsakes, and each tells one small story about someone who cared for someone. About half can only be found as the dog, by sniffing near them. Found keepsakes go into the **memory box** on the title screen. See `docs/art_and_production.md` for the reasoning.

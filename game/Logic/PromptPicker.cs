@@ -181,6 +181,29 @@ namespace Bodhi.Game
             }
         }
 
+        // Which kind of care a button press was, for the year-long bond (BondJourney): a meal,
+        // towelling him, petting him or him leaning in. False for every other press. The scene
+        // records it (GameSession.record_care) once act() says it happened.
+        public static bool bond_care_for(PromptAction action, out BondCareKind kind)
+        {
+            switch (action)
+            {
+                case PromptAction.feed:
+                    kind = BondCareKind.feed;
+                    return true;
+                case PromptAction.towel:
+                    kind = BondCareKind.towel_or_bath;
+                    return true;
+                case PromptAction.pet:
+                case PromptAction.lean:
+                    kind = BondCareKind.pet;
+                    return true;
+                default:
+                    kind = BondCareKind.pet;  // Unused: nothing to record.
+                    return false;
+            }
+        }
+
         // True if he's within 150 of this x and on her level (for a bowl, a bath, his bed).
         public static bool dog_is_near(PromptView view, double x)
         {
