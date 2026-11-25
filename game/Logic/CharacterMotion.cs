@@ -157,6 +157,18 @@ namespace Bodhi.Game
             }
         }
 
+        // Something solid stopped them sideways (a wall): no sideways speed is left.
+        public void stop_across()
+        {
+            velocity_x = 0;
+        }
+
+        // Something solid stopped them up or down (they landed, or bumped their head).
+        public void stop_up_down()
+        {
+            velocity_y = 0;
+        }
+
         // Moves `value` toward `target` by at most `largest_step`, landing exactly on it.
         static double move_toward(double value, double target, double largest_step)
         {
