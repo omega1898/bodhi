@@ -255,6 +255,32 @@ namespace Bodhi.Rules.Tests
             Assert.That(run.use("talked_to_nell", true), Is.True);
         }
 
+        // Chapter Four's near miss: her whistle reaches the square while he is one row of huts
+        // away, so the line he half hears comes only after she has whistled, and the dogs are
+        // already settled in the grotto when she puts up the poster that faces it.
+        [Test]
+        public void chapter_four_misses_by_one_row_of_huts()
+        {
+            var run = ChapterRobot.play(ChristmasChapters.strand(), skip_films: false);
+            var order = run.event_order.ToList();
+            Assert.That(order.IndexOf("human_called_during_human_section"), Is.LessThan(order.IndexOf("under_the_trumpets")));
+            Assert.That(order.IndexOf("into_the_grotto"), Is.LessThan(order.IndexOf("last_poster")));
+            Assert.That(order.IndexOf("red_door"), Is.LessThan(order.IndexOf("kofi_done")), "the red door first: then he leads");
+        }
+
+        // Break it: a whistle on the way into the market, before the tree is lit, doesn't start
+        // the near miss early; it waits for six o'clock.
+        [Test]
+        public void chapter_four_near_miss_waits_for_six_oclock()
+        {
+            var run = new ChapterRun(ChristmasChapters.strand());
+            ChapterRobot.finish(run, skip_films: true, stop_when: playing => playing.has_happened("em_bus"));
+            Assert.That(run.call(), Is.True);
+            Assert.That(run.has_happened("under_the_trumpets"), Is.False);
+            ChapterRobot.finish(run, skip_films: false, stop_when: playing => playing.has_happened("whistle_time"));
+            Assert.That(run.cutscene_playing, Is.True, "the earlier whistle counts once six o'clock comes");
+        }
+
         // Break it: each call gives a fresh copy, so one playthrough can't change another's chapter.
         [Test]
         public void each_copy_of_a_chapter_is_separate()
