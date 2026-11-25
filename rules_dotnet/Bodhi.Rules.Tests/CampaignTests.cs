@@ -47,7 +47,7 @@ namespace Bodhi.Rules.Tests
             {
                 Assert.That(campaign.memory.knows(moment.fact), Is.True, moment.fact);
             }
-            Assert.That(campaign.keepsakes_found, Is.EqualTo(34));  // All but the three known gaps.
+            Assert.That(campaign.keepsakes_found, Is.EqualTo(37));  // Every keepsake: 4 in the first chapter, 3 in the other 11.
         }
 
         // Care carries over: the mud and the meals in the bag at the end of one chapter are there

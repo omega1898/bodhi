@@ -35,7 +35,7 @@ namespace Bodhi.Rules
                 },
                 rules = new StoryRule[]
                 {
-                    new StoryRule { on = "level_started", lines = new string[] { "Two months in the emergency flat, on the wrong side of the city.", "The water came up the stairs again last night. {dog} shook until morning." }, objective = "Look around the flat. Take what matters." },
+                    new StoryRule { on = "level_started", lines = new string[] { "Two months in the emergency flat, on the wrong side of the city.", "The water came up the stairs again last night. {dog} shook until morning." }, objective = "Look around the flat. Take what matters. Switch to {dog} to sniff out what he hid.", switching = true },
                     new StoryRule { on = "dog_petted", lines = new string[] { "{dog} leans the whole warm weight of him into my hand. He always has." } },
                     new StoryRule { on = "human_called", lines = new string[] { "One whistle, and {dog} comes. Every time." } },
                     new StoryRule { on = "ball_fetched", lines = new string[] { "Again. It is always again." } },
@@ -43,7 +43,7 @@ namespace Bodhi.Rules
                     new StoryRule { on = "photo_taken", lines = new string[] { "The photograph. {dog} on our sofa, eight weeks old. The green door behind him.", "Home is far. West, past the river. But it's ours." }, objective = "Leave the flat. Head west, home.", remove = new string[] { "flat_door" } },
                     new StoryRule { on = "poster_read", lines = new string[] { "'LOST IN THE FLOOD: BISCUIT. Old and grey. Deaf in one ear. Answers to whistles.", "My mum is a nurse at St Agnes Hospital, west. Please bring him. Mina, 10.'" }, voice = StoryVoice.note, schedule_seconds = 1, schedule_event = "poster_recognised" },
                     new StoryRule { on = "poster_recognised", lines = new string[] { "Mina, from next door. She had drawn him from memory: the white muzzle, the blue collar.", "{dog} pushed his nose against the paper and whined." } },
-                    new StoryRule { on = "set_out", lines = new string[] { "Nobody could tell us when the roads would open.", "So we walked. A bag. A photograph. Each other." }, fetch = false, schedule_seconds = 6, schedule_event = "chapter_done" },
+                    new StoryRule { on = "set_out", lines = new string[] { "Nobody could tell us when the roads would open.", "So we walked. A bag. A photograph. Each other." }, switching = false, fetch = false, schedule_seconds = 6, schedule_event = "chapter_done" },
                     new StoryRule { on = "chapter_done", complete = true },
                 },
                 aftermath = new string[] { "We walked until the city thinned into fields.", "{dog} ran ahead, stopped, and looked back.", "Ran ahead, stopped, looked back. As if to say: still there? Good." },
