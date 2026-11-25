@@ -315,6 +315,31 @@ const her_shin_length = 20.0;
 const her_torso_length = 27.5;
 
 // Draws one frame of her as SVG, from a pose given in game units (feet at 0, 0; facing right).
+// A short curved line across a limb, for a crease or a seam. `from` and `to` are the ends of
+// one bone in pixels; the line sits `along` (0 to 1) of the way down it, reaches `width`
+// pixels either side of the bone's middle, bows `bulge` pixels toward `to`, and is moved
+// `shift` pixels to one side (negative is toward the front of a limb hanging straight down).
+function across_limb(from, to, along, width, bulge, shift) {
+    const direction = normalized(subtract(to, from));
+    const side = [-direction[1], direction[0]];
+    const centre = add(add(from, scale(subtract(to, from), along)), scale(side, shift));
+    const start = add(centre, scale(side, -width));
+    const end = add(centre, scale(side, width));
+    const bend = add(centre, scale(direction, bulge));
+    return 'M ' + start.map(number_text).join(',') + ' Q ' + bend.map(number_text).join(',') + ' ' + end.map(number_text).join(',');
+}
+
+// A line down a limb through its joints (pixel points), kept `shift` pixels to one side of
+// the middle, as a seam is.
+function along_limb(points, shift) {
+    return 'M ' + points.map(function moved(point, index) {
+        const before = points[Math.max(0, index - 1)];
+        const after = points[Math.min(points.length - 1, index + 1)];
+        const direction = normalized(subtract(after, before));
+        return add(point, scale([-direction[1], direction[0]], shift)).map(number_text).join(',');
+    }).join(' L ');
+}
+
 function draw_her(pose) {
     const torso_angle = torso_angle_of(pose);
     const head_angle = torso_angle * 0.4 + (pose.head_tilt || 0);
@@ -325,7 +350,15 @@ function draw_her(pose) {
         const ankle = add(foot, [0, -3.6]);
         const knee = solve_joint(pose.hip, ankle, her_thigh_length, her_shin_length, -1);
         const points = [pose.hip, knee, ankle].map(to_pixels);
-        let text = '<path d="' + tube_path(points, [80, 58, 46]) + '" fill="' + (near ? 'url(#jeans)' : '#2b3550') + '" stroke="#161c2b" stroke-width="3" stroke-linejoin="round"/>';
+        const jeans = tube_path(points, [80, 58, 46]);
+        let text = '<path d="' + jeans + '" fill="' + (near ? 'url(#jeans)' : '#2b3550') + '" stroke="#161c2b" stroke-width="3" stroke-linejoin="round"/>';
+        // Denim close up: the diagonal weave, gold topstitching down the side seam, creases
+        // where the leg bends at the hip, and the jeans bunching where they meet the boot.
+        text += '<path d="' + jeans + '" fill="url(#twill)"/>';
+        text += '<path d="' + along_limb([points[0], points[1], points[2]], -3) + '" fill="none" stroke="#c49a52" stroke-width="1.6" stroke-dasharray="5 4" stroke-linejoin="round" opacity="0.5"/>';
+        text += '<path d="' + across_limb(points[0], points[1], 0.2, 14, 4, -14) + ' ' + across_limb(points[0], points[1], 0.3, 12, 4, -16) +
+            ' ' + across_limb(points[1], points[2], 0.74, 21, -5, 0) + ' ' + across_limb(points[1], points[2], 0.84, 22, -5, 0) + '" fill="none" stroke="#141a28" stroke-width="2.2" stroke-linecap="round" opacity="0.4"/>';
+        text += '<path d="' + across_limb(points[1], points[2], 0.71, 20, -5, 0) + ' ' + across_limb(points[1], points[2], 0.81, 21, -5, 0) + '" fill="none" stroke="#6c7eaa" stroke-width="1.8" stroke-linecap="round" opacity="0.35"/>';
         const crease = to_pixels(knee);
         text += '<path d="M ' + number_text(crease[0] - 14) + ',' + number_text(crease[1] - 4) + ' Q ' + number_text(crease[0]) + ',' + number_text(crease[1] + 8) + ' ' + number_text(crease[0] + 14) + ',' + number_text(crease[1] - 2) + '" fill="none" stroke="#1a2030" stroke-width="3" opacity="0.5" stroke-linecap="round"/>';
         text += place_part(her_parts.boot, ankle, foot_angle || 0);
@@ -342,6 +375,14 @@ function draw_her(pose) {
             text += '<path d="' + sleeve + '" fill="#0c2322" opacity="0.4" transform="translate(-9,7)"/>';
         }
         text += '<path d="' + sleeve + '" fill="' + (near ? 'url(#sleeve_lit)' : '#23514f') + '" stroke="#0f2a29" stroke-width="4" stroke-linejoin="round"/>';
+        // Sleeve close up: the seam where the sleeve is sewn on at the shoulder, a long soft
+        // fold down the upper arm, and the fabric bunching inside the elbow, with light on the
+        // raised edge of each fold.
+        text += '<path d="' + across_limb(points[0], points[1], 0.12, 24, 5, 0) + '" fill="none" stroke="#0f2a29" stroke-width="2.2" stroke-linecap="round" opacity="0.45"/>' +
+            '<path d="' + across_limb(points[0], points[1], 0.17, 23, 5, 0) + '" fill="none" stroke="#7cc0b8" stroke-width="1.4" stroke-dasharray="4 3" opacity="0.45"/>' +
+            '<path d="' + along_limb([add(points[0], scale(subtract(points[1], points[0]), 0.3)), add(points[0], scale(subtract(points[1], points[0]), 0.85))], 6) + '" fill="none" stroke="#0f2a29" stroke-width="2.5" stroke-linecap="round" opacity="0.25"/>' +
+            '<path d="' + across_limb(points[1], points[2], 0.02, 14, -6, -9) + ' ' + across_limb(points[0], points[1], 0.9, 13, 6, -9) + '" fill="none" stroke="#0f2a29" stroke-width="2.6" stroke-linecap="round" opacity="0.4"/>' +
+            '<path d="' + across_limb(points[1], points[2], 0.09, 13, -6, -9) + '" fill="none" stroke="#7cc0b8" stroke-width="1.6" stroke-linecap="round" opacity="0.4"/>';
         const cuff_direction = normalized(subtract(wrist, elbow));
         // Close up, the sleeve ended in a flat dark disc with an oval for a hand. Now the cuff
         // is a turned-back band with the dark opening of the sleeve inside it, and the hand
@@ -358,6 +399,7 @@ function draw_her(pose) {
             '<path d="M -13,6 C -15,16 -14,26 -11,34" fill="none" stroke="#b07d64" stroke-width="2.5" stroke-linecap="round" opacity="0.35"/>' +
             '<path d="M -22,-6 C -22,4 22,4 22,-6 L 21,-12 C 21,-4 -21,-4 -21,-12 Z" fill="#1f4c4b"/>' +
             '<path d="M -20,-4 C -10,1 10,1 20,-4" fill="none" stroke="#5aa59f" stroke-width="2" stroke-linecap="round" opacity="0.5"/>' +
+            '<circle cx="13" cy="-7" r="3.4" fill="#163837"/><circle cx="12.2" cy="-7.8" r="1.1" fill="#6fb3ad" opacity="0.7"/>' +
             '</g>';
         return near ? text : '<g filter="url(#far_side)">' + text + '</g>';
     };
@@ -604,7 +646,7 @@ function draw_dog(adult_pose, build) {
     const arch = pose.arch || 0;
     const head = pose.head;
     // The fur is drawn in the body's own coordinates (origin mid-spine, turned with the spine),
-    // so its curl texture and fluffy edge move with the body. Drawn in the frame's coordinates
+    // so its curl texture, clumps and fluffy edge move with the body. Drawn in the frame's coordinates
     // the texture stayed put while the body moved, and the fur seemed to swim.
     const body_angle = Math.atan2(axis[1], axis[0]);
     const to_body = function to_body(point) {
@@ -744,7 +786,7 @@ function draw_dog(adult_pose, build) {
     const ear_root = add(head, rotate_point(scale([-4.2, -3.6], build.head), pose.head_angle || 0));
     const ear_markup = place_part(dog_parts.ear, ear_root, (pose.head_angle || 0) + (pose.ear || 0.2), ' scale(' + Math.round(0.92 * build.ear * 1000) / 1000 + ')');
     const body_place = to_pixels(spine_middle);
-    return '<g transform="translate(' + number_text(body_place[0]) + ',' + number_text(body_place[1]) + ') rotate(' + number_text(degrees(body_angle)) + ')"><g filter="url(#fluffy)">' + fur.join('') + '</g></g>' +
+    return '<g transform="translate(' + number_text(body_place[0]) + ',' + number_text(body_place[1]) + ') rotate(' + number_text(degrees(body_angle)) + ')"><g filter="url(#fluffy)"><g filter="url(#clumps)">' + fur.join('') + '</g></g></g>' +
         '<path d="M ' + back_line.map(function point_text(point) { return point.map(number_text).join(','); }).join(' L ') + '" fill="none" stroke="#fff3d8" stroke-width="12" stroke-linecap="round" opacity="0.18"/>' +
         head_markup + ear_markup;
 }
@@ -1079,6 +1121,8 @@ const biscuit_changes = [
     ['#f6ead8', '#eeece6'], ['#f1dcc0', '#dcd8d0'],
     // A smoother coat.
     ['scale="22"', 'scale="9"'], ['opacity="0.31"', 'opacity="0.12"'],
+    // Shallower clumps, lit in plain grey rather than the warm red-brown of Bodhi's coat.
+    ['surfaceScale="13"', 'surfaceScale="6"'], ['intercept="0.71"', 'intercept="0.68"'], ['intercept="0.65"', 'intercept="0.68"'],
 ];
 function biscuit_look(markup) {
     let result = markup;

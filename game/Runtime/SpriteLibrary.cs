@@ -49,6 +49,20 @@ namespace Bodhi.Game
             return drawings[frame];
         }
 
+        // The sharper close-up drawing when its set is loaded ("her_close" for "her"), otherwise
+        // the normal one, so a close-up still shows something if its sharper set is missing.
+        public static Sprite close_up(string set_name, string animation_name, int frame)
+        {
+            // Unity objects are checked with == null, never ??, because Unity's own null check
+            // also catches a sprite that has been let go.
+            Sprite sharper = sprite(FrameSheets.close_up_name(set_name), animation_name, frame);
+            if (sharper != null)
+            {
+                return sharper;
+            }
+            return sprite(set_name, animation_name, frame);
+        }
+
         // True if a set's sprites are ready.
         public static bool has(string set_name) => set_name != null && sprites.ContainsKey(set_name);
 

@@ -40,6 +40,17 @@ packing_gap = 2
 # 2048 keeps every sheet comfortably under that.
 widest_sheet = 2048
 
+# Sharper drawings for close-ups. The opening's hug and the title screen show Em and Bodhi about
+# twice as big as a chapter does, so the animations they use are drawn again at twice the
+# pixels, as sets of their own ("her_close", "bodhi_close"). The game uses these only in a
+# close-up (SpriteLibrary.close_up); elsewhere the normal drawings are already sharp enough.
+# Each close-up set: the set it is drawn from, and which of its animations.
+close_up_sets = {'her_close': ('her', ['idle', 'kneel', 'embrace']), 'bodhi_close': ('bodhi', ['sit', 'embrace'])}
+close_up_pixels_per_unit = 7
+# Close-up pictures may be up to 4096 pixels on a side: still within every iPhone's limit, and
+# they're loaded only while a close-up is on screen.
+widest_close_up_sheet = 4096
+
 # How many pixels out from a drawing the bleeding reaches.
 bleed_pixels = 4
 
@@ -100,15 +111,15 @@ def bleed_colours(picture):
     return Image.fromarray(numpy.clip(numpy.round(pixels), 0, 255).astype(numpy.uint8), 'RGBA')
 
 
-# Places boxes of the given (width, height) in rows, left to right, no wider than `widest_sheet`.
+# Places boxes of the given (width, height) in rows, left to right, no wider than `widest`.
 # Returns each box's (left, top) and the sheet's (width, height).
-def pack_in_rows(sizes):
+def pack_in_rows(sizes, widest=widest_sheet):
     places = []
     row_left, row_top, row_height, sheet_width = 0, 0, 0, 0
     for width, height in sizes:
-        if width > widest_sheet:
+        if width > widest:
             raise ValueError('a drawing ' + str(width) + ' pixels wide is wider than a sheet')
-        if row_left > 0 and row_left + width > widest_sheet:
+        if row_left > 0 and row_left + width > widest:
             row_top += row_height + packing_gap
             row_left, row_height = 0, 0
         places.append((row_left, row_top))
@@ -121,7 +132,7 @@ def pack_in_rows(sizes):
 # Cuts, trims, bleeds and packs one animation's sheet. Returns the packed picture and, per
 # drawing, its box in Unity's terms: x and y of the bottom-left corner (Unity counts rows up from
 # the bottom of a picture), width, height, and the feet's position in pixels from that corner.
-def pack_animation(sheet_picture, cell, frame_count, columns, pixels_per_unit):
+def pack_animation(sheet_picture, cell, frame_count, columns, pixels_per_unit, widest=widest_sheet):
     cell_width = round(cell['width'] * pixels_per_unit)
     cell_height = round(cell['height'] * pixels_per_unit)
     feet_x = cell['feet_x'] * pixels_per_unit
@@ -134,7 +145,9 @@ def pack_animation(sheet_picture, cell, frame_count, columns, pixels_per_unit):
         box = trimmed_box(cell_picture)
         pieces.append(bleed_colours(cell_picture.crop(box)))
         boxes.append(box)
-    places, (sheet_width, sheet_height) = pack_in_rows([piece.size for piece in pieces])
+    places, (sheet_width, sheet_height) = pack_in_rows([piece.size for piece in pieces], widest)
+    if sheet_height > widest:
+        raise ValueError('the drawings make a sheet ' + str(sheet_height) + ' pixels tall, taller than ' + str(widest))
     packed = Image.new('RGBA', (sheet_width, sheet_height), (0, 0, 0, 0))
     frames = []
     for piece, box, (left, top) in zip(pieces, boxes, places):
@@ -202,7 +215,25 @@ def hold_point(points):
     return [point[0], point[1]]
 
 
-# Exports every set.
+# Draws, packs and saves one animation as the picture `picture_name`. Returns what
+# FrameSheets.Data.cs needs to know about it.
+def export_animation(picture_name, animation, cell, pixels_per_unit, widest):
+    picture_path = os.path.join(frames_folder, picture_name + '.png')
+    sheet_width = round(animation['columns'] * cell['width'] * pixels_per_unit)
+    sheet = draw_sheet(os.path.join(repository, animation['sheet']), sheet_width, picture_path + '.drawing.png')
+    packed, frames = pack_animation(sheet, cell, animation['frames'], animation['columns'], pixels_per_unit, widest)
+    packed.save(picture_path, optimize=True)
+    for frame, points in zip(frames, animation['points']):
+        frame['feet'] = points['feet']
+        frame['hold'] = hold_point(points)
+    print(picture_name.ljust(26), str(len(frames)).rjust(3), 'drawings', str(packed.width) + 'x' + str(packed.height))
+    return {
+        'picture': 'Frames/' + picture_name, 'sheet_width': packed.width, 'sheet_height': packed.height,
+        'cycle_length': animation.get('cycle_length', 0), 'frames': frames,
+    }
+
+
+# Exports every set, then the close-up sets.
 def main():
     atlas = read_frame_list()
     os.makedirs(frames_folder, exist_ok=True)
@@ -212,20 +243,15 @@ def main():
         cell = atlas[set_name]['cell']
         sets[set_name] = {'pixels_per_unit': pixels_per_unit, 'animations': {}}
         for animation_name, animation in atlas[set_name]['animations'].items():
-            picture_name = set_name + '_' + animation_name
-            picture_path = os.path.join(frames_folder, picture_name + '.png')
-            sheet_width = round(animation['columns'] * cell['width'] * pixels_per_unit)
-            sheet = draw_sheet(os.path.join(repository, animation['sheet']), sheet_width, picture_path + '.drawing.png')
-            packed, frames = pack_animation(sheet, cell, animation['frames'], animation['columns'], pixels_per_unit)
-            packed.save(picture_path, optimize=True)
-            for frame, points in zip(frames, animation['points']):
-                frame['feet'] = points['feet']
-                frame['hold'] = hold_point(points)
-            sets[set_name]['animations'][animation_name] = {
-                'picture': 'Frames/' + picture_name, 'sheet_width': packed.width, 'sheet_height': packed.height,
-                'cycle_length': animation.get('cycle_length', 0), 'frames': frames,
-            }
-            print(picture_name.ljust(26), str(len(frames)).rjust(3), 'drawings', str(packed.width) + 'x' + str(packed.height))
+            sets[set_name]['animations'][animation_name] = export_animation(
+                set_name + '_' + animation_name, animation, cell, pixels_per_unit, widest_sheet)
+    for close_name, (set_name, animation_names) in close_up_sets.items():
+        cell = atlas[set_name]['cell']
+        sets[close_name] = {'pixels_per_unit': close_up_pixels_per_unit, 'animations': {}}
+        for animation_name in animation_names:
+            sets[close_name]['animations'][animation_name] = export_animation(
+                close_name + '_' + animation_name, atlas[set_name]['animations'][animation_name], cell,
+                close_up_pixels_per_unit, widest_close_up_sheet)
     write_data(sets)
 
 

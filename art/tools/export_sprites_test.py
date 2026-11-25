@@ -113,6 +113,30 @@ def test_too_wide_is_refused():
 
 
 # Break it: no drawings packs to a 1 by 1 sheet rather than crashing.
+def test_close_up_sheets_may_be_wider():
+    places, (sheet_width, _) = tool.pack_in_rows([(3000, 10), (900, 10)], tool.widest_close_up_sheet)
+    check(sheet_width == 3902 and places[1] == (3002, 0), 'a close-up sheet holds a drawing too wide for a normal one')
+
+
+def test_too_tall_is_refused():
+    # Break it: drawings that would stack up taller than the limit are refused, not saved as a
+    # picture the iPhone would shrink and blur.
+    tall = Image.new('RGBA', (20, 30), (200, 120, 60, 255))
+    cell = {'width': 20, 'height': 30, 'feet_x': 10, 'feet_y': 30}
+    try:
+        tool.pack_animation(tall, cell, 1, 1, 1, widest=25)
+        check(False, 'a sheet taller than the limit is refused')
+    except ValueError as error:
+        check('tall' in str(error), 'a sheet taller than the limit is refused')
+
+
+def test_close_ups_come_from_real_sets():
+    for close_name, (set_name, animation_names) in tool.close_up_sets.items():
+        check(close_name == set_name + '_close' and set_name in tool.pixels_per_unit_of_set and len(animation_names) > 0,
+              close_name + ' is drawn from ' + set_name)
+    check(tool.close_up_pixels_per_unit >= 2 * tool.pixels_per_unit_of_set['her'], 'close-ups have at least twice the pixels')
+
+
 def test_nothing_to_pack():
     places, size = tool.pack_in_rows([])
     check(places == [] and size == (1, 1), 'nothing to pack gives an empty 1 by 1 sheet')
@@ -126,7 +150,8 @@ def test_numbers_for_csharp():
 
 
 for test in [test_packing_never_overlaps, test_bleeding_colours_the_rim, test_bleeding_an_empty_picture, test_trimming,
-             test_pivot_lands_on_the_feet, test_too_wide_is_refused, test_nothing_to_pack, test_numbers_for_csharp]:
+             test_pivot_lands_on_the_feet, test_too_wide_is_refused, test_close_up_sheets_may_be_wider, test_too_tall_is_refused,
+             test_close_ups_come_from_real_sets, test_nothing_to_pack, test_numbers_for_csharp]:
     test()
 if problems:
     print(str(len(problems)) + ' problem(s).')
