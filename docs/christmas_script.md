@@ -342,26 +342,74 @@ Then the title card *Chapter Four: Strand*, 16 December.
 
 Get Biscuit down off the lorry. / Find what she left. Sniff for it. / Hide in the woodshed. / Find which way is home. / Follow Biscuit. / Look for signs of them. / Ask in the café. / Put up a poster in Nell's window. / Follow the prints.
 
-### Chapter Four: Strand (16 December)
+### Chapter Four: Strand (16 December), in full
 
-*Underneath:* Biscuit leads them to a red door on Kirk Wynd, the house where he was young. Kofi's family lives there now, and that is how a boy with chestnuts comes to know two lost dogs. The red door never opens for Biscuit, and Bodhi learns what Em already knows: you can't go back.
+Written in full on 25 November 2026, when the chapter was built. The chapter's question: *will they find each other in a town full of people?*
 
-| Beat | Voice | Line |
+*Underneath:* Biscuit leads them to a red door on Kirk Wynd, the house where he was young, and sits down to wait for it to open. It never does. A boy comes out of the house next door with a paper cone of chestnuts, and that is how Kofi comes to know two lost dogs. At the red door Bodhi understands what Em already knows, that you can't go back, and from here he leads. Then the loneliest near miss in the game: a whole town counting down together, Em's whistle and the band's first note at the same moment, and one row of huts between them.
+
+#### Dusk (Bodhi)
+
+| # | Beat | Voice | Caption |
+|---|---|---|---|
+| 1 | Arriving (film) | B | Boots. Wheels. Sugar, burning. A hundred people, all at once. |
+| 2 | | B | Too many smells. Too many feet. The old dog, pressed against a wall. |
+| 3 | Kirk Wynd | B | The old dog knows these stones. His tail goes up, for the first time in days. |
+| 4 | | B | A red door. The old dog sits. Waits. Like it will open. |
+| 5 | | B | It doesn't open. |
+| 6 | Kofi (film) | B | A different door. A boy. Chestnuts, hot, in paper. Hands that smell of smoke. |
+| 7 | | B | He crouches. He doesn't grab. He holds out the paper. |
+| 8 | | B | Hot. Sweet. Half for the old dog. |
+| 9 | | B | The boy runs in, shouting. The old dog still looks at the red door. |
+| 10 | The turn | B | Nobody is coming to the red door. Come, old dog. |
+| 11 | The kerb | B | Wheels. Big. Loud. Coming. The old dog, stepping off the stones. |
+| 12 | The shove | B | Bark. Shove. Shoulder into him. Back. BACK. |
+| 13 | | B | The wheels, a nose away. Hot wind. Gone. |
+| 14 | The market | B | Under the huts: dark, and dropped things. Boots go past like weather. |
+| 15 | Found by nose | B | Dropped. Salt and bread, still warm. Dropped things are allowed. |
+
+#### Six o'clock (Em)
+
+| # | Beat | Voice | Caption |
+|---|---|---|---|
+| 16 | The bus | Em | Strand had its Christmas market up. Every stall had a string of lights. |
+| 17 | | Em | Gingerbread. Chestnuts. Hot apple. The brass band's breath, hanging in the cold. |
+| 18 | Kofi's mum's stall | Em | 'A ginger one and a grandpa one,' the boy said. 'On our step. The grandpa wanted in.' |
+| 19 | | Em | 'Old dogs go back to where they were young,' his mum said. 'My gran did too.' |
+| 20 | | Em | I rang Ama. 'Kirk Wynd,' she said. 'The red door.' Then, very quietly: 'That was ours.' |
+| 21 | Poster | Em | One poster on the carousel, where every child in Strand would ride past it. |
+| 22 | Poster | Em | One on the chestnut stall, where Kofi could see it. |
+| 23 | The steps | Em | From the town-hall steps I could see the whole square, and none of it was him. |
+| 24 | The tree (film) | Em | At six the whole square counted down from ten, and the tree came on. |
+| 25 | The whistle (film) | Em | I whistled across the square at the very moment the band began to play. |
+| 26 | | B | A sliver of something. Her? Under the trumpets. Gone. |
+| 27 | | B | The big animal in the straw shouts. Ears flat. Gone, gone. |
+| 28 | | Em | One row of huts. I found that out later. One row of huts. |
+
+#### Night (Bodhi, then Em)
+
+| # | Beat | Voice | Caption |
+|---|---|---|---|
+| 29 | Fading | B | The old dog, shaking again. Cold in his bones, not his fur. |
+| 30 | The crate | B | A box. Push. Push. Up against the little house. |
+| 31 | The grotto (film) | B | Inside: a big chair. Beard and peppermints. Snow that isn't cold. |
+| 32 | | B | The old dog lies down in it and sighs. |
+| 33 | | B | A big chair. Beard and peppermints. The old dog asleep in cotton snow. |
+| 34 | Closes | Em | Across the square I put up my last poster. It faced the grotto. |
+
+Then the title card *Chapter Five: The Lantern Train*, 17 December.
+
+#### Keepsakes
+
+| Keepsake | Found by | Text |
 |---|---|---|
-| Opens | B | Boots. Wheels. Sugar, burning. A hundred people, all at once. |
-| The old streets | B | The old dog knows these stones. His tail goes up, for the first time in days. |
-| The red door | B | A red door. The old dog sits. Waits. Like it will open. |
-| | B | It doesn't open. |
-| The market | Em | Strand had its Christmas market up. Every stall had a string of lights. |
-| | Em | Gingerbread. Chestnuts. Hot apple. The brass band's breath, hanging in the cold. |
-| Kofi | Em | 'A ginger one and a grandpa one,' the boy said. 'On our step. The grandpa wanted in.' |
-| | Em | 'Old dogs go back to where they were young,' his mum said. 'My gran did too.' |
-| The tree | Em | At six the whole square counted down from ten, and the tree came on. |
-| The near miss | Em | I whistled across the square at the very moment the band began to play. |
-| | B | A sliver of something. Her? Under the trumpets. Gone. |
-| | Em | One row of huts. I found that out later. One row of huts. |
-| Closes | B | A big chair. Beard and peppermints. The old dog asleep in cotton snow. |
-| | Em | Across the square I put up my last poster. It faced the grotto. |
+| The grotto's letter board | Em | Pinned to the grotto's letter board: 'Dear Santa, please can Grandad's dog come home from the vet.' |
+| The mitten on the railing | Bodhi | A lost mitten, clipped to a market railing at a child's height, so its owner could reach it. |
+| The photograph in the porch | Em | In the town-hall porch, a photograph sixty years old: the first Strand tree, and everyone under it. |
+
+#### Objectives, in order
+
+Follow Biscuit. / Lead Biscuit away. Find somewhere warm. / Push Biscuit back onto the kerb! / Find something dropped. Stay out of sight. / Ask at the stalls. / Put up posters. / Climb the town-hall steps. Look for him. / Whistle for {dog}. / Biscuit is fading. Find somewhere warm. / Climb in the back window. / Put up your last poster.
 
 ### Chapter Five: The Lantern Train (17 December)
 

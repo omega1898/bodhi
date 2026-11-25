@@ -14,6 +14,7 @@ namespace Bodhi.Rules
                 first_snow(),
                 lamp_in_window(),
                 kell_bridge(),
+                strand(),
             };
         }
     }
