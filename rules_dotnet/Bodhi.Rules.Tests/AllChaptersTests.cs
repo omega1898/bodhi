@@ -184,8 +184,9 @@ namespace Bodhi.Rules.Tests
         }
 
         // Plays a run to its end, starting it first if nothing has happened yet. With stop_when,
-        // it stops early, as soon as that question about the run answers true.
-        public static void finish(ChapterRun run, bool skip_films, Func<ChapterRun, bool> stop_when = null)
+        // it stops early, as soon as that question about the run answers true. after_each_step,
+        // if given, is called after every step, so a test can look at each moment.
+        public static void finish(ChapterRun run, bool skip_films, Func<ChapterRun, bool> stop_when = null, Action<ChapterRun> after_each_step = null)
         {
             var script = run.chapter;
             if (run.event_order.Count == 0)
@@ -217,6 +218,7 @@ namespace Bodhi.Rules.Tests
                 {
                     switches_without_progress = 0;
                 }
+                after_each_step?.Invoke(run);
             }
         }
 
