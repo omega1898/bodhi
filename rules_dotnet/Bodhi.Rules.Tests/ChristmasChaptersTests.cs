@@ -381,6 +381,23 @@ namespace Bodhi.Rules.Tests
             Assert.That(run.care.dirt, Is.EqualTo(0), "the towel took five days of hill out of his curls");
         }
 
+        // Chapter Eight: the black ice holds him and not her. Its edge stops Em, never Bodhi,
+        // and they come back together only when his rope and her crank have both been done.
+        [Test]
+        public void chapter_eight_black_ice_holds_him_not_her()
+        {
+            var edge = Bodhi.Game.ChristmasStages.blackwater().find_solid("black_ice_edge");
+            Assert.That(Bodhi.Game.StageLook.solid_blocks(edge, Character.human), Is.True);
+            Assert.That(Bodhi.Game.StageLook.solid_blocks(edge, Character.dog), Is.False);
+            var run = new ChapterRun(ChristmasChapters.blackwater());
+            ChapterRobot.finish(run, skip_films: true, stop_when: playing => playing.has_happened("rope_held"));
+            Assert.That(run.reunion_stage, Is.EqualTo(ReunionStage.none), "the rope alone doesn't bring them in");
+            ChapterRobot.finish(run, skip_films: false);
+            Assert.That(run.is_complete, Is.True);
+            var order = run.event_order.ToList();
+            Assert.That(order.IndexOf("reunion_embrace"), Is.GreaterThan(order.IndexOf("crank_turned")));
+        }
+
         // Break it: each call gives a fresh copy, so one playthrough can't change another's chapter.
         [Test]
         public void each_copy_of_a_chapter_is_separate()
