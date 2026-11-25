@@ -22,6 +22,9 @@ The Unity side of the game: everything between the rules (`rules/`, which decide
   - `FlipbookChooser`: which drawing to show each frame, ported from the browser game: walking drawings move on by distance so feet stay planted; jumps follow the arc; landings, turns, stops, skids and getting up play over the rest.
   - `FramePacing`: runs the game at the screen's own frame rate (120 on ProMotion iPhones).
   - `CharacterMover`: moves her or Bodhi through a chapter and keeps them out of walls and floors (steps, ceilings, the chapter's ends, falling out of the world). Unity's own physics isn't used for them, so the game feels the same on every phone.
+  - `OpeningTitle`: the start-up animation as a timeline: at any moment, how strongly the sky, house, door light, paw prints, name and buttons show, where Bodhi and Em stand and which drawing each shows, and the camera's zoom. A tap skips to the settled title.
+  - `BackStory`: the caption cards in her voice told on New Game before Coming Home: tap to move on, hold to skip them all.
+  - `MemoryBox`: the memory box screen: every chapter with its keepsakes (memories once found, hints while missing), totals for the year, and replaying a finished chapter without moving the year on.
 - `Runtime/`: the Unity scripts. They decide nothing themselves; they ask `Logic/` and draw the answer.
   - `ChapterDirector`: the one script the scene needs. It makes everything else and plays every chapter in turn.
   - `ChapterLevel`: builds a chapter's place (sky, floors, water, props, markers) from its stage, and keeps it in step with the story.
