@@ -20,6 +20,7 @@ namespace Bodhi.Game
                 bothy(),
                 windy_gap(),
                 christmas_eve(),
+                christmas_day(),
             };
         }
 
@@ -39,6 +40,7 @@ namespace Bodhi.Game
                 case "bothy": return bothy();
                 case "windy_gap": return windy_gap();
                 case "christmas_eve": return christmas_eve();
+                case "christmas_day": return christmas_day();
                 default: return null;
             }
         }

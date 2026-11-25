@@ -843,24 +843,69 @@ Then the title card *Chapter Twelve: Christmas Day*, 25 December.
 
 Keep going down. Keep the marker posts close. / Lead Em down. Find the old path by its smell. / Bark, so she knows you're there. / Lead her toward the bell. / Cross the iced footbridge together. / Down through the pines. Home.
 
-### Chapter Twelve: Christmas Day (25 December)
+### Chapter Twelve: Christmas Day (25 December), in full
 
-| Beat | Voice | Line |
+Written in full on 25 November 2026, when the chapter was built. The chapter's question: *what does Christmas look like now?*
+
+*Underneath:* every setup pays off. The cold nose at six, but from her bed this time. The stolen bauble and the name tag in the stocking, the tag buckled "the right notch" beside the bell. The sandwich "for the stowaways". A snowman whose nose survives, because the puppy who ate it has grown up. A whistle he answers. And the old saying, said whole, by everyone, at a lamp lit for nobody. The last scene settles into the title screen: the game ends where the player first saw it.
+
+#### Morning
+
+| # | Beat | Voice | Caption |
+|---|---|---|---|
+| 1 | Waking (film) | B | Morning. Her feet. Her bed. Snow at the window. Out? |
+| 2 | | Em | Christmas morning, and a cold nose in my ear, exactly on time. |
+| 3 | The stocking | Em | In his stocking: a new ball, and the red bauble I'd found under the sofa. |
+| 4 | | Em | And his name tag. It had come in the post on Christmas Eve, while we were on the hill. |
+| 5 | The tag | Em | I buckled it on beside the bell. The right notch. |
+| 6 | | N | 'BODHI. If found, call Em.' |
+| 7 | The new ball | Em | He brought the new ball back. Then he lay on it, in case anyone else wanted it. |
+| 8 | The towel | Em | The last of the fell came out of his curls: one burr, from Windy Gap. I kept it. |
+| 9 | Dinner | Em | His own Christmas dinner: turkey, carrot, no gravy. He ate it in nine seconds. |
+| 10 | A cuddle | Em | He leaned on me and sighed, like an old dog. Like Biscuit. |
+
+#### Lunch
+
+| # | Beat | Voice | Caption |
+|---|---|---|---|
+| 11 | Visitors (film) | Em | Mina, Ama and Biscuit came up the lane for lunch, Biscuit in his blue collar. |
+| 12 | | Em | Biscuit barked once at the door. Hello. |
+| 13 | Presents | Em | Mina gave {dog} a drawing. He sniffed it very seriously, and approved. |
+| 14 | Dougie | Em | Dougie came up the lane with a box. Inside: a ham sandwich. 'For the stowaways.' |
+| 15 | | Em | He'd had them in his lorry for a whole day and never known. |
+| 16 | Tam | Em | Tam rang. Clementine was fine. Did the sled run true? It did. |
+| 17 | The sprout | B | Green. Round. Smells of... no. No. |
+| 18 | | Em | He stole a sprout off Mina's plate, tasted it, and gave it back. |
+
+#### Night
+
+| # | Beat | Voice | Caption |
+|---|---|---|---|
+| 19 | The snowman | Em | That night, under the aurora, we built a snowman in the clearing. |
+| 20 | The arms | B | Sticks. Good sticks. Not for chewing. For the cold white one. |
+| 21 | | Em | He brought the arms. He did not eat the nose. He has grown up. |
+| 22 | | Em | Mina put the Santa hat on. 'Now he's finished,' she said. |
+| 23 | The whistle | Em | I whistled, just to hear it. Of course he came. |
+| 24 | | Em | I heard him before I saw him: the little brass bell, and the new tag beside it. |
+| 25 | The lamp (film) | Em | Mina handed me the matches. 'A light for the hill,' I said. |
+| 26 | | Em | 'And the hill brings them home,' we said, all of us. |
+| 27 | Closes | Em | That night I put the lamp in the window anyway. |
+| 28 | | Em | Not for anyone on the hill. Everyone I'd been waiting for was home. |
+| 29 | | B | Her. The stove. The old dog, snoring. Here is the place. |
+
+Then the epilogue (below), on the screen after the chapter.
+
+#### Keepsakes
+
+| Keepsake | Found by | Text |
 |---|---|---|
-| Opens | B | Morning. Her feet. Her bed. Snow at the window. Out? |
-| | Em | Christmas morning, and a cold nose in my ear, exactly on time. |
-| The tag | Em | His name tag had come on Christmas Eve, while we were on the hill. |
-| | Em | I buckled it on beside the bell. The right notch. |
-| Dougie | Em | Dougie came up the lane with a box. Inside: a ham sandwich. 'For the stowaways.' |
-| Tam | Em | Tam rang. Clementine was fine. Did the sled run true? It did. |
-| Dinner | Em | {dog} stole a sprout off Mina's plate, tasted it, and gave it back. |
-| The snowman | Em | That night, under the aurora, we built a snowman in the clearing. |
-| The whistle | Em | I whistled, just to hear it. Of course he came. |
-| The old words | Em | Mina lit the lamp. 'A light for the hill,' she said. |
-| | Em | 'And the hill brings them home,' we said, all of us. |
-| Closes | Em | That night I put the lamp in the window anyway. |
-| | Em | Not for anyone on the hill. Everyone I'd been waiting for was home. |
-| | B | Her. The stove. The old dog, snoring. Here is the place. |
+| Mina's drawing | Em | Mina's drawing: two dogs and a lamp in a window. 'BODHI AND BISCUIT. HOME.' x x |
+| The stick under the tree | Bodhi | The bothy stick, under the tree, wrapped by {dog} in his own way: in my best scarf. |
+| Tam's card | Em | A card from Tam, with a reindeer hair taped inside: 'From Clementine.' |
+
+#### Objectives, in order
+
+Open his stocking. / Put his name tag on. / Look after him: towel, Christmas dinner, a cuddle. / Open the presents. / Something smells interesting on the table. (the game hands you {dog}) / Go out and build a snowman. / Switch to {dog}. Fetch sticks for its arms. / Whistle for {dog}. / Light the lamp in the window.
 
 ### Epilogue: The Herder (Christmas night)
 
