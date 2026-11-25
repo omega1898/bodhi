@@ -2,6 +2,8 @@
 
 > **Status:** approved by the owner on 25 November 2026 (see section 11 for what was decided).
 >
+> **The words:** every caption, chapter by chapter, is in `docs/christmas_script.md`, with the storytelling methods it uses. The deeper threads added on 25 November 2026 are marked **(added)** below.
+>
 > **What this is:** the story bible for the Christmas game starring Em and Bodhi. Every chapter's scenery, lighting, props, puzzles and captions are built from it, so when it changes, the chapters change with it. It is a proposal written on 25 November 2026; nothing in the code has been changed yet (section 9 lists what would change). How Em and Bodhi look is designed separately (`docs/characters.md`). This document says what happens to them, not how they are drawn.
 
 **At a glance**
@@ -68,17 +70,39 @@ A long glacial valley in the far north, cold enough for snow from December and f
 
 **The custom.** In Hollin, on winter nights, you leave a light in the window "for anyone still out on the hill". It is set up in Chapter One and pays off in every chapter after.
 
+### The history under the snow (added 25 November 2026)
+
+The player only ever glimpses this. It is written down so every chapter tells the same history; none of it is ever explained in one go.
+
+- **The drovers.** For three hundred years, until the railway came, drovers walked cattle and sheep from the high farms over Windy Gap and down past the cabin to Hollin, then on to Strand market. The cairns mark their way. Under the snow the path still smells of them, which is how Bodhi finds it blind in Chapter Eleven.
+- **The custom is older than the church.** It started with the drovers' wives, who lit a lamp for men still on the hill. Everyone in Hollin still lights one; almost nobody remembers why. The words you say as you light it are **"A light for the hill."** There is a second half, the answer, that only the old remember: **"And the hill brings them home."** Mina learned it from her gran. Em hears it for the first time in Chapter Two, and in Chapter Twelve everyone says it together.
+- **Mercy.** Hollin's church bell, cast in 1868, is called Mercy. It is rung for weddings, for funerals, and "for the hill": in a storm, every quarter hour, so anyone lost up there can walk toward the sound. The church keeps an old storm book of every time it was rung that way. Mina finds it in Chapter Eleven.
+- **The Long White.** What old Hollin calls a fifty-year storm. The last was Christmas 1974: eleven days of snow, the valley cut off for three weeks. The radio calls this year's a weather warning; Tam calls it a Long White, and so, by Chapter Eleven, does everyone.
+- **Tam and Moss.** In the Long White of 1974, Tam Rennie was twelve. He went back up the hill for a strayed calf and the storm caught him. His father's collie, Moss, found him, lay on him for three nights in the bothy so he wouldn't freeze, then led him down the drovers' path in the dark, nose to the old scent, toward a village where every window had been lit for him. Tam cut her name into the bothy doorframe at a dog's height. He has never told anyone the whole story. He tells Em, in five lines, in Chapter Seven.
+- **Biscuit's first home.** Biscuit was born in Tam's barn, the pup of Tam's collie Bess, and given to Ama when she was a young nurse living in Strand. They moved up to Hollin when Mina was small. That is why, deaf and muddled, he walks down the valley in Chapter Three: he isn't lost, not to him; he is going back to where he was young. And it is why he went out into the storm at all: in a Long White an old herd dog goes out to bring the stock in. Tam recognises him in Chapter Six.
+
+### The sayings
+
+Short lines the valley says, which mean more each time they come back.
+
+| Saying | Who says it | Where it lands |
+|---|---|---|
+| "A light for the hill." / "And the hill brings them home." | Everyone, lighting the lamp; the answer only the old know | Ch1 (Em says the first half lightly), Ch2 (Mina gives the answer), Ch12 (everyone says both) |
+| "When the deer turn their tails to the north, bar the door." | Herders | The prologue (Tam watches them turn) |
+| "Snow forgets. A nose remembers." | Tam | Ch7 (about Moss), Ch11 (Bodhi, in his own words: "Snow forgets. Noses don't.") |
+| "Go now, or you're here till the thaw." | Tam | Ch7 |
+
 ## 3. The cast
 
-**Em.** Based on a real person; see `docs/characters.md` for how she looks, and keep giving her a say in how she's shown. In this story she is warm, funny, stubborn and practical. She talks to Bodhi all the time. She never gives up looking, and she never says how frightened she is: you see it in what she does (the hourly whistle from the porch, the empty collar she keeps in her pocket). Nothing about her life outside the valley is mentioned.
+**Em.** Based on a real person; see `docs/characters.md` for how she looks, and keep giving her a say in how she's shown. In this story she is warm, funny, stubborn and practical. She talks to Bodhi all the time. She never gives up looking, and she never says how frightened she is: you see it in what she does (the hourly whistle from the porch, the empty collar she keeps in her pocket). Nothing about her life outside the valley is mentioned. **(Added.)** She carries one small guilt: after his towel she let his collar out a notch so it wouldn't pinch his fluffed-up curls, and wet curls lie flat. She says it once, at the moment it happens ("One notch."), confesses it to Mina in Chapter Seven, and buckles it "the right notch, this time" in Chapter Six.
 
 **Bodhi.** A male goldendoodle, based on a real dog. Red-apricot curls, a cream beard, a black nose (`docs/characters.md`). In this story he is **about nine months old**: nearly grown, all paws and opinions, seeing his **first snow** and having his **first Christmas**. He stays one age for all twelve days. His collar has a small brass bell and a red bow, as on the title screen, but no name tag yet: it is still in the post, which is why nobody who finds him can ring Em. He grows up over the twelve days, from a puppy who lunges into the dark to a young dog who looks back at Em and waits for her to say "go".
 
-**Mina Osei**, 10 (invented). Lives in the cottage below the cabin. She draws, makes cards and is braver than she looks. She keeps Em's lamp lit for ten nights. Reused from `docs/story.md`.
+**Mina Osei**, 10 (invented). Lives in the cottage below the cabin. She draws, makes cards and is braver than she looks. She keeps Em's lamp lit for ten nights. Reused from `docs/story.md`. **(Added.)** She is sure she latched the log store the night Biscuit got out. She didn't, and she knows it by morning. Keeping the lamp lit is her penance as much as her promise. She confesses on Tam's phone in Chapter Seven, and Em answers with her own guilt: "Latches slip. So do collars." In Chapter Eleven her guilt turns into action: she finds the church's storm book, has Mercy rung and lights every window in Hollin.
 
 **Ama Osei** (invented). Mina's mother, a nurse at the cottage hospital in Strand. Calm, practical, drives Em down the valley and keeps ringing. Reused from `docs/story.md`.
 
-**Biscuit**, 13 (invented). Mina's dog: grey to the eyebrows, a white muzzle, deaf in one ear, a blue collar ("If found, call Ama"). He barks exactly once, very politely: that means hello. He loves puppies. Reused from `docs/story.md`.
+**Biscuit**, 13 (invented). Mina's dog: grey to the eyebrows, a white muzzle, deaf in one ear, a blue collar ("If found, call Ama"). He barks exactly once, very politely: that means hello. He loves puppies. Reused from `docs/story.md`. **(Added.)** Born in Tam's barn, a herd dog's pup; he still stares up at the hill when weather is coming, though he can't hear it (see "The history under the snow").
 
 **Dougie** (invented). Delivers Christmas trees from the timber yard to Strand market in his green lorry. Never knows he had two stowaways until he sees the poster. Keeps a ham sandwich under his seat.
 
@@ -88,7 +112,9 @@ A long glacial valley in the far north, cold enough for snow from December and f
 
 **Pat** (invented). The guard on the Lantern Train. Pulls the brake on the viaduct without being asked twice.
 
-**Tam** (invented). An old reindeer herder on the hill above the railway. Gruff, kind, talks to his reindeer more than to people. Gives them his father's sled: the sled on the title screen.
+**Tam Rennie** (invented). An old reindeer herder on the hill above the railway, sixty-four. Gruff, kind, talks to his reindeer more than to people. Gives them his father's sled: the sled on the title screen. **(Added.)** He is the prologue's eyes, the boy Moss brought home in 1974, and the man who bred Biscuit. A young Tam and a collie are in the photo on his wall; the collie is Moss.
+
+**Moss** (invented, 1974; added). Tam's father's collie. Only ever seen in an old photograph and a name cut into the bothy doorframe. Bodhi does on Christmas Eve what she did fifty years before.
 
 **Clementine** (invented). Tam's reindeer calf, with a white face and no sense at all. Bodhi herds her back into her pen and makes a friend for life.
 
@@ -102,7 +128,7 @@ Each chapter lists its setting (this drives the art), its plot, what the player 
 
 **Setting.** The cabin above Hollin and its clearing (the title screen's place), the lane down through the pines, and the timber yard. Dawn: blue-white, big slow flakes falling, the first snow lying smooth and untouched. Afternoon: a low peach sun skimming the snow, blue shadows as long as trees, dark by half past three. Evening: inside the cabin, with stove light, the tree, and the lamp in the window. Night: a blizzard roaring out of the north, everything white and sideways, the lantern the only light.
 
-**Plot.** Bodhi wakes Em at six, whining at the window: snow, the first of his life. They spend the day in it: snowball fetch (the snowballs vanish when they land, which baffles him), and the snowman from the title screen. Mina comes up the lane with Biscuit and a card for Bodhi's first Christmas. At the timber yard Dougie is loading his last lorry of trees for Strand market, leaving at first light. Bodhi chooses the most lopsided tree in the yard, and they haul it home on the sled. In the evening Em towels the snow out of his curls, feeds him, decorates the tree (he steals a bauble) and hangs his first stocking. She lights the lamp in the window and tells him about the custom: "Not for us. We're in." After midnight the blizzard hits, and Mina and Ama hammer on the door: Biscuit got out, and he can't hear them call. Mina begs: Bodhi can smell him. In the white-out Bodhi catches the scent and lunges, and the lead comes back with only his collar on it. Em whistles into the storm.
+**Plot.** Bodhi wakes Em at six, whining at the window: snow, the first of his life. They spend the day in it: snowball fetch (the snowballs vanish when they land, which baffles him), and the snowman from the title screen. Mina comes up the lane with Biscuit and a card for Bodhi's first Christmas. At the timber yard Dougie is loading his last lorry of trees for Strand market, leaving at first light. Bodhi chooses the most lopsided tree in the yard, and they haul it home on the sled. In the evening Em towels the snow out of his curls, feeds him, decorates the tree (he steals a bauble) and hangs his first stocking. She lights the lamp in the window and tells him about the custom: "Not for us. We're in." **(Added:** before dinner she lets his collar out a notch, because the towel has doubled his curls; at noon Mercy rings in the village; Biscuit stands at the top of the lane staring at the hill; at the door Mina says she is sure she shut the log store.**)** After midnight the blizzard hits, and Mina and Ama hammer on the door: Biscuit got out, and he can't hear them call. Mina begs: Bodhi can smell him. In the white-out Bodhi catches the scent and lunges, and the lead comes back with only his collar on it. Em whistles into the storm.
 
 **The player does.** As Bodhi: the first run in the snow; sniffing out vanished snowballs (scent); fetching the snowman's stick arms; sniffing out the stolen bauble. As Em: throwing snowballs (fetch); the whistle (taught here, so the ending can break it); rolling the snowman's base (push); pulling the sled up the lane (push/pull, with Bodhi tugging the rope); three care moments (towel, dinner, petting him on the bed); hanging baubles and the stocking; lighting the lamp. Then the blizzard search with the lantern, Bodhi pulling on the lead along the scent, and the final whistle.
 
@@ -129,7 +155,7 @@ Each chapter lists its setting (this drives the art), its plot, what the player 
 
 **Setting.** The pine woods behind Hollin in a full blizzard: drifts to Bodhi's chest, black trunks, snow driving sideways, the roar of wind in the tops. A fallen spruce over a hollow. At the foot of the lane, the timber yard under one orange sodium lamp, Dougie's lorry loaded and tarpaulined, its edges cracking in the wind. Cut in between: the cabin porch and its window lamp. Dawn: the storm gone, the sky blue-grey, every surface new and smooth.
 
-**Plot.** Bodhi follows Biscuit's thread of scent through the storm. The wind keeps tearing it away and he keeps finding it again. He finds the old dog curled in a hollow under a fallen spruce, too cold to stand, and lies along his back until the shaking stops. When the wind drops he coaxes Biscuit downhill toward the only light he can see, the yard lamp, and they crawl under the lorry's tarpaulin among the trees. They share the ham sandwich. Em, sent home by Ama at two, does not go to bed. She turns up the lamp and whistles from the porch every hour. At first light she finds Biscuit's blue collar caught on a fence wire ("If found, call Ama", with Ama standing beside her) and promises Mina: "I'll bring him home in this." From under the tarpaulin Bodhi sees a tiny warm light high on the hill, and knows it is hers. But Biscuit can't walk any more, and Bodhi won't leave him. At dawn Dougie climbs into his cab and drives his last load down the valley, with no idea he has passengers.
+**Plot.** Bodhi follows Biscuit's thread of scent through the storm. The wind keeps tearing it away and he keeps finding it again. He finds the old dog curled in a hollow under a fallen spruce, too cold to stand, and lies along his back until the shaking stops. When the wind drops he coaxes Biscuit downhill toward the only light he can see, the yard lamp, and they crawl under the lorry's tarpaulin among the trees. They share the ham sandwich. Em, sent home by Ama at two, does not go to bed. She turns up the lamp and whistles from the porch every hour. At first light she finds Biscuit's blue collar caught on a fence wire ("If found, call Ama", with Ama standing beside her) and promises Mina: "I'll bring him home in this." **(Added:** at the window Mina gives the answer to the old saying, "And the hill brings them home", which Em has never heard.**)** From under the tarpaulin Bodhi sees a tiny warm light high on the hill, and knows it is hers. But Biscuit can't walk any more, and Bodhi won't leave him. At dawn Dougie climbs into his cab and drives his last load down the valley, with no idea he has passengers.
 
 **The player does.** As Bodhi: a scent trail that drifts with the wind (**new**: sniff again when the wind changes); digging Biscuit out; a **reversed care moment** (**new**: hold to press against Biscuit until he stops shaking); leading Biscuit (**new**: an escort; he follows slowly, and Bodhi must wait and nudge him up); squeezing under the yard fence; climbing a log pile onto the lorry. As Em: the lantern search (calling, whistling); turning up the lamp; the hourly porch whistle (a short film of hours passing); the dawn search; finding the collar on the wire.
 
@@ -145,7 +171,7 @@ Each chapter lists its setting (this drives the art), its plot, what the player 
 
 **Setting.** Halfway down the valley, where the road crosses the outflow of frozen Hollin Water. Nell's café: steamed-up windows, a neon OPEN sign with one letter out, a string of lights round the door. The snowplough depot: big yellow ploughs with tinsel on their blades. A woodshed, a bus shelter, and the frozen lake stretching away up the valley. Hard frost, a pale lemon sun, breath hanging in the air, dark again by half past three.
 
-**Plot.** The dogs' half comes first. The lorry stops at Kell Bridge to wait for the snowplough, and Dougie goes in for a bacon roll. Bodhi wakes to the smell of bacon and the lake and gets Biscuit down off the lorry before it moves on. Nell sees two dogs at her bins and leaves sausage ends and a bowl of water by the woodshed, but they are too frightened to be caught. Bodhi wants to go up the valley, where home smells drift down the lake on the wind. But Biscuit, deaf and muddled, sets off down the road toward Strand, and Bodhi won't leave him. Then the player switches to Em, an hour later. At the timber yard she found three ginger curls on a tree net and the yard's order book: the last load went to Strand. Before leaving she gave Mina her spare key ("Keep the lamp lit. In case he finds his own way."). Ama drives her down the valley. At Kell Bridge the player, as Em, reads the traces the player just left as Bodhi: two sets of prints, one big and slow, one small and bouncing; a licked-clean bowl; a curl on the woodshed nail; and Nell's story. Em puts the first LOST poster in the café window. His name tag was still in the post, and she knows that's why nobody has rung.
+**Plot.** The dogs' half comes first. The lorry stops at Kell Bridge to wait for the snowplough, and Dougie goes in for a bacon roll. Bodhi wakes to the smell of bacon and the lake and gets Biscuit down off the lorry before it moves on. Nell sees two dogs at her bins and leaves sausage ends and a bowl of water by the woodshed, but they are too frightened to be caught. Bodhi wants to go up the valley, where home smells drift down the lake on the wind. But Biscuit, deaf and muddled, sets off down the road toward Strand, and Bodhi won't leave him. **(Added:** Biscuit isn't lost, to himself: he is going back to Strand, where he lived when he was young. Ama works it out at Kell Bridge.**)** Then the player switches to Em, an hour later. At the timber yard she found three ginger curls on a tree net and the yard's order book: the last load went to Strand. Before leaving she gave Mina her spare key ("Keep the lamp lit. In case he finds his own way."). Ama drives her down the valley. At Kell Bridge the player, as Em, reads the traces the player just left as Bodhi: two sets of prints, one big and slow, one small and bouncing; a licked-clean bowl; a curl on the woodshed nail; and Nell's story. Em puts the first LOST poster in the café window. His name tag was still in the post, and she knows that's why nobody has rung.
 
 **The player does.** As Bodhi: climbing down from the lorry; sniffing out the sausage ends; hiding in the woodshed (a small space only he fits); sneaking past the plough crew; following Biscuit. As Em: examining the traces (looking, not sniffing); a short talk with Nell (a film moment); putting up the poster; finding where the prints lead. **The twist:** one place, an hour apart. The player always knows more than Em does.
 
@@ -161,7 +187,7 @@ Each chapter lists its setting (this drives the art), its plot, what the player 
 
 **Setting.** The market town at the foot of the valley, at dusk and into night. A cobbled square full of wooden market huts strung with warm-white bulbs. A carousel. A chestnut brazier with sparks going up. The brass band on the town-hall steps. A living nativity with a real donkey. Santa's grotto in a garden shed padded with cotton-wool snow. And the big town tree, dark until six o'clock. Light snow falling through the lights.
 
-**Plot.** The dogs reach Strand at dusk, starving, and the market is a wall of boots and smells. Bodhi learns how a town works: hide under the huts, take only what is dropped, keep Biscuit out of the road. Biscuit wanders toward a bus, and Bodhi barks and shoves him back onto the kerb. Kofi at the chestnut stall shares a paper cone and tells his mum about "a ginger one and a grandpa one". Em arrives on the evening bus and works the market with posters. At six the whole square counts down for the tree. Em whistles across the square at the very moment the band starts a carol. Under the nativity stable, Bodhi lifts his head at a sliver of something, the donkey brays, and it's gone. They miss each other by one row of huts. Biscuit is fading with cold, so Bodhi finds the warmest place in town: Santa's grotto after closing. They sleep in the cotton snow under the empty chair. Across the square, Em puts up her last poster on the bus shelter, facing the grotto.
+**Plot.** The dogs reach Strand at dusk, starving, and the market is a wall of boots and smells. Bodhi learns how a town works: hide under the huts, take only what is dropped, keep Biscuit out of the road. Biscuit wanders toward a bus, and Bodhi barks and shoves him back onto the kerb. Kofi at the chestnut stall shares a paper cone and tells his mum about "a ginger one and a grandpa one". **(Added:** first, Biscuit leads them to a red door on Kirk Wynd, Ama's old house, and sits waiting for it to open. Kofi's family lives there now; that is where Kofi meets them. The door never opens for Biscuit, and from then on Bodhi leads.**)** Em arrives on the evening bus and works the market with posters. At six the whole square counts down for the tree. Em whistles across the square at the very moment the band starts a carol. Under the nativity stable, Bodhi lifts his head at a sliver of something, the donkey brays, and it's gone. They miss each other by one row of huts. Biscuit is fading with cold, so Bodhi finds the warmest place in town: Santa's grotto after closing. They sleep in the cotton snow under the empty chair. Across the square, Em puts up her last poster on the bus shelter, facing the grotto.
 
 **The player does.** As Bodhi: moving unseen through the market (hiding under huts, timing the crowds); sniffing out dropped food; leading Biscuit through gaps (escort); the kerb rescue (a timed shove); pushing a crate to reach the grotto's back window and climbing in. As Em: asking at the stalls; putting up posters; climbing the town-hall steps for a view; the whistle (a scripted near miss); the tree-lighting countdown (a film).
 
@@ -193,7 +219,7 @@ Each chapter lists its setting (this drives the art), its plot, what the player 
 
 **Setting.** The hillside above the line: old pines opening onto a high moor under a clear, freezing sky. **The aurora returns**, green curtains for the first time since the title screen. Tam's farm: wooden pens, a stone farmhouse with one lit window, a barn hung with harness bells, and the herd as dark shapes with frosted breath. Snow that squeaks underfoot.
 
-**Plot.** The dogs climb through the forest in the dark, Biscuit stumbling. Bodhi smells big animals, mossy and warm and not dogs, and follows them to the reindeer barn. Inside, Clementine the calf has nosed the gate open and is wandering toward the moor. Something old wakes up in Bodhi, and he turns her back into her pen. Tam comes out with a torch and finds two dogs and a calf, all safe, and carries Biscuit to his stove. Down in the forest Em follows the prints uphill, whistling, until she sees Tam's yard light with the aurora above it. Bodhi hears the whistle, close and real now, and runs. **The reunion** happens in the snow between the pens, with the reindeer watching. The player controls the approach, the kneel and the touch (`docs/design.md`). Em puts his collar back on and the bell rings. In Tam's kitchen, Valley Radio: the road and the railway are closed by drifts, and a bigger storm is coming for Christmas Eve.
+**Plot.** The dogs climb through the forest in the dark, Biscuit stumbling. Bodhi smells big animals, mossy and warm and not dogs, and follows them to the reindeer barn. Inside, Clementine the calf has nosed the gate open and is wandering toward the moor. Something old wakes up in Bodhi, and he turns her back into her pen. Tam comes out with a torch and finds two dogs and a calf, all safe, and carries Biscuit to his stove. **(Added:** Tam knows him: "You're Bess's." Biscuit was born in this barn, and an old herd dog goes out in a Long White to bring the stock in.**)** Down in the forest Em follows the prints uphill, whistling, until she sees Tam's yard light with the aurora above it. Bodhi hears the whistle, close and real now, and runs. **The reunion** happens in the snow between the pens, with the reindeer watching. The player controls the approach, the kneel and the touch (`docs/design.md`). Em puts his collar back on and the bell rings. In Tam's kitchen, Valley Radio: the road and the railway are closed by drifts, and a bigger storm is coming for Christmas Eve.
 
 **The player does.** As Bodhi: following the herd's scent; **herding Clementine** (**new**: she moves away from him, so he steers her by where he stands, then pulls the gate rope in his teeth); barking to bring Tam. As Em: climbing through the forest with the lantern; whistling; opening the field gate. Then both: the reunion (approach, kneel, contact), and a care moment: buckling his collar back on.
 
@@ -209,7 +235,7 @@ Each chapter lists its setting (this drives the art), its plot, what the player 
 
 **Setting.** Tam's farm by day: a hard blue sky, snow glare, long blue shadows, the herd grazing lichen on the moor. Tam's workshop with his father's wooden sled hanging on the wall. The drovers' path climbing away from the farm, marked by old cairns. By afternoon a grey lid of cloud sits on the mountains.
 
-**Plot.** A day of ordinary affection after five days of fear. Em towels Bodhi, brushes the ice balls out of his paws and feeds them both, and he sleeps on her feet, waking every hour to check they're still there. Ama rings on Tam's wall phone: Mina has kept Em's lamp lit every night, and won't go to bed until both dogs are home. Tam says the drovers' path goes over the fell to Hollin in two days, three with an old dog: "Go now, or you're here till the thaw." He takes down his father's sled. Em and Bodhi mend it: Bodhi sniffs out the missing runner pin in the straw, and Em fits it. Bodhi learns "pull" in a small harness, and Biscuit rides on a sheepskin. They say goodbye to Clementine, who tries to come too, and set out at noon. At the first cairn Em looks back, and then the snow begins.
+**Plot.** A day of ordinary affection after five days of fear. Em towels Bodhi, brushes the ice balls out of his paws and feeds them both, and he sleeps on her feet, waking every hour to check they're still there. Ama rings on Tam's wall phone: Mina has kept Em's lamp lit every night, and won't go to bed until both dogs are home. Tam says the drovers' path goes over the fell to Hollin in two days, three with an old dog: "Go now, or you're here till the thaw." **(Added:** on the phone Mina confesses she didn't latch the log store, and Em tells her about the notch. That evening Tam tells the story of Moss and the Long White of 1974, five lines, the only time he tells it: "Snow forgets, lass. A nose remembers."**)** He takes down his father's sled. Em and Bodhi mend it: Bodhi sniffs out the missing runner pin in the straw, and Em fits it. Bodhi learns "pull" in a small harness, and Biscuit rides on a sheepskin. They say goodbye to Clementine, who tries to come too, and set out at noon. At the first cairn Em looks back, and then the snow begins.
 
 **The player does.** Care moments (towel, grooming ice from his paws, feeding, petting); snowball fetch on the moor (the vanishing snowballs again, now he digs them out like a pro); mending the sled (Bodhi sniffs out the pin, Em fits it); harness practice (**new**: Bodhi pulls the empty sled); the first slope (Em pushes while Bodhi pulls, both at once).
 
@@ -241,7 +267,7 @@ Each chapter lists its setting (this drives the art), its plot, what the player 
 
 **Setting.** A one-room stone shelter on the open fell: a fireplace, a wooden sleeping platform, a visitors' book on a shelf, a drying line strung across. Outside, the storm: snow banked to the window, wind howling over the roof. Inside: firelight on stone, steam rising from wet gloves. Two nights snowed in.
 
-**Plot.** The first storm pins them in the bothy for two nights. Biscuit stops eating and lies very still, and for the first time Em is afraid for him. She and Bodhi keep him warm, coax water into him and keep the fire alive, and Bodhi lies along Biscuit's back all night, the way he did in the spruce hollow. When the fire runs low, Bodhi goes out into the howling dark to dig the woodpile out of a drift: a short, frightening dog section. To pass the hours Em reads the visitors' book aloud, forty years of strangers stuck in this same room at Christmas. On the second night Bodhi brings her a present: a stick, from the woodpile. In the morning Biscuit lifts his head, eats from Em's hand, and barks once. Hello.
+**Plot.** The first storm pins them in the bothy for two nights. Biscuit stops eating and lies very still, and for the first time Em is afraid for him. She and Bodhi keep him warm, coax water into him and keep the fire alive, and Bodhi lies along Biscuit's back all night, the way he did in the spruce hollow. When the fire runs low, Bodhi goes out into the howling dark to dig the woodpile out of a drift: a short, frightening dog section. To pass the hours Em reads the visitors' book aloud, forty years of strangers stuck in this same room at Christmas. **(Added:** one entry is from 1974, in a twelve-year-old's hand, signed T. R.; low on the doorframe, at a dog's height, is cut the name MOSS. This is Tam's bothy.**)** On the second night Bodhi brings her a present: a stick, from the woodpile. In the morning Biscuit lifts his head, eats from Em's hand, and barks once. Hello.
 
 **The player does.** Care moments: warming Biscuit (the reversed care moment, now with Em's hands too), hand-feeding, towelling, petting Bodhi. Keeping the fire going: as Bodhi, sniffing out and digging up logs in the drift; as Em, carrying them in and shouldering the snow-jammed door open (push). Small comforts: blocking the draught, drying the gloves. Reading the book (the keepsakes). A long night (a film of time passing).
 
@@ -273,7 +299,7 @@ Each chapter lists its setting (this drives the art), its plot, what the player 
 
 **Setting.** The descent from Windy Gap into the worst storm in fifty years. A white-out: wind, horizontal snow, no up or down. The lantern blows out, and for a stretch there is **no warm light at all**. Later the storm thins, and Hollin's windows appear below one by one, candles and lamps lit by hand because the power is still out. Highest of all, under the pines, one brighter light: Em's lamp. Then the iced footbridge over the burn's gorge, the pines behind the cabin, the porch, Mina, and midnight.
 
-**Plot.** They start down at noon to beat the storm, and the storm wins. By dark it's a white-out. Em's lantern blows out, and she can't see the path or her own hand. **The roles reverse.** Em holds Bodhi's harness, and Bodhi leads her down, nose to the path, because a path walked for centuries by drovers and sheep still smells of them under the snow. In Hollin, Mina has asked the vicar to ring the church bell every quarter hour "for anyone out on the hill", and she has gone door to door until every house has a candle in the window. The bell gives Bodhi a direction. Near the bottom the storm thins, and the village appears below, dozens of small lights, with Em's lamp highest of all. At the iced footbridge they work together for the last time. Down through the pines, Mina, on Em's porch, hears Bodhi's bell before she sees anything. Biscuit barks once. Mina runs.
+**Plot.** They start down at noon to beat the storm, and the storm wins. By dark it's a white-out. Em's lantern blows out, and she can't see the path or her own hand. **The roles reverse.** Em holds Bodhi's harness, and Bodhi leads her down, nose to the path, because a path walked for centuries by drovers and sheep still smells of them under the snow. In Hollin, Mina has asked the vicar to ring the church bell every quarter hour "for anyone out on the hill", and she has gone door to door until every house has a candle in the window. **(Added:** the bell is Mercy, and Mina found the custom in the church's old storm book, the last entry written in 1974. Bodhi does what Moss did, on the same path, toward the same lit windows.**)** The bell gives Bodhi a direction. Near the bottom the storm thins, and the village appears below, dozens of small lights, with Em's lamp highest of all. At the iced footbridge they work together for the last time. Down through the pines, Mina, on Em's porch, hears Bodhi's bell before she sees anything. Biscuit barks once. Mina runs.
 
 **The player does.** As Bodhi: **leading Em** (**new**: the reverse of following; she holds on, slows on steep ground, and calls to check he's there, so he barks back to keep her close); following the path's old scent; heading for the church bell (a sound, not a sight). As Em: whistling, so he knows she's still holding on; clearing the footbridge's handrail rope. Both: the footbridge (Bodhi crosses first with the sled rope, Em steadies the sled). Then a film: Mina and Biscuit.
 
@@ -289,7 +315,7 @@ Each chapter lists its setting (this drives the art), its plot, what the player 
 
 **Setting.** The cabin on Christmas morning: deep fresh snow, a clean blue sky, sun on everything, icicles on the eaves. Inside: the lopsided tree lit, the stove going, the stocking full. The power comes back at lunchtime. Christmas night: the clearing, the aurora, the lantern on the snow, the sled by the porch: **the title screen, exactly**.
 
-**Plot.** Bodhi wakes Em at six with a cold nose in her ear, as on the first day of snow, but this time from her bed, on her feet. His stocking holds a new ball, the stolen bauble (Em found it under the sofa), and his name tag, which came in the post on Christmas Eve. Em buckles it onto his collar next to the bell. She towels the last of the fell out of his curls and gives him a Christmas dinner of his own. Mina, Ama and Biscuit come up the lane for lunch, Biscuit in his blue collar. Mina gives Bodhi a drawing of two dogs and a lamp in a window. Dougie turns up with a box: a ham sandwich, "for the stowaways". Tam rings to say Clementine is fine and wants to know how the sled is. In the evening, under the aurora, Em and Bodhi build a snowman in the clearing. Mina adds the Santa hat, and the scene settles into the title screen. Em whistles, and of course he comes. Last thing, she lights the lamp in the window anyway.
+**Plot.** Bodhi wakes Em at six with a cold nose in her ear, as on the first day of snow, but this time from her bed, on her feet. His stocking holds a new ball, the stolen bauble (Em found it under the sofa), and his name tag, which came in the post on Christmas Eve. Em buckles it onto his collar next to the bell. She towels the last of the fell out of his curls and gives him a Christmas dinner of his own. Mina, Ama and Biscuit come up the lane for lunch, Biscuit in his blue collar. Mina gives Bodhi a drawing of two dogs and a lamp in a window. Dougie turns up with a box: a ham sandwich, "for the stowaways". Tam rings to say Clementine is fine and wants to know how the sled is. In the evening, under the aurora, Em and Bodhi build a snowman in the clearing. Mina adds the Santa hat, and the scene settles into the title screen. Em whistles, and of course he comes. Last thing, she lights the lamp in the window anyway. **(Added:** Mina says "A light for the hill", and all of them answer "And the hill brings them home". Then an epilogue: up on the moor, Tam's reindeer lie down facing south.**)**
 
 **The player does.** Opening the stocking; care moments (towel, Christmas dinner, petting); fetch with the new ball; giving presents (Bodhi brings Em his stick from the bothy); Bodhi stealing a sprout from the table and being caught (comedy); building the snowman (push the base, fetch the arms, the hat); the whistle, answered; the last lamp.
 
@@ -303,151 +329,11 @@ Each chapter lists its setting (this drives the art), its plot, what the player 
 
 ## 5. Chapter One narration in full
 
-Em speaks in plain lines; **Bodhi's lines are marked B** and shown in small capitals; **notes (N)** are written things. {dog} is replaced with his name. Every caption is under 90 characters.
-
-### Opening cards (before the chapter, `BackStory`)
-
-| # | Picture | Caption |
-|---|---|---|
-| 1 | Black, wind | The night of the blizzard, I whistled for him. He didn't come. |
-| 2 | The valley at dawn | Hollin sits at the top of the valley, where the road gives up. |
-| 3 | The cabin | Ours was the last cabin, under the pines, with a porch that creaked. |
-| 4 | Bodhi asleep by the stove | {dog} was nine months old. Big paws. Bigger opinions. |
-| 5 | The window, first flakes | He had never seen snow. |
-| 6 | The window, morning | On the fourteenth of December, he woke me up to show me. |
-
-### The chapter
-
-| # | Beat | Voice | Caption |
-|---|---|---|---|
-| 1 | Waking (film) | B | White. Out there. Everything white. |
-| 2 | | B | It smells of nothing. How does it smell of nothing? |
-| 3 | | Em | Six in the morning: a cold nose in my ear, and a whine at the window. |
-| 4 | Door opens | Em | I opened the door. He looked at the snow. The snow looked at him. |
-| 5 | | Em | Then he went in face first. |
-| 6 | First steps | B | Cold! Cold on the paws! Again! |
-| 7 | | B | Bite it. It goes. Bite more. |
-| 8 | | Em | He bit the snow. He bit all of it. He sneezed, and bit it again. |
-| 9 | First throw lands | Em | The snowball landed, and stopped being a snowball. |
-| 10 | | B | Gone. Into the white. Where? Where? |
-| 11 | Snowball dug out | Em | He dug it out and brought me back a handful of water. |
-| 12 | First whistle | Em | One whistle, and he came. He always came. |
-| 13 | | Em | I heard him before I saw him: the little bell on his collar. |
-| 14 | Snowman base rolled | Em | The bottom ball took me ten minutes. He helped by lying on it. |
-| 15 | Middle and head | Em | Then the middle, and a head packed hard between my mittens. |
-| 16 | Stick fetched | Em | He brought a stick for the arms. Then a branch. Then most of a tree. |
-| 17 | Carrot placed | B | Orange. Crunchy. Mine. |
-| 18 | | Em | The snowman had a nose for almost four seconds. |
-| 19 | Mina arrives (film) | Em | Mina came up the lane from the cottage below, Biscuit plodding behind. |
-| 20 | | Em | Biscuit was thirteen, grey to the eyebrows, and deaf in one ear. |
-| 21 | | Em | He barked once, very politely. That is how Biscuit says hello. |
-| 22 | | B | The old dog. Warm blanket. Toast. And the girl, all over him. |
-| 23 | | B | The best smell on the whole lane. |
-| 24 | Card read | N | 'To {dog}. Happy first Christmas! Love, Biscuit (he can't write) and Mina (10).' |
-| 25 | Santa hat | Em | Mina put a Santa hat on the snowman. 'Now he's finished,' she said. |
-| 26 | Down the lane | Em | At the bottom of the lane, Dougie was loading his lorry with trees for Strand. |
-| 27 | | Em | 'Last load goes down at first light,' he said. 'Pick quick.' |
-| 28 | Lorry sniffed | B | Pine. Oil. Under the seat, a sandwich. Ham. |
-| 29 | Tree chosen | Em | He chose it. He sat down beside it and would not move. |
-| 30 | | Em | It was the most lopsided tree in the yard. It leaned like it was listening. |
-| 31 | Up the lane | Em | I pulled the sled. He took the rope in his teeth and pulled the other way. |
-| 32 | | Em | We got home eventually. |
-| 33 | Towel (care) | Em | Snow in his ears, snow in his toes, snow in places snow shouldn't go. |
-| 34 | | Em | He came out of the towel twice his size and very pleased about it. |
-| 35 | Dinner (care) | Em | Dinner, gone. Then he chased the empty bowl round the kitchen. |
-| 36 | Tree decorated | Em | Fairy lights, three tins of baubles, and the tinsel he hadn't eaten. |
-| 37 | Bauble stolen | Em | One red bauble went missing. So did {dog}, briefly. |
-| 38 | Stocking hung | Em | His first stocking. I'd sewn his name on in felt. The D was backwards. |
-| 39 | | Em | He sniffed it, found it empty, and looked at me as if I'd been unfair. |
-| 40 | Lamp lit | Em | In Hollin, on winter nights, you leave a light in the window. |
-| 41 | | Em | For anyone still out on the hill. |
-| 42 | | Em | Not for us, {dog}. We're in. |
-| 43 | Bed | Em | He was not allowed on the bed. He got on the bed. |
-| 44 | | B | Her feet. Her breathing. The stove, ticking. |
-| 45 | | B | Here. Here is the place. |
-| 46 | Night (film) | B | Wind. Big wind. Something out there is wrong. |
-| 47 | | Em | Just after midnight, the wind found the chimney and began to roar. |
-| 48 | | Em | Then someone was hammering on the door. |
-| 49 | At the door (film) | Em | Mina and Ama, white with snow, a torch shaking between them. |
-| 50 | | Em | 'Biscuit got out with the logs,' Ama said. 'He can't hear us call.' |
-| 51 | | Em | Mina didn't say anything. She just looked at {dog}. |
-| 52 | | Em | 'He can smell him,' she said. 'Please.' |
-| 53 | Setting out | Em | I clipped on his lead and took the lantern. I left the lamp in the window. |
-| 54 | The woods | Em | Past the cabin, the world was white and roaring and had no edges. |
-| 55 | | Em | The lantern lit a small circle of snow, and nothing else. |
-| 56 | Scent caught | B | The old dog! Faint. Frightened. That way! |
-| 57 | | Em | {dog} pulled so hard the lead sang. |
-| 58 | The lunge | B | THE OLD DOG. Close. Go. GO. |
-| 59 | | Em | Then the lead went light in my hand. |
-| 60 | | Em | I pulled it in. His collar came back on the end of it. Bell and all. |
-| 61 | Objective | | Whistle for {dog}. |
-| 62 | Whistle pressed | Em | I whistled. |
-| 63 | | Em | The only bell was the one in my hand. |
-| 64 | | Em | For the first time, he didn't come. |
-| 65 | Black | B | Her whistle, torn to pieces by the wind. |
-| 66 | | B | The old dog. Thin as a thread. That way. |
-| 67 | | B | Keep going. |
-
-Then the title card *Chapter Two: The Lamp in the Window*, 14 December, night, and the unlock screen.
-
-**Keepsake texts.** Mina's card: line 24. The stolen bauble (found as Bodhi, under the sofa): "The oldest bauble in the cabin, red glass. He had hidden it with great care." The puppy book: "My puppy book, folded at 'First winter'. 'Most puppies love snow. Some eat it.'"
-
-**Objectives, in order** (kept plain, because they are instructions): Go out into the snow with {dog}. / Throw a snowball for {dog}. / Switch to {dog}. Sniff to find it. / Whistle for {dog}. / Build a snowman: roll the bottom ball. / Find sticks for its arms. / Take the sled down to the timber yard. / Let {dog} choose a tree. / Pull the tree home. / Towel him dry. / Give him his dinner. / Decorate the tree. / Hang up his stocking. / Light the lamp in the window. / Time for bed. / Take the lantern. Keep {dog} on his lead. / Follow {dog}. Find Biscuit. / Whistle for {dog}.
-
-**If Option B is chosen,** lines 59 to 67 become: the lead slips (59 and 60 as written); the search goes on into the night (a short film); then "'We'll freeze, Em,' Ama said. 'First light.'" / "I turned the lamp up and sat by the window with his collar in my lap." / "In Hollin you leave a light in the window for anyone still out on the hill." / "I had never needed it to work before." / B: "A light. Very small. Very far. Hers."
+Moved to `docs/christmas_script.md`, section 3, rewritten on 25 November 2026 with the threads added above (the notch, Mercy, Biscuit at the hill, Mina's latch) and a prologue before it (section 2 there). The hook is unchanged: Option A, "The whistle in the white".
 
 ## 6. Opening and closing lines, Chapters Two to Twelve
 
-| Ch | | Voice | Line |
-|---|---|---|---|
-| 2 | Opens | B | Snow to the chest. Wind in the ears. The old dog's smell: here. Gone. Here. |
-| 2 | | Em | Ama made me go home at two. I didn't go to bed. |
-| 2 | Closes | Em | At first light a lorry went down the valley road. I didn't even look up. |
-| 2 | | B | The floor shakes. Pine and diesel. Her light, getting small. |
-| 3 | Opens | B | The floor stops. Bacon. Lake. Men's voices. Down. Now. |
-| 3 | | Em | On a tree net in the yard: three ginger curls. |
-| 3 | Closes | Em | Two sets of prints going down the road, away from home. |
-| 3 | | Em | Every few steps, the small ones turned to face the valley. Then went on. |
-| 4 | Opens | B | Boots. Wheels. Sugar, burning. A hundred people, all at once. |
-| 4 | | Em | Strand had its Christmas market up. Every stall had a string of lights. |
-| 4 | Closes | B | A big chair. Beard and peppermints. The old dog asleep in cotton snow. |
-| 4 | | Em | Across the square I put up my last poster. It faced the grotto. |
-| 5 | Opens | B | Rails. Iron and frost. They smell of the valley. Up. Home is up. |
-| 5 | | Em | 'Two dogs went up the railway line at first light,' the woman said. |
-| 5 | Closes | Em | In the recess, two sets of prints, pressed right back against the stone. |
-| 5 | | Em | Then, far down in the trees, one bark. His. |
-| 6 | Opens | B | Trees. Dark. Then big animals. Moss and breath. Not dogs. |
-| 6 | | Em | I followed the prints uphill until my lantern was the only light there was. |
-| 6 | Reunion | Em | He hit me so hard we both went over in the snow. |
-| 6 | | Em | I buckled his collar back on. The bell rang. I cried at a bell. |
-| 6 | Closes | Em | Hollin was cut off. Christmas was a week away. |
-| 6 | | Em | And Biscuit couldn't walk. |
-| 7 | Opens | Em | He slept on my feet and woke every hour to check they were still there. |
-| 7 | | B | Her feet. Still here. Sleep. Check. Still here. |
-| 7 | Closes | Em | At the first cairn I looked back. Tam waved with his whole arm. |
-| 7 | | Em | Then the snow came down, and the farm was gone. |
-| 8 | Opens | Em | Blackwater Tarn was frozen from shore to shore, and it was singing. |
-| 8 | | B | Ice! Slide. Legs go everywhere. Again! |
-| 8 | Closes | Em | I put a candle in the hut window. Nobody would see it. I lit it anyway. |
-| 8 | | Em | All night the ice boomed, like a door very far away. |
-| 9 | Opens | Em | The storm caught us at the bothy door, and held us there two days. |
-| 9 | | B | Stone. Smoke. Old boots. A hundred strangers, all of them kind. |
-| 9 | Closes | Em | I wrote our names in the book, under forty years of strangers. |
-| 9 | | Em | Then we went to climb the pass. |
-| 10 | Opens | Em | Windy Gap earned its name in the first five minutes. |
-| 10 | | B | Wind full of ice. Harness tight. Her, behind. Pull. |
-| 10 | Middle | Em | He looked at me. I said go. |
-| 10 | Closes | Em | Below us, the whole valley, and Hollin at the end of it. |
-| 10 | | Em | Every window in Hollin was dark. |
-| 11 | Opens | Em | We started down at noon, to beat the storm. The storm won. |
-| 11 | | B | White. Loud. Her hand on the harness, holding tight. Slow. |
-| 11 | Closes | Em | The lamp was still in my window. Mina had kept it lit for ten nights. |
-| 11 | | Em | Then the bell rang twelve, and it was Christmas. |
-| 12 | Opens | B | Morning. Her feet. Her bed. Snow at the window. Out? |
-| 12 | | Em | Christmas morning, and a cold nose in my ear, exactly on time. |
-| 12 | Closes | Em | That night I put the lamp in the window anyway. |
-| 12 | | Em | Not for anyone on the hill. Everyone I'd been waiting for was home. |
-| 12 | | B | Her. The stove. The old dog, snoring. Here is the place. |
+Moved to `docs/christmas_script.md`, section 4, with each chapter's key scenes, and an epilogue after Chapter Twelve.
 
 ## 7. Voice guide
 
@@ -483,6 +369,8 @@ Then the title card *Chapter Two: The Lamp in the Window*, 14 December, night, a
 
 **Others**: notes are in the writer's own voice. Mina writes in capitals and kisses. Ama is calm and exact. Tam talks in short dry lines ("Go now, or you're here till the thaw."). Dougie is cheerful ("For the stowaways."). The radio is warm and a little formal. Notes are objects the player finds, never summaries.
 
+**The storyteller** (added): third person, past tense, only in the prologue and the epilogue, and only about Tam and the hill. Plain and old-fashioned, like a story told by a fire: "Fifty years the hill had waited. It had been patient long enough." The ten storytelling methods behind the whole script are in `docs/christmas_script.md`, section 1.
+
 ## 8. Setups and payoffs (for whoever builds each chapter)
 
 | Thing | Set up | Pays off |
@@ -500,6 +388,13 @@ Then the title card *Chapter Two: The Lamp in the Window*, 14 December, night, a
 | Lunging versus asking | Ch1: he lunges without a look | Ch10: "He looked at me. I said go." |
 | The sled | Ch1: Em's sled; Ch7: Tam's father's sled | Ch12: Tam's sled by the porch, as on the title screen |
 | The aurora | The title screen | Ch6: the reunion. Ch12: the last scene |
+| The notch (added) | Ch1: "I let his collar out a notch, so it wouldn't pinch." | Ch1 end: "One notch." Ch6: "The right notch, this time", and the puppy book's underlined line. Ch7: confessed to Mina. Ch12: the name tag, "the right notch" |
+| Mina's latch (added) | Ch1: "I shut the log store. I'm sure I did." | Ch7: "It was me." / "Latches slip. So do collars." Ch11: she has Mercy rung |
+| Mercy, the church bell (added) | Ch1: "rung once, long ago, for the hill" | Ch11: rung every quarter hour; Bodhi walks toward it. Ch11 end: "Mercy rang twelve" |
+| The saying's second half (added) | Ch1: "A light for the hill", said lightly | Ch2: Mina gives the answer. Ch12: everyone says both halves |
+| Moss and 1974 (added) | The prologue: "a dog called Moss brought him home" | Ch6: the photo. Ch7: Tam's story. Ch9: the book and the doorframe. Ch11: Bodhi on the same path |
+| Biscuit's first home (added) | Ch1: Bodhi smells "sheep, a long time ago"; Biscuit stares at the hill | Ch3: "He's going home." Ch4: the red door. Ch6: "You're Bess's." |
+| The reindeer (added) | The prologue: tails to the north | The epilogue: lying down, facing south |
 
 ## 9. Art direction, chapter by chapter
 
