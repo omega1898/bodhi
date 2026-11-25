@@ -63,7 +63,7 @@ namespace Bodhi.Game
             controls = new PlayerControls();
             camera_rig = new CameraRig(transform);
             hud = new GameHud(transform, controls);
-            titles = new TitleScreens(transform);
+            titles = new TitleScreens(transform, camera_rig.view);
             game_audio = gameObject.AddComponent<GameAudio>();
             session = new GameSession(new SaveFiles(Path.Combine(Application.persistentDataPath, "saves")), dog_name);
             home_screen = new HomeScreen(transform, session, dog_name);

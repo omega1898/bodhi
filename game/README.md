@@ -22,7 +22,11 @@ The Unity side of the game: everything between the rules (`rules/`, which decide
   - `FlipbookChooser`: which drawing to show each frame, ported from the browser game: walking drawings move on by distance so feet stay planted; jumps follow the arc; landings, turns, stops, skids and getting up play over the rest.
   - `FramePacing`: runs the game at the screen's own frame rate (120 on ProMotion iPhones).
   - `CharacterMover`: moves her or Bodhi through a chapter and keeps them out of walls and floors (steps, ceilings, the chapter's ends, falling out of the world). Unity's own physics isn't used for them, so the game feels the same on every phone.
-  - `OpeningTitle`: the start-up animation as a timeline: at any moment, how strongly the sky, house, door light, paw prints, name and buttons show, where Bodhi and Em stand and which drawing each shows, and the camera's zoom. A tap skips to the settled title.
+  - `OpeningTitle`: the start-up animation as a timeline: at any moment, how far the picture has faded up from black, how strongly the starry sky and aurora show, how far the camera has tilted down from the aurora to the snowfield, and when the name and buttons fade in. A tap skips to the settled title.
+  - `Title/PlayTrack`: one character's moves as a list of beats (stay, go to, circle, leap), answering where they are, which way they face, how fast they're going and what they're doing at any moment. Each beat starts where the last ended, so nobody ever jumps.
+  - `Title/SnowmanPlay`: what Em and Bodhi do on the title screen: building the snowman (about 34 seconds), then a 24-second round of play that loops seamlessly. Also where the snowballs, the stick and the thrown snowball are, and the puffs of snow.
+  - `Motion/Stride`: leg timing for walking, running, trotting and galloping (from how people and dogs really move). Cycles move on by distance travelled, so planted feet never slide.
+  - `Motion/LegReach`: bends a two-part limb so its end lands on a chosen spot (inverse kinematics): keeps feet on the snow and lets an arm reach a snowball.
   - `BackStory`: the caption cards in her voice told on New Game before Coming Home: tap to move on, hold to skip them all.
   - `MemoryBox`: the memory box screen: every chapter with its keepsakes (memories once found, hints while missing), totals for the year, and replaying a finished chapter without moving the year on.
   - `FetchGame`: the fetch game at home as timing rules: the ball arcs from her to him, a tap while it's in his reach is a catch, too early or letting it land is a miss, and each catch in a row makes the next throw a little faster, up to a limit.
@@ -37,17 +41,20 @@ The Unity side of the game: everything between the rules (`rules/`, which decide
   - `GameHud`, `TouchButton`: subtitles, the goal, the button prompt, captions, darkness, fades, touch buttons and the title, pause, after-chapter and end-of-year screens.
   - `PlayerControls`: keyboard, game controller and touch buttons, read the same way.
   - `GreyBox`: plain coloured boxes for everything not drawn yet (and for a character whose pictures are missing).
+  - `Title/TitleWorld`: the 3D scene behind the title: sky, land, snow, lights, camera, the snowman (`Title/Snowman`, with Em's lantern) and the two of them, moved on each frame from `SnowmanPlay`.
+  - `World/`: what every 3D scene is built from. `MeshKit` makes shapes in code (balls, tapered tubes, lathe shapes, boxes, height grids) with a colour at every corner; `WorldLook` makes the materials, lights, light from the sky, fog, camera and post-processing to the art bible's values; `NightSky` is the starry sky and the aurora's curtains; `SnowLand` the snowfield, mountains, pines, boulders and the cabin; `SnowFall` falling snow and snow puffs.
+  - `Characters/`: Em (`HumanFigure`, posed with `HumanPose`) and Bodhi (`DogFigure`, posed with `DogPose`) in 3D, built in code as stand-ins until their Unity AI models arrive. Each frame turns the choreography into a pose: walking, running, trotting and galloping from `Stride`, every title action as a pose, smooth blends between them, feet placed with `Limb` (`LegReach`), and springs for her hair and his ears and tail.
 - `Editor/`: scripts that run only in the Unity Editor. `FrameImport` sets how the animation pictures are imported (exact size, no shrunken copies, iPhone ASTC squeeze); `HighFrameRateBuild` lets the iPhone build run at 120 frames a second on ProMotion screens.
 - `Resources/Frames/`: the animation pictures, made by `art/tools/export_sprites.py`. Don't edit them by hand.
+- `Resources/Shaders/`: the 3D scenes' shaders, in HLSL: `BodhiLit` (every solid thing: colour from the mesh, soft wrap lighting, a cold rim light, snow sparkle, shadows, fog), `BodhiNightSky` (stars, the Milky Way and the moon, worked out per pixel), `BodhiAurora` (the aurora's curtains) and `BodhiGlow` (soft particles). They live in `Resources/` so Unity always puts them in the app.
+
+To see the 3D title scene without pressing Play (for example from a Claude Code session, which can read pictures but can't watch the Unity window), `unity/Assets/Editor/TitleSnapshot.cs` saves still pictures of it at chosen moments; its first lines give the Terminal command.
 
 The scripts in `Runtime/` can only really be compiled by Unity. In the cloud, `dotnet build rules_dotnet/Bodhi.Game.RuntimeStubCheck` compiles them against stand-ins for Unity's types, which catches typos and wrong calls but isn't proof.
 
 ## Trying it in Unity (on the Mac)
 
-1. Make a Unity 6 project with the **Universal 2D** template.
-2. Add the two packages (below). Unity also installs the Input System and Unity UI they ask for.
-3. When Unity asks to switch to the new Input System, say yes (or set **Project Settings**, **Player**, **Active Input Handling** to **Input System Package**).
-4. In an empty scene, add an empty GameObject, add the `ChapterDirector` component to it, and press Play.
+The Unity project is `unity/` (Unity 6000.6, made from the URP 3D template). It already has the packages added and its one scene, `Assets/Scenes/Game.unity`, holds a `ChapterDirector`. Open `unity/` in Unity Hub and press Play. **Bodhi, Set Up Project** in Unity's menu reapplies the scene, app details and graphics settings (`unity/Assets/Editor/ProjectSetup.cs`).
 
 Every sound effect, the music for each mood, and the rain and wind are made in code (`Logic/SoundSynth.cs` and `Logic/MusicSynth.cs`, played by `Runtime/GameAudio.cs`), so the game has sound with no audio files at all. To replace one with a recorded file, put a clip with the same name in `Assets/Resources/Sounds/` (like `bark`, `whistle`, `thunder`) or `Assets/Resources/Music/` (named after the mood, like `calm` or `tense`); the file wins.
 
