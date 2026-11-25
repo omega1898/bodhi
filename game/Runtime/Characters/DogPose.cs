@@ -120,7 +120,7 @@ namespace Bodhi.Game
             pose.body_pitch = 5 * Mathf.Sin(turn * (phase - 0.15f)) * gallop;
             pose.neck_pitch = Mathf.Lerp(-4 + 3 * Mathf.Cos(2 * turn * phase) * trot, 10 + 7 * Mathf.Cos(turn * (phase - 0.42f)), gallop);
             pose.head_pitch = Mathf.Lerp(0, -6, gallop);
-            pose.tail_lift = Mathf.Lerp(16, -38, gallop);
+            pose.tail_lift = Mathf.Lerp(26, -8, gallop);    // Carried high and happy; streaming out at a gallop.
             pose.tail_wag = Mathf.Lerp(20, 6, gallop);
             pose.ear_perk = -30 * gallop - 8 * trot;
             pose.jaw_open = Mathf.Lerp(10, 18, gallop + trot * 0.5f);
@@ -150,7 +150,7 @@ namespace Bodhi.Game
             pose.hind_right = new PawPose { forward = 0.14f };
             pose.front_left = new PawPose { forward = -0.1f };
             pose.front_right = new PawPose { forward = -0.08f };
-            pose.tail_lift = -12;    // Lying out behind him on the snow, sweeping it as he wags.
+            pose.tail_lift = -18;    // Lying out behind him on the snow, sweeping it as he wags.
             pose.tail_wag = 25;
             pose.tail_wag_speed = 2.6f;
             pose.head_tilt = 12 * Mathf.Sin(seconds * 0.7f) * Mathf.Clamp01(Mathf.Sin(seconds * 0.31f) * 3);  // The head tilt.

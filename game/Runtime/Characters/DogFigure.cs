@@ -41,6 +41,7 @@ namespace Bodhi.Game
         readonly Vector3[] paw_home = new Vector3[4];        // Where each paw stands, from his root, when standing.
 
         DogPose current = DogPose.standing();
+        SkinnedModel model;   // His real model from Blender, once he's wearing it.
         float facing_now, facing_speed, speed_now, phase, wag_clock;
         Vector3 last_position;
         bool placed = false;
@@ -259,6 +260,51 @@ namespace Bodhi.Game
             current.hind_right = DogPose.blend(paws[3], target_paws[3], delta <= 0 ? 1 : paw_ease);
             wag_clock += delta * current.tail_wag_speed;
             apply(current, delta);
+            model?.follow();
+        }
+
+        // Puts on his real 3D model (art/blender/build_bodhi.py, imported from game/Resources/Models):
+        // the code-built pieces hide, and every frame the model's bones point the way this figure's
+        // parts do (SkinnedModel). Without a model he simply stays as he is.
+        public void wear(GameObject prefab)
+        {
+            if (prefab == null)
+            {
+                return;
+            }
+            model = new SkinnedModel(prefab, root, WorldLook.solid(rim: 0.6f, wrap: 0.6f, grain: 0.04f));
+            foreach (var piece in root.GetComponentsInChildren<MeshRenderer>())
+            {
+                piece.enabled = false;
+            }
+            model.face_forward(model.bone("head"), model.bone("back_half"));
+            model.hips_follow(model.bone("back_half"), rear);
+            // Each bone, the next bone in its chain (Blender adds "_end" to the tip of a chain),
+            // and the two points on this figure it should point between.
+            model.link(model.bone("back_half"), "front_half", rear, front);
+            model.link(model.bone("front_half"), "neck", front, neck);
+            model.link(model.bone("neck"), "head", neck, head);
+            model.link(model.bone("head"), "head_end", head, mouth_point);
+            model.link(model.bone("tail_1"), "tail_2", tail[0], tail[1]);
+            model.link(model.bone("tail_2"), "tail_2_end", tail[1], tail[2]);
+            foreach (int side in new[] { -1, 1 })
+            {
+                var ear = model.bone_on_side("ear", side);
+                model.link(ear, ear != null ? ear.name + "_end" : "", side < 0 ? left_ear : right_ear, null, new Vector3(0, -0.17f, 0));
+            }
+            for (int leg = 0; leg < 4; leg++)
+            {
+                bool front_leg = leg < 2;
+                int side = leg % 2 == 0 ? -1 : 1;
+                string kind = front_leg ? "front_" : "hind_";
+                float foot_length = front_leg ? front_paw_height : hind_foot;
+                var upper = model.bone_on_side(kind + "upper", side);
+                string ending = upper != null ? upper.name.Substring(upper.name.Length - 2) : "";  // ".L" or ".R"
+                model.link(upper, kind + "lower" + ending, legs[leg].upper, legs[leg].lower);
+                model.link(model.bone(kind + "lower" + ending), kind + "foot" + ending, legs[leg].lower, feet[leg]);
+                model.link(model.bone(kind + "foot" + ending), kind + "foot" + ending + "_end", feet[leg], null, new Vector3(0, -foot_length, 0));
+            }
+            model.follow();
         }
 
         // The pose for what he's doing now.
