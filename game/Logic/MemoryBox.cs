@@ -54,7 +54,7 @@ namespace Bodhi.Game
         {
             var year = campaign ?? new Campaign();
             string name = string.IsNullOrEmpty(dog_name) ? "Bodhi" : dog_name;
-            var scripts = StoryChapters.all();
+            var scripts = Stories.chapters(year.story);
             var box = new MemoryBox { chapters = new MemoryBoxChapter[scripts.Length] };
             for (int index = 0; index < scripts.Length; index++)
             {
@@ -87,7 +87,7 @@ namespace Bodhi.Game
             {
                 return null;
             }
-            var scripts = StoryChapters.all();
+            var scripts = Stories.chapters(campaign.story);
             for (int index = 0; index < scripts.Length; index++)
             {
                 if (scripts[index].id == chapter_id)

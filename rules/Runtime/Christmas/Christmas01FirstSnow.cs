@@ -71,7 +71,7 @@ namespace Bodhi.Rules
                     new StoryRule { on = "wake_2", lines = new string[] { "Six in the morning: a cold nose in my ear, and a whine at the window.", "Snow had come in the night, the way it does in Hollin: all at once, and meaning it." }, schedule_seconds = 6, schedule_event = "woke_up" },
                     new StoryRule { on = "woke_up", objective = "Go out into the snow with {dog}.", follow = true, cutscene = CutsceneChange.end },
                     // The first snow.
-                    new StoryRule { on = "front_door_opened", lines = new string[] { "I opened the door. He looked at the snow. The snow looked at him.", "Then he went in face first." }, schedule_seconds = 4, schedule_event = "first_steps" },
+                    new StoryRule { on = "front_door_opened", lines = new string[] { "I opened the door. He looked at the snow. The snow looked at him.", "Then he went in face first." }, schedule_seconds = 4, schedule_event = "first_steps", remove = new string[] { "front_door" } },
                     new StoryRule { on = "first_steps", lines = new string[] { "Cold! Cold on the paws! Again!", "Bite it. It goes. Bite more." }, voice = StoryVoice.dog, schedule_seconds = 3.5, schedule_event = "first_bites" },
                     new StoryRule { on = "first_bites", lines = new string[] { "He bit the snow. He bit all of it. He sneezed, and bit it again." }, objective = "Throw a snowball for {dog}." },
                     // The snowball that vanishes.
@@ -122,7 +122,7 @@ namespace Bodhi.Rules
                     new StoryRule { on = "door_2", lines = new string[] { "Then she stopped talking and just looked at {dog}.", "'He can smell him,' she said. 'Please.'" }, schedule_seconds = 6, schedule_event = "set_out_ready" },
                     new StoryRule { on = "set_out_ready", objective = "Take the lantern. Keep {dog} on his lead.", cutscene = CutsceneChange.end },
                     // The blizzard.
-                    new StoryRule { on = "lantern_taken", lines = new string[] { "I clipped on his lead and took the lantern. I left the lamp in the window." }, objective = "Follow {dog}. Find Biscuit." },
+                    new StoryRule { on = "lantern_taken", lines = new string[] { "I clipped on his lead and took the lantern. I left the lamp in the window." }, objective = "Follow {dog}. Find Biscuit.", remove = new string[] { "back_door" } },
                     new StoryRule { on = "into_the_woods", lines = new string[] { "Past the cabin, the world was white and roaring and had no edges.", "The lantern lit a small circle of snow, and nothing else." } },
                     new StoryRule { on = "scent_caught", lines = new string[] { "The old dog! Faint. Frightened. That way!" }, voice = StoryVoice.dog, fear_change = 0.2, schedule_seconds = 2.5, schedule_event = "lead_sang" },
                     new StoryRule { on = "lead_sang", lines = new string[] { "{dog} pulled so hard the lead sang." }, schedule_seconds = 3, schedule_event = "under_it_all" },

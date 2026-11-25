@@ -31,8 +31,11 @@ namespace Bodhi.Game
         bool year_open = false;         // A year is loaded (New Game, Continue or Home), so changes are saved.
         string last_saved_year;         // The year's text as last written, so an unchanged year isn't rewritten.
 
+        // Which story this session plays: every new or loaded year is a year of it.
+        public Story story { get; }
+
         // The year being played.
-        public Campaign campaign { get; private set; } = new Campaign();
+        public Campaign campaign { get; private set; }
 
         // The chapter being played, or null before a game starts and after the last chapter.
         public ChapterRun run { get; private set; }
@@ -60,17 +63,26 @@ namespace Bodhi.Game
         // True if there's a game to continue.
         public bool has_save => files.read(campaign_slot) != null;
 
-        // Makes a session that keeps its saves in these files, and fills {dog} with this name.
-        public GameSession(SaveFiles files, string dog_name)
+        // Makes a session of the flood story. The session's tests use it, because they are
+        // written around that story's twelve chapters; the game asks for its story by name.
+        public GameSession(SaveFiles files, string dog_name) : this(files, dog_name, Story.flood)
+        {
+        }
+
+        // Makes a session of this story that keeps its saves in these files, and fills {dog}
+        // with this name.
+        public GameSession(SaveFiles files, string dog_name, Story story)
         {
             this.files = files ?? throw new ArgumentNullException(nameof(files));
             subtitles = new SubtitlePacer(dog_name);
+            this.story = story;
+            campaign = new Campaign(story);
         }
 
         // New Game: forgets any save and starts the first chapter.
         public void new_game()
         {
-            campaign = new Campaign();
+            campaign = new Campaign(story);
             year_open = true;
             if (today > 0)
             {
@@ -209,7 +221,7 @@ namespace Bodhi.Game
         // The memory box on the title screen shows it. A new year if there's no usable save.
         public Campaign saved_year()
         {
-            var year = new Campaign();
+            var year = new Campaign(story);
             string text = files.read(campaign_slot);
             if (text != null && year.load_text(text))
             {
@@ -220,7 +232,7 @@ namespace Bodhi.Game
             {
                 return year;
             }
-            return new Campaign();
+            return new Campaign(story);
         }
 
         // The phone's local date as a whole number of days since 1 January in year 1, the day
@@ -338,7 +350,7 @@ namespace Bodhi.Game
         // marks it open so changes are saved. Then moves it on to today, if the date is known.
         void load_year()
         {
-            campaign = new Campaign();  // A failed load leaves it like this: a new year.
+            campaign = new Campaign(story);  // A failed load leaves it like this: a new year.
             if (!load_campaign(files.read(campaign_slot)))
             {
                 load_campaign(files.read_backup(campaign_slot));

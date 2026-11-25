@@ -65,7 +65,7 @@ namespace Bodhi.Game
             hud = new GameHud(transform, controls);
             titles = new TitleScreens(transform, camera_rig.view);
             game_audio = gameObject.AddComponent<GameAudio>();
-            session = new GameSession(new SaveFiles(Path.Combine(Application.persistentDataPath, "saves")), dog_name);
+            session = new GameSession(new SaveFiles(Path.Combine(Application.persistentDataPath, "saves")), dog_name, Story.christmas);
             home_screen = new HomeScreen(transform, session, dog_name);
             check_today();
             show_title();
@@ -651,7 +651,7 @@ namespace Bodhi.Game
             hud.set_caption("");
             var run = session.run;
             built_for = run;
-            stage = ChapterStages.for_chapter(run.chapter.id);
+            stage = StoryStages.for_chapter(session.story, run.chapter.id);
             game_audio.prepare(stage.all_moods());  // Made now, while loading, not mid-chapter.
             var weather = stage.weather_sound();
             game_audio.set_weather((float)weather.rain, (float)weather.wind);
