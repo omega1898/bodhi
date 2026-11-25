@@ -28,9 +28,7 @@ namespace Bodhi.Game
         PlayerControls controls;
         GameHud hud;
         CameraRig camera_rig;
-        AudioSource sound_player;
-        AudioSource music_player;
-        string playing_mood = null;
+        GameAudio game_audio;
         bool started = false;                        // Past the title screen.
         bool paused = false;
         bool aftermath_showing = false;
@@ -55,10 +53,7 @@ namespace Bodhi.Game
             controls = new PlayerControls();
             camera_rig = new CameraRig(transform);
             hud = new GameHud(transform, controls);
-            sound_player = gameObject.AddComponent<AudioSource>();
-            music_player = gameObject.AddComponent<AudioSource>();
-            music_player.loop = true;
-            music_player.volume = 0.6f;
+            game_audio = gameObject.AddComponent<GameAudio>();
             session = new GameSession(new SaveFiles(Path.Combine(Application.persistentDataPath, "saves")), dog_name);
             show_title();
         }
@@ -545,6 +540,9 @@ namespace Bodhi.Game
             var run = session.run;
             built_for = run;
             stage = ChapterStages.for_chapter(run.chapter.id);
+            game_audio.prepare(stage.all_moods());  // Made now, while loading, not mid-chapter.
+            var weather = stage.weather_sound();
+            game_audio.set_weather((float)weather.rain, (float)weather.wind);
             level = new ChapterLevel(stage, run.chapter);
             tracker = new StageTracker(stage, run);
             steering = new CompanionSteering(new System.Random());
@@ -592,6 +590,7 @@ namespace Bodhi.Game
             hud.set_prompt("", Vector3.zero, null);
             hud.show_aftermath(string.Join("\n", lines), () => session.next_chapter());
             play_music(stage.aftermath.mood);
+            game_audio.set_weather((float)stage.aftermath.rain, 0);
         }
 
         // The end of the year: what they kept.
@@ -666,36 +665,16 @@ namespace Bodhi.Game
             return setting.kind == SettingKind.text ? setting.text : "";
         }
 
-        // Plays a sound from Resources/Sounds, if an artist has added it (silence until then).
+        // Plays a sound effect (an artist's file if there is one, otherwise the made one).
         void play_sound(string name)
         {
-            if (string.IsNullOrEmpty(name))
-            {
-                return;
-            }
-            var clip = Resources.Load<AudioClip>("Sounds/" + name);
-            if (clip != null)
-            {
-                sound_player.PlayOneShot(clip);
-            }
+            game_audio.play_sound(name);
         }
 
-        // Plays the music for a mood from Resources/Music, if it has changed and exists.
+        // Fades into the music for a mood.
         void play_music(string mood)
         {
-            if (string.IsNullOrEmpty(mood) || mood == playing_mood)
-            {
-                return;
-            }
-            playing_mood = mood;
-            var clip = Resources.Load<AudioClip>("Music/" + mood);
-            if (clip == null)
-            {
-                music_player.Stop();
-                return;
-            }
-            music_player.clip = clip;
-            music_player.Play();
+            game_audio.play_music(mood);
         }
     }
 }
