@@ -88,7 +88,20 @@ namespace Bodhi.Rules.Tests
                     Assert.That(animation.cycle_length, Is.EqualTo(match.cycle_length), label + " cycle");
                     for (int frame = 0; frame < animation.count; frame++)
                     {
-                        Assert.That(animation.frames[frame].foot_count, Is.EqualTo(match.frames[frame].foot_count), label + " feet");
+                        var sharp = animation.frames[frame];
+                        var normal_drawing = match.frames[frame];
+                        Assert.That(sharp.foot_count, Is.EqualTo(normal_drawing.foot_count), label + " feet");
+                        // The same size and feet point in game units (pixels divided by pixels per
+                        // unit), so the title screen can swap one for the other without a jump.
+                        // Each box is trimmed to its visible pixels, and the sharper drawing shows
+                        // a little more of the faint, feathered fur edge, so allow four normal
+                        // pixels (about 1 unit, under 1% of Em's height). The drawing itself
+                        // can't drift: its box and feet are measured from the same corner.
+                        double leeway = 4 / normal.pixels_per_unit;
+                        Assert.That(sharp.width / close.pixels_per_unit, Is.EqualTo(normal_drawing.width / normal.pixels_per_unit).Within(leeway), label + " width");
+                        Assert.That(sharp.height / close.pixels_per_unit, Is.EqualTo(normal_drawing.height / normal.pixels_per_unit).Within(leeway), label + " height");
+                        Assert.That(sharp.pivot_x / close.pixels_per_unit, Is.EqualTo(normal_drawing.pivot_x / normal.pixels_per_unit).Within(leeway), label + " feet across");
+                        Assert.That(sharp.pivot_y / close.pixels_per_unit, Is.EqualTo(normal_drawing.pivot_y / normal.pixels_per_unit).Within(leeway), label + " feet height");
                     }
                 }
             }

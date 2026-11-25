@@ -116,7 +116,9 @@ namespace Bodhi.Game
         public void show_opening(bool has_save, Action new_game, Action continue_game, Action memory_box, Action home)
         {
             hide();
-            SpriteLibrary.prepare(new[] { "her", "bodhi" });
+            // The normal drawings, and the sharper close-up ones the hug and title use (the
+            // camera is near, so the normal ones would show their pixels).
+            SpriteLibrary.prepare(new[] { "her", "bodhi", FrameSheets.close_up_name("her"), FrameSheets.close_up_name("bodhi") });
             on_new_game = new_game;
             on_continue = continue_game;
             on_memory_box = memory_box;
@@ -207,7 +209,9 @@ namespace Bodhi.Game
         // Puts one character's drawing where the opening says, feet on its ground line.
         void draw_character(Image drawing, OpeningCharacter character)
         {
-            var sprite = SpriteLibrary.sprite(character.frame_set, character.animation, character.frame);
+            // The sharp close-up drawing where there is one (idle, kneel, sit, embrace), else the
+            // normal one (the trot). Both are the same size on screen, so swapping never jumps.
+            var sprite = SpriteLibrary.close_up(character.frame_set, character.animation, character.frame);
             drawing.enabled = sprite != null && character.opacity > 0;
             if (!drawing.enabled)
             {
