@@ -90,6 +90,26 @@ Each chapter names Bodhi's age (`dog_age`), which sets his size, his drawings an
 
 He gets hungry and dirty as the story goes on (`prototype/web/js/care.js`). It never ends the game; a hungry dog is slower and noses the bag, and a muddy one has muddy paws. Feeding him and drying him are the "ordinary affection" the design asks for between frightening moments. Coming Home teaches both; Home repeats them.
 
+### The bond across the year
+
+Separate from how he feels in the moment (which starts fresh each chapter), Em and Bodhi's bond grows slowly over the whole year (`rules/Runtime/BondJourney.cs`). Every ordinary kindness adds a little: a meal, a towel or bath, brushing, a cuddle, a game of fetch, a walk, practising a trick. Finishing a chapter, finding each other again and finding a keepsake add more. The same kindness on the same day counts in full a couple of times, then less, then not at all until tomorrow, so the bond can't be rushed by repeating one thing.
+
+The bond has five levels, each with a trick he becomes ready to learn:
+
+| Level | Name | Trick |
+|---|---|---|
+| 1 | Getting to know you | Sit |
+| 2 | Friends | High five |
+| 3 | Best friends | Spin |
+| 4 | Family | Bow |
+| 5 | Inseparable | Hug |
+
+A whole year of story alone takes them to about Family; looking after him at home is what makes them Inseparable. The numbers live in one table in the code so they can be tuned in playtests.
+
+### Home days
+
+Between and after chapters there is always something small to do at home (`rules/Runtime/HomeDay.cs`). Each day offers three tasks, the same three for everyone on that date: brush him, give him his dinner, a walk round the block, dry him after the garden, a cuddle, find the hidden ball as Bodhi, play fetch until he catches five in a row, practise a trick he knows, or teach him a new one once he's ready. Each grows the bond. Doing all three on days in a row builds a streak; missing a day only starts the streak again, and never takes anything away. The fetch game keeps his best run of catches, ever and today.
+
 ## Keepsakes (why players replay)
 
 Each chapter hides three keepsakes, and each tells one small story about someone who cared for someone. About half can only be found as the dog, by sniffing near them. Found keepsakes go into the **memory box** on the title screen. See `docs/art_and_production.md` for the reasoning.
