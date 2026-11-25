@@ -134,6 +134,17 @@ namespace Bodhi.Rules
             return report;
         }
 
+        // Every state the player can reach from the start, for tests that check each one.
+        internal static List<int[]> reachable_states(Puzzle puzzle)
+        {
+            var states_by_key = new Dictionary<string, int[]>();
+            if (puzzle != null && puzzle.is_valid)
+            {
+                explore(puzzle, null, states_by_key, new Dictionary<string, Move>(), new List<Move>(), new List<string>());
+            }
+            return new List<int[]>(states_by_key.Values);
+        }
+
         // True if the goal can be reached with only this character acting.
         static bool can_solve_alone(Puzzle puzzle, Character who)
         {
