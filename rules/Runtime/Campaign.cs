@@ -15,7 +15,7 @@ namespace Bodhi.Rules
         public const int format_version = 1;
         public const int maximum_text_length = 64 * 1024;  // Far more than a full save needs.
 
-        readonly ChapterScript[] chapters = StoryChapters.all();
+        readonly ChapterScript[] chapters;
         readonly SortedSet<string> keepsakes = new SortedSet<string>(StringComparer.Ordinal);  // "chapter_id:keepsake".
         int chapter_index = 0;
         ChapterRun current_run = null;
@@ -33,6 +33,22 @@ namespace Bodhi.Rules
         // What the last finished chapter added to the bond (points, level up, new tricks), for
         // the aftermath screen. Empty until a chapter is finished.
         public BondChange last_chapter_bond { get; private set; } = new BondChange();
+
+        // Which story this year belongs to.
+        public Story story { get; }
+
+        // A year of the flood story. The story engine's tests use it, because they are written
+        // around its twelve chapters; the game itself asks for its story by name (GameSession).
+        public Campaign() : this(Story.flood)
+        {
+        }
+
+        // A year of this story, from its first chapter.
+        public Campaign(Story story)
+        {
+            this.story = story;
+            chapters = Stories.chapters(story);
+        }
 
         // The chapter to play next, or null once the year is over.
         public ChapterScript current_chapter => is_finished ? null : chapters[chapter_index];
