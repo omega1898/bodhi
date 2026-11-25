@@ -2,6 +2,8 @@
 
 > **Status:** approved by the owner on 25 November 2026 (see section 11 for what was decided).
 >
+> **Built:** all twelve chapters are in the game as of 25 November 2026: the story in `rules/Runtime/Christmas/`, each chapter's stage in `game/Logic/Christmas/`, the opening cards in `game/Logic/BackStory.cs`. They play as grey boxes until the 3D chapter scenery is made; the new mechanics in section 4 marked **(new)** are simplified for now (each chapter's pull request says how).
+>
 > **The words:** every caption, chapter by chapter, is in `docs/christmas_script.md`, with the storytelling methods it uses. The deeper threads added on 25 November 2026 are marked **(added)** below.
 >
 > **What this is:** the story bible for the Christmas game starring Em and Bodhi. Every chapter's scenery, lighting, props, puzzles and captions are built from it, so when it changes, the chapters change with it. It is a proposal written on 25 November 2026; nothing in the code has been changed yet (section 9 lists what would change). How Em and Bodhi look is designed separately (`docs/characters.md`). This document says what happens to them, not how they are drawn.
@@ -415,7 +417,7 @@ This follows `docs/unity_art_bible.md`: every scene is cold blue dark with **one
 | 11 | White-out: low contrast, no horizon; then night | Diffuse storm white, then dark | **None** while the lantern is out. Then dozens of tiny candles below, and Em's lamp the brightest, highest one; at the end, the porch | Horizontal snow, then thinning flakes; bell rings as visible sound waves in the snow (optional) |
 | 12 | Blue-sky morning, sunlit snow; night is the title screen | Sun, then moonlight and aurora | Indoors: the tree and stove. At night: Em's lantern, the cabin window, the tree | Icicles dripping; at night, gentle snow and a shooting star |
 
-## 10. Files that would need changing to build it (none are changed here)
+## 10. Files that would need changing to build it (written before building; the chapters are now built, see the note at the top)
 
 **Story and chapters (rules)**
 - `rules/Runtime/Chapters/`: all twelve chapter files rewritten for this story (for example `Chapter01FirstSnow.cs` to `Chapter12ChristmasDay.cs`), with ids, titles, dated eyebrows, places, things, zones, story rules, keepsakes and aftermath lines. `StoryChapters.cs` lists them in order. Bodhi is nine months old in every chapter, with one size.

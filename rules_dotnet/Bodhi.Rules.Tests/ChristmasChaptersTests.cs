@@ -482,6 +482,51 @@ namespace Bodhi.Rules.Tests
             Assert.That(run.solid_is_removed("footbridge_ice"), Is.True);
         }
 
+        // The whole story: twelve chapters, fourteenth of December to Christmas Day, three
+        // keepsakes each, ending on the lamp lit for nobody and the epilogue on Tam's hill.
+        [Test]
+        public void the_story_is_twelve_chapters_to_christmas_day()
+        {
+            Assert.That(chapter_ids(), Is.EqualTo(new[]
+            {
+                "first_snow", "lamp_in_window", "kell_bridge", "strand", "lantern_train", "reindeer_hill",
+                "tams_sled", "blackwater", "bothy", "windy_gap", "christmas_eve", "christmas_day",
+            }));
+            var last = ChristmasChapters.christmas_day();
+            Assert.That(last.aftermath[0], Does.Contain("reindeer lay down in the snow, facing south"));
+            var run = ChapterRobot.play(last, skip_films: false);
+            var order = run.event_order.ToList();
+            Assert.That(order.IndexOf("last_lamp"), Is.GreaterThan(order.IndexOf("came_running")), "the lamp after the whistle he answers");
+            Assert.That(order.Last(), Is.EqualTo("chapter_done"));
+        }
+
+        // Break it: the last whistle is a fresh one, made once night has fallen; a whistle at
+        // breakfast doesn't count for it.
+        [Test]
+        public void chapter_twelve_whistle_comes_after_the_snowman()
+        {
+            var run = new ChapterRun(ChristmasChapters.christmas_day());
+            ChapterRobot.finish(run, skip_films: true, stop_when: playing => playing.has_happened("christmas_morning"));
+            run.pass_time(2);
+            run.call();
+            Assert.That(run.has_happened("human_called_during_aftermath"), Is.False, "breakfast isn't night");
+            ChapterRobot.finish(run, skip_films: true, stop_when: playing => playing.has_happened("sprout_stolen"));
+            Assert.That(run.use("snowman_base", true), Is.True);
+            Assert.That(run.switch_character(), Is.True);
+            Assert.That(run.use("arms_fetched", true), Is.True);
+            for (int step = 0; step < 20; step++)
+            {
+                run.pass_time(0.25);
+            }
+            Assert.That(run.has_happened("came_running"), Is.False, "no fresh whistle yet");
+            Assert.That(run.call(), Is.True);
+            for (int step = 0; step < 8; step++)
+            {
+                run.pass_time(0.25);
+            }
+            Assert.That(run.has_happened("came_running"), Is.True, "of course he came");
+        }
+
         // Break it: each call gives a fresh copy, so one playthrough can't change another's chapter.
         [Test]
         public void each_copy_of_a_chapter_is_separate()

@@ -22,6 +22,7 @@ namespace Bodhi.Rules
                 bothy(),
                 windy_gap(),
                 christmas_eve(),
+                christmas_day(),
             };
         }
     }
