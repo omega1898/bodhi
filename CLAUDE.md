@@ -16,6 +16,7 @@ The owner is learning programming from zero. Every change must be readable by a 
 - `prototype/web/`: the whole story as a playable browser game (canvas, no libraries). The art, story and pacing blueprint for the Unreal version. Test it with `node prototype/web/tests/playtest.js`.
 - `ios/`: the iOS app. `project.yml` (turned into an Xcode project on the Mac by XcodeGen), two Swift files, the app icon, and `bundle_game.sh`, which copies the game in. Cloud sessions can't build it; the Mac does.
 - `art/`: the game's art as editable SVG files: painted character parts, frame-by-frame animations (`art/animations/`, drawn by `art/tools/draw_frames.js`), scenery layers. See `art/README.md`. Check frames with `node prototype/web/tests/frames_check.js`.
+- `look/`: the Unity version's palette and motion maths in plain C#, from `docs/unity_art_bible.md`, tested along with the rules.
 - `rules/`: the Unity version's game rules in plain C# (no Unity code), as a Unity package. Tested anywhere with `dotnet test rules_dotnet/Bodhi.Rules.Tests`; see `rules/README.md` and `docs/unity_rebuild_spec.md`.
 - `docs/`: design, story, art and production, architecture, cloud session guide.
 
