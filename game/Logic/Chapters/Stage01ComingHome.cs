@@ -17,6 +17,7 @@ namespace Bodhi.Game
                 scenery = new StageSetting[] { StageSetting.of_text("sky_top", "#7d93ad"), StageSetting.of_text("sky_bottom", "#f0d2a8"), StageSetting.of_text("far", "hills"), StageSetting.of_text("mid", "trees"), StageSetting.of_flag("sun", true), StageSetting.of_text("far_color", "#8a8f96"), StageSetting.of_text("mid_color", "#6a7a5a"), StageSetting.of_text("ground_top", "#7a8a52"), StageSetting.of_text("ground_body", "#4d5236"), StageSetting.of_text("wall", "#8a7a66"), StageSetting.of_text("room_wall", "#c9b79c"), StageSetting.of_text("near", "near_hedges"), StageSetting.of_text("near_color", "#4d5a38"), StageSetting.of_number("darkness", 0.04), StageSetting.of_text("darkness_color", "rgb(30,30,45)"), StageSetting.of_number("rain", 0), StageSetting.of_number("wind", 0.15), StageSetting.of_text("darkness_floor", "#3a3324"), StageSetting.of_text("foreground", "grass"), StageSetting.of_text("foreground_color", "rgba(46,58,30,0.8)"), StageSetting.of_text("mist", "rgba(255,232,200,0.05)") },
                 human_start_x = 130, human_start_feet_y = 520,
                 dog_start_x = 404, dog_start_feet_y = 520,
+                ball_x = 700, ball_y = 510,
                 guest = new StageGuest { x = 1050, feet_y = 520, size = 0.86, mode = "still", pose = "sit" },
                 solids = new StageSolid[]
                 {

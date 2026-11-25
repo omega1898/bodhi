@@ -17,6 +17,7 @@ namespace Bodhi.Game
                 scenery = new StageSetting[] { StageSetting.of_text("sky_top", "#5b6a7c"), StageSetting.of_text("sky_bottom", "#b9b2a6"), StageSetting.of_text("far", "city"), StageSetting.of_nothing("mid"), StageSetting.of_text("far_color", "#6f7783"), StageSetting.of_text("mid_color", "#5a616c"), StageSetting.of_text("window_color", "rgba(255,214,150,0.35)"), StageSetting.of_text("ground_top", "#6b6660"), StageSetting.of_text("ground_body", "#3b3835"), StageSetting.of_text("wall", "#4b4640"), StageSetting.of_text("room_wall", "#4a3f3a"), StageSetting.of_text("near", "near_street"), StageSetting.of_text("near_color", "#3e4048"), StageSetting.of_number("darkness", 0.22), StageSetting.of_text("darkness_color", "rgb(30,30,40)"), StageSetting.of_number("rain", 0.35), StageSetting.of_number("wind", 0.15), StageSetting.of_text("fog", "rgba(200,200,205,0.05)"), StageSetting.of_text("darkness_floor", "#1c1a19"), StageSetting.of_flag("wet", true) },
                 human_start_x = 520, human_start_feet_y = 520,
                 dog_start_x = 640, dog_start_feet_y = 520,
+                ball_x = 760, ball_y = 510,
                 solids = new StageSolid[]
                 {
                     new StageSolid { kind = "floor", x = 0, y = 520, width = 2600, height = 100 },

@@ -461,6 +461,10 @@ function export_stage(level, index) {
     const dog = pair(level.start.dog, where + '.start.dog');
     lines.push('                human_start_x = ' + human[0] + ', human_start_feet_y = ' + human[1] + ',');
     lines.push('                dog_start_x = ' + dog[0] + ', dog_start_feet_y = ' + dog[1] + ',');
+    if (level.ball) {
+        const ball = pair(level.ball, where + '.ball');
+        lines.push('                ball_x = ' + ball[0] + ', ball_y = ' + ball[1] + ',');
+    }
     if (level.guest) {
         only_keys(level.guest, ['start', 'size', 'mode', 'pose'], where + '.guest');
         const start = pair(level.guest.start, where + '.guest.start');

@@ -1,5 +1,6 @@
 // Purpose: decides where the character you aren't playing walks: beside you, to you in a
-// reunion, or (Bodhi, when calm) a little ahead to explore before sitting to check back. When a
+// reunion, to a spot the story sends him, after the ball and back with it in the fetch chapters,
+// or (Bodhi, when calm) a little ahead to explore before sitting to check back. When a
 // wall blocks the way it tries a jump, and at a wall too tall to clear it waits and looks back
 // instead of leaping at it forever. Ported from update_companion in prototype/web/js/game.js.
 //
@@ -30,6 +31,14 @@ namespace Bodhi.Game
         public bool on_ground;
         public bool blocked;                // The physics says a wall stops the companion.
         public double obstacle_height;      // How far above the companion's feet the wall's top is.
+        public double companion_feet_y;     // Where the companion's feet are (to reach the ball).
+
+        // His errands, which come before following (as in the browser game):
+        public double? run_to_x;            // The story sends him running to this x (StageTracker).
+        public bool fetching;               // Fetch is on, there's a ball, and it's his turn for it.
+        public bool carrying_ball;          // He has it in his mouth: bring it back.
+        public double ball_x, ball_y;       // The loose ball's centre.
+        public double ball_speed_x;         // He waits for a rolling ball to slow down.
     }
 
     // What the companion should do this frame.
@@ -40,6 +49,9 @@ namespace Bodhi.Game
         public double speed_scale;          // Passed to CharacterMotion.step.
         public double sit_seconds;          // Above 0: sit (or stand still, for her) this long.
         public int face;                    // Not 0: turn to face this way.
+        public bool arrived;                // He got to run_to_x: tell StageTracker.arrived.
+        public bool pick_up_ball;           // He's at the ball: pick it up (BallFlight.dog_picks_up).
+        public bool drop_ball;              // He's back with it: drop it at her feet, "ball_fetched".
     }
 
     public class CompanionSteering
@@ -56,6 +68,15 @@ namespace Bodhi.Game
         public const double wait_seconds = 2.5;              // At a wall he can't clear.
         public const double give_up_after_seconds = 1.4;     // Blocked this long: stop trying.
         public const double jump_rest_seconds = 0.6;         // Between two jumps at a wall.
+        public const double run_to_gap = 10;                 // How close a story run gets him...
+        public const double run_to_arrived = 14;             // ...and how close counts as there.
+        public const double run_to_speed_scale = 1.1;
+        public const double bring_back_gap = 34;             // He stops this near her with the ball...
+        public const double drop_within = 40;                // ...and drops it this near.
+        public const double ball_gap = 6;
+        public const double ball_rolling_speed = 60;         // Faster than this, he waits for it.
+        public const double pick_up_across = 20;
+        public const double pick_up_up_down = 30;
 
         readonly Random random;
         bool following = false;
@@ -92,6 +113,41 @@ namespace Bodhi.Game
                 target_x = view.leader_x;
                 stop_distance = reunion_gap;
                 order.speed_scale = reunion_speed_scale;
+            }
+            else if (is_dog && view.run_to_x != null && !double.IsNaN(view.run_to_x.Value) && !double.IsInfinity(view.run_to_x.Value))
+            {
+                target_x = view.run_to_x;
+                stop_distance = run_to_gap;
+                order.speed_scale = run_to_speed_scale;
+                if (Math.Abs(view.companion_x - view.run_to_x.Value) < run_to_arrived)
+                {
+                    order.arrived = true;
+                    order.sit_seconds = 2;
+                    order.face = face_toward(view.companion_x, view.leader_x);
+                }
+            }
+            else if (is_dog && view.fetching && view.carrying_ball)
+            {
+                target_x = view.leader_x;
+                stop_distance = bring_back_gap;
+                if (Math.Abs(view.leader_x - view.companion_x) < drop_within)
+                {
+                    order.drop_ball = true;
+                    order.sit_seconds = 1.6;
+                }
+            }
+            else if (is_dog && view.fetching && Math.Abs(view.ball_speed_x) < ball_rolling_speed)
+            {
+                target_x = view.ball_x;
+                stop_distance = ball_gap;
+                if (Math.Abs(view.ball_x - view.companion_x) < pick_up_across && Math.Abs(view.ball_y - view.companion_feet_y) < pick_up_up_down)
+                {
+                    order.pick_up_ball = true;
+                }
+            }
+            else if (is_dog && view.fetching)
+            {
+                // The ball is still rolling fast: he stays put and watches it.
             }
             else if (is_dog && ahead_target != null)
             {
@@ -136,7 +192,7 @@ namespace Bodhi.Game
                 if (following)
                 {
                     order.direction = Math.Sign(distance);
-                    if (is_dog && Math.Abs(distance) < trot_within)
+                    if (is_dog && Math.Abs(distance) < trot_within && view.run_to_x == null)
                     {
                         order.speed_scale *= trot_scale;  // Trot when close, run when far.
                     }

@@ -131,6 +131,16 @@ check('an unknown field inside a drawing field stops the stage export', function
     assert.throws(function () { exporter.export_stage(bad_guest, 0); }, /dance/);
 });
 
+check('the ball keeps its start, and a broken one stops the stage export', function () {
+    const with_ball = good_stage();
+    with_ball.ball = [70, 85];
+    assert.match(exporter.export_stage(with_ball, 0), /ball_x = 70, ball_y = 85,/);
+    assert.doesNotMatch(exporter.export_stage(good_stage(), 0), /ball_x/);
+    const bad_ball = good_stage();
+    bad_ball.ball = [70, 'up'];
+    assert.throws(function () { exporter.export_stage(bad_ball, 0); }, /ball/);
+});
+
 check('a missing start or a broken place stops the stage export', function () {
     const no_start = good_stage();
     delete no_start.start.dog;
