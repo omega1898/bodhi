@@ -1,8 +1,8 @@
 // Purpose: everything drawn on top of the game: the story lines (subtitles), the current goal,
 // the words over the "use" button, a film's big caption, the night's darkness, fades and
-// lightning, the touch buttons on a phone, and the title, pause, after-chapter and end-of-year
+// lightning, the touch buttons on a phone, and the pause, after-chapter and end-of-year
 // screens. It is built in code with Unity's UI (uGUI) and its built-in font, so it needs no
-// imported assets; an artist's fonts and panels replace the plain ones later.
+// imported assets; an artist's fonts and panels replace the plain ones later. The title lives in TitleScreens.
 //
 // It shows what it's told and reports button presses; ChapterDirector decides everything else.
 using System;
@@ -30,10 +30,9 @@ namespace Bodhi.Game
         readonly Text subtitle, objective, prompt, caption;
         readonly Image darkness, fade, flash;
         readonly GameObject touch_buttons;
-        readonly GameObject title_screen, pause_screen, aftermath_screen, year_end_screen;
-        readonly Button continue_button;
+        readonly GameObject pause_screen, aftermath_screen, year_end_screen;
         readonly Text aftermath_text, year_end_text;
-        Action on_new_game, on_continue, on_resume, on_next;
+        Action on_resume, on_next;
         float fade_left, flash_left;
 
         // Builds the whole overlay and the EventSystem that lets taps and clicks reach it.
@@ -68,10 +67,6 @@ namespace Bodhi.Game
             touch_buttons = build_touch_buttons();
             touch_buttons.SetActive(Touchscreen.current != null || Application.isMobilePlatform);
 
-            title_screen = make_screen("title", new Color(0.06f, 0.06f, 0.08f, 1f));
-            make_text(title_screen.transform, "name", 72, TextAnchor.MiddleCenter, 0.1f, 0.6f, 0.9f, 0.85f).text = "Bodhi";
-            make_button(title_screen.transform, "New Game", 0.5f, 0.42f, () => on_new_game?.Invoke());
-            continue_button = make_button(title_screen.transform, "Continue", 0.5f, 0.3f, () => on_continue?.Invoke());
 
             pause_screen = make_screen("pause", new Color(0, 0, 0, 0.7f));
             make_text(pause_screen.transform, "paused", 48, TextAnchor.MiddleCenter, 0.1f, 0.55f, 0.9f, 0.75f).text = "Paused";
@@ -88,18 +83,7 @@ namespace Bodhi.Game
             fade.raycastTarget = false;
             flash = make_image(canvas, "flash", Color.clear, 0, 0, 1, 1);
             flash.raycastTarget = false;
-            title_screen.transform.SetAsLastSibling();
             hide_screens();
-        }
-
-        // The title: New Game, and Continue only when there's a save.
-        public void show_title(bool has_save, Action new_game, Action continue_game)
-        {
-            hide_screens();
-            on_new_game = new_game;
-            on_continue = continue_game;
-            continue_button.gameObject.SetActive(has_save);
-            title_screen.SetActive(true);
         }
 
         // The pause panel, or none.
@@ -126,10 +110,9 @@ namespace Bodhi.Game
             year_end_screen.SetActive(true);
         }
 
-        // Hides the title, pause, after-chapter and end-of-year screens.
+        // Hides the pause, after-chapter and end-of-year screens.
         public void hide_screens()
         {
-            title_screen.SetActive(false);
             pause_screen.SetActive(false);
             aftermath_screen.SetActive(false);
             year_end_screen.SetActive(false);

@@ -196,6 +196,24 @@ namespace Bodhi.Game
             }
         }
 
+        // The year as saved, read without starting a chapter, counting anything or writing anything.
+        // The memory box on the title screen shows it. A new year if there's no usable save.
+        public Campaign saved_year()
+        {
+            var year = new Campaign();
+            string text = files.read(campaign_slot);
+            if (text != null && year.load_text(text))
+            {
+                return year;
+            }
+            string backup = files.read_backup(campaign_slot);
+            if (backup != null && year.load_text(backup))
+            {
+                return year;
+            }
+            return new Campaign();
+        }
+
         // Loads the year from a save's text, counting a damaged one. False if there was none.
         bool load_campaign(string text)
         {
