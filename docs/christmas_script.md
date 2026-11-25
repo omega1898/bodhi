@@ -729,19 +729,60 @@ Then the title card *Chapter Ten: Windy Gap*, 23 December.
 
 Light the fire. / Offer Biscuit some food. / Switch to {dog}. Keep Biscuit warm. / Open the door. It's jammed with snow. / Switch to {dog}. Find the logs under the drift. / Carry the logs in. / Towel {dog} dry. / Read the visitors' book. / Switch to {dog}. Bring her something.
 
-### Chapter Ten: Windy Gap (23 December)
+### Chapter Ten: Windy Gap (23 December), in full
 
-| Beat | Voice | Line |
+Written in full on 25 November 2026, when the chapter was built. The chapter's question: *has he learned to wait for her?*
+
+*Underneath:* in Chapter One, Bodhi lunged into the dark without a look, and the lead came back empty. Nine days later the sled goes down a gully with Biscuit in it, and he looks at Em first. The game holds him to it: the gully edge won't let him through until she says go. It is the smallest gesture in the story and the one everything turned on. Then the reward for the hardest climb: the whole valley, Hollin at the end of it, and every window dark.
+
+#### The climb
+
+| # | Beat | Voice | Caption |
+|---|---|---|---|
+| 1 | Opens (film) | Em | Windy Gap earned its name in the first five minutes. |
+| 2 | | B | Wind full of ice. Harness tight. Her, behind. Pull. |
+| 3 | The first pitch | Em | The map said two days. The map had never pulled a sled. |
+| 4 | The ledge | Em | Below the frozen waterfall the path narrowed to a ledge, and the wind found us. |
+| 5 | The gust (film) | Em | The sled went down the gully with Biscuit in it, and he didn't even bark. |
+
+#### The look
+
+| # | Beat | Voice | Caption |
+|---|---|---|---|
+| 6 | Looking | B | The sled, going. Go? Look at her first. |
+| 7 | Go | Em | He looked at me. I said go. |
+| 8 | | Em | Nine days ago he would have gone without looking. |
+| 9 | The sled | B | Down. Down. Snow in a river. The sled, sliding. Teeth. Rope. HOLD. |
+| 10 | The shelf | B | The old dog, out. Onto the flat rock. Stay. Good. |
+
+#### The waterfall (Em)
+
+| # | Beat | Voice | Caption |
+|---|---|---|---|
+| 11 | Round | Em | I went round by the frozen waterfall. There was no other way down. |
+| 12 | Steps | Em | The waterfall was organ pipes of ice. I cut steps with the edge of my boot. |
+| 13 | The rope | Em | I tied Tam's rope round an iron post furred white with rime. |
+| 14 | Across the gully | Em | Across the gully I could see him, holding the sled, not letting go. |
+| 15 | | Em | 'Good boy,' I shouted. The wind took it. He heard it anyway. |
+| 16 | The sheepfold | Em | We met at an old sheepfold at the foot of the gully. |
+| 17 | | Em | He leaned his whole weight against my legs. We stayed like that a while. |
+| 18 | The top (film) | Em | We hauled it all back up together, and came over the top of Windy Gap. |
+| 19 | Closes | Em | Below us, the whole valley, and Hollin at the end of it. |
+| 20 | | Em | Every window in Hollin was dark. |
+
+Then the title card *Chapter Eleven: Christmas Eve*, 24 December.
+
+#### Keepsakes
+
+| Keepsake | Found by | Text |
 |---|---|---|
-| Opens | Em | Windy Gap earned its name in the first five minutes. |
-| | B | Wind full of ice. Harness tight. Her, behind. Pull. |
-| The ledge | Em | The map said two days. The map had never pulled a sled. |
-| The gully | Em | The sled went down the gully with Biscuit in it, and he didn't even bark. |
-| The look | B | The sled, going. Go? Look at her first. |
-| | Em | He looked at me. I said go. |
-| | Em | Nine days ago he would have gone without looking. |
-| Closes | Em | Below us, the whole valley, and Hollin at the end of it. |
-| | Em | Every window in Hollin was dark. |
+| The bowl in the cairn | Bodhi | A dog bowl wedged into a cairn, full of snow, for any dog passing over the Gap. |
+| The bench on the shoulder | Em | A bench on the shoulder of the climb, cleared of snow this morning: 'For Iain, who loved this view.' |
+| The flags on the marker post | Em | Prayer flags tied to a marker post, faded white by years of this wind. Still there. |
+
+#### Objectives, in order
+
+Pull together up to the pass. / Look at Em first. / Chase the sled down the gully. Hold it. / Nudge Biscuit onto the shelf. / Cut steps in the frozen waterfall. / Fix Tam's rope. / Climb down to the sheepfold. / (they meet) / Haul the sled up to the top of the pass.
 
 ### Chapter Eleven: Christmas Eve (24 December)
 

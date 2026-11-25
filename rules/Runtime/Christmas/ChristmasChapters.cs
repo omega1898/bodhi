@@ -20,6 +20,7 @@ namespace Bodhi.Rules
                 tams_sled(),
                 blackwater(),
                 bothy(),
+                windy_gap(),
             };
         }
     }

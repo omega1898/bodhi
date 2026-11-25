@@ -427,6 +427,29 @@ namespace Bodhi.Rules.Tests
             Assert.That(run.use("logs_dug", true), Is.True);
         }
 
+        // Chapter Ten: he asks before he goes. The gully edge holds Bodhi until she says go, and
+        // it only opens after he has looked at her; in Chapter One he lunged without a look.
+        [Test]
+        public void chapter_ten_he_looks_at_her_before_he_goes()
+        {
+            var edge = Bodhi.Game.ChristmasStages.windy_gap().find_solid("gully_edge");
+            Assert.That(Bodhi.Game.StageLook.solid_blocks(edge, Character.dog), Is.True);
+            Assert.That(Bodhi.Game.StageLook.solid_blocks(edge, Character.human), Is.False);
+            var run = new ChapterRun(ChristmasChapters.windy_gap());
+            ChapterRobot.finish(run, skip_films: true, stop_when: playing => playing.has_happened("the_look"));
+            Assert.That(run.controlled_character, Is.EqualTo(Character.dog));
+            Assert.That(run.solid_is_removed("gully_edge"), Is.False, "not until she says go");
+            Assert.That(run.report_zone("reached_sled", false, true), Is.False, "he can't reach the sled yet");
+            Assert.That(run.use("looked_at_her", true), Is.True);
+            for (int step = 0; step < 20; step++)
+            {
+                run.pass_time(0.25);
+            }
+            Assert.That(run.has_happened("she_said_go"), Is.True);
+            Assert.That(run.solid_is_removed("gully_edge"), Is.True);
+            Assert.That(run.report_zone("reached_sled", false, true), Is.True);
+        }
+
         // Break it: each call gives a fresh copy, so one playthrough can't change another's chapter.
         [Test]
         public void each_copy_of_a_chapter_is_separate()

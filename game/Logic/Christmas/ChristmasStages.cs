@@ -18,6 +18,7 @@ namespace Bodhi.Game
                 tams_sled(),
                 blackwater(),
                 bothy(),
+                windy_gap(),
             };
         }
 
@@ -35,6 +36,7 @@ namespace Bodhi.Game
                 case "tams_sled": return tams_sled();
                 case "blackwater": return blackwater();
                 case "bothy": return bothy();
+                case "windy_gap": return windy_gap();
                 default: return null;
             }
         }
