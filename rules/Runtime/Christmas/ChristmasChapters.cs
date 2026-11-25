@@ -21,6 +21,7 @@ namespace Bodhi.Rules
                 blackwater(),
                 bothy(),
                 windy_gap(),
+                christmas_eve(),
             };
         }
     }

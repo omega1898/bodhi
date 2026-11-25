@@ -450,6 +450,38 @@ namespace Bodhi.Rules.Tests
             Assert.That(run.report_zone("reached_sled", false, true), Is.True);
         }
 
+        // Chapter Eleven reverses the roles: once the lantern is out the player is Bodhi, and Em
+        // follows him on the harness, from the old path to the footbridge.
+        [Test]
+        public void chapter_eleven_he_leads_her_home()
+        {
+            var run = new ChapterRun(ChristmasChapters.christmas_eve());
+            ChapterRobot.finish(run, skip_films: true, stop_when: playing => playing.has_happened("he_leads"));
+            Assert.That(run.controlled_character, Is.EqualTo(Character.dog), "the player is Bodhi");
+            Assert.That(run.dog_follows, Is.True, "and Em follows on the harness");
+            Assert.That(run.switching_allowed, Is.False, "all the way to the footbridge");
+            ChapterRobot.finish(run, skip_films: false);
+            Assert.That(run.is_complete, Is.True);
+            var order = run.event_order.ToList();
+            Assert.That(order.IndexOf("mercy_heard"), Is.LessThan(order.IndexOf("village_lights")), "the bell before the lights");
+            Assert.That(order.IndexOf("bell_first"), Is.GreaterThan(order.IndexOf("crossed")));
+        }
+
+        // Break it: neither of them crosses the footbridge alone; the ice stays until his rope
+        // and her handrail are both done.
+        [Test]
+        public void chapter_eleven_footbridge_needs_both()
+        {
+            var run = new ChapterRun(ChristmasChapters.christmas_eve());
+            ChapterRobot.finish(run, skip_films: true, stop_when: playing => playing.has_happened("footbridge_reached"));
+            Assert.That(run.controlled_character, Is.EqualTo(Character.dog), "he is still leading");
+            Assert.That(run.use("rope_across", true), Is.True);
+            Assert.That(run.solid_is_removed("footbridge_ice"), Is.False, "his rope alone");
+            Assert.That(run.switch_character(), Is.True);
+            Assert.That(run.use("handrail_cleared", true), Is.True);
+            Assert.That(run.solid_is_removed("footbridge_ice"), Is.True);
+        }
+
         // Break it: each call gives a fresh copy, so one playthrough can't change another's chapter.
         [Test]
         public void each_copy_of_a_chapter_is_separate()
