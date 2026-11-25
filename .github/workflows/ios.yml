@@ -1,0 +1,90 @@
+# Purpose: build the iPhone app on one of GitHub's Mac computers whenever the app or the game
+# changes, so a mistake in the Swift files, project.yml or bundle_game.sh shows up as a red
+# check on the pull request, before it ever reaches your Mac.
+#
+# What it proves: the app compiles for a real iPhone with the Xcode version Apple currently
+# requires, and the finished app carries the game inside it.
+# What it can't prove: anything about signing, your Apple account, or how the game feels on a
+# phone. It builds with signing turned off, because signing needs your Apple identity, which
+# must never be stored on GitHub.
+#
+# Cost: Mac minutes count extra against GitHub's free monthly allowance for private
+# repositories, so this only runs when files the app is built from change.
+
+# The name shown for this workflow on GitHub's "Actions" tab and on pull requests.
+name: ios
+
+# "on" lists the events that start this workflow.
+on:
+  push:
+    # Only when one of these paths changed in the push. "**" means "anything inside".
+    paths:
+      - 'ios/**'
+      - 'prototype/web/**'
+      - 'art/**'
+      - '.github/workflows/ios.yml'
+  pull_request:
+    paths:
+      - 'ios/**'
+      - 'prototype/web/**'
+      - 'art/**'
+      - '.github/workflows/ios.yml'
+
+# The job only reads the code; it can't push, comment or change settings (least privilege).
+permissions:
+  contents: read
+
+jobs:
+  build_iphone_app:
+    # The label shown for this job on GitHub.
+    name: iPhone app builds (unsigned, Release)
+    # A fresh Mac with Apple's tools. "macos-latest" currently means macOS 26 with Xcode 26,
+    # which Apple requires for App Store uploads since 28 April 2026.
+    runs-on: macos-latest
+    # Stop if it runs longer than 20 minutes, for example a build stuck waiting.
+    timeout-minutes: 20
+    steps:
+      # Download the repository's code onto the Mac.
+      - name: Check out the code
+        uses: actions/checkout@v4
+
+      # XcodeGen turns ios/project.yml into an Xcode project (see the comment at its top).
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      # Print the Xcode version into the log, so a failure can be traced to a tool change.
+      - name: Show the Xcode version
+        run: xcodebuild -version
+
+      # The same commands as steps 6 in docs/app_store.md, minus opening Xcode.
+      - name: Copy the game in and generate the Xcode project
+        run: |
+          sh ios/bundle_game.sh
+          cd ios
+          xcodegen
+
+      # Build for a real iPhone ("iphoneos"), in the Release setup an App Store upload uses.
+      # CODE_SIGNING_ALLOWED=NO skips signing, which needs your Apple identity.
+      - name: Build the app
+        run: |
+          cd ios
+          xcodebuild -project UntilWeFindHome.xcodeproj -target UntilWeFindHome \
+            -sdk iphoneos -configuration Release \
+            CODE_SIGNING_ALLOWED=NO build
+
+      # A build can succeed and still ship without the game if the copy step broke, so look
+      # inside the finished app for the game's page, its code and its art.
+      - name: Check the game is inside the app
+        run: |
+          app="ios/build/Release-iphoneos/UntilWeFindHome.app"
+          for needed in Game/index.html Game/js/game.js Game/fonts/fonts.css Game/art/animations/bodhi_idle.svg; do
+            if [ ! -f "$app/$needed" ]; then
+              echo "Missing from the app: $needed"
+              exit 1
+            fi
+          done
+          if grep -q 'fonts.googleapis.com' "$app/Game/index.html"; then
+            echo "The bundled page still reaches out to Google Fonts, so it wouldn't be fully offline."
+            exit 1
+          fi
+          echo "The app carries the game and needs no internet."
