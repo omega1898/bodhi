@@ -227,6 +227,34 @@ namespace Bodhi.Rules.Tests
             Assert.That(run.report_zone("tried_to_leave", false, true), Is.False);
         }
 
+        // Chapter Three: one place, an hour apart. Everything Em reads at Kell Bridge is a trace
+        // the player left as Bodhi, so she can only read it after he has made it, and the
+        // chapter plays as him first, then as her.
+        [Test]
+        public void chapter_three_is_his_morning_then_her_hour_later()
+        {
+            var run = ChapterRobot.play(ChristmasChapters.kell_bridge(), skip_films: false);
+            var order = run.event_order.ToList();
+            Assert.That(order.IndexOf("sausage_found"), Is.LessThan(order.IndexOf("bowl_read")), "the bowl is licked before she sees it");
+            Assert.That(order.IndexOf("hid_in_woodshed"), Is.LessThan(order.IndexOf("curl_found")), "the curl is on the nail before she finds it");
+            Assert.That(order.IndexOf("followed_biscuit"), Is.LessThan(order.IndexOf("em_arrived")));
+            Assert.That(order.IndexOf("em_arrived"), Is.LessThan(order.IndexOf("prints_read")));
+        }
+
+        // Break it: Em can't ask Nell before she has read all three traces herself.
+        [Test]
+        public void em_reads_the_traces_before_asking_nell()
+        {
+            var run = new ChapterRun(ChristmasChapters.kell_bridge());
+            ChapterRobot.finish(run, skip_films: true, stop_when: playing => playing.has_happened("em_arrived"));
+            Assert.That(run.use("talked_to_nell", true), Is.False);
+            Assert.That(run.use("prints_read", true), Is.True);
+            Assert.That(run.use("bowl_read", true), Is.True);
+            Assert.That(run.use("talked_to_nell", true), Is.False, "two of three");
+            Assert.That(run.use("curl_found", true), Is.True);
+            Assert.That(run.use("talked_to_nell", true), Is.True);
+        }
+
         // Break it: each call gives a fresh copy, so one playthrough can't change another's chapter.
         [Test]
         public void each_copy_of_a_chapter_is_separate()
