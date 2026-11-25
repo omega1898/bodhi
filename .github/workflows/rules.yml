@@ -45,10 +45,6 @@ jobs:
       - name: Build the sound preview
         run: dotnet build rules_dotnet/Bodhi.Audio.Preview --nologo
 
-      # Break-it tests for the tool that turns the browser chapters into C# data.
-      - name: Check the chapter exporter refuses bad data
-        run: node rules_dotnet/tools/export_chapters_test.js
-
       # Break-it tests for the drawing tool: a repaint that drops a colour the puppy or Biscuit
       # recolour must stop the tool.
       - name: Check the drawing tool's colour guards

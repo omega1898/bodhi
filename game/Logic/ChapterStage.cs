@@ -1,9 +1,9 @@
 // Purpose: everything a chapter needs on screen that the story rules don't: how big it is, its
 // floors, walls and water, the furniture and scenery, where she and Bodhi start, and what each
 // story rule does to the scene (move someone, dim the lights, shake the camera, raise a flood).
-// It is the browser game's "drawing-only" chapter data (prototype/web/js/levels.js), exported by
-// rules_dotnet/tools/export_chapters.js into game/Logic/Chapters/, so one Unity scene can build
-// any of the twelve chapters without anyone placing things by hand.
+// The twelve chapters' data lives in game/Logic/Chapters/ (first exported from the old browser
+// game, now edited there directly), so one Unity scene can build any of the twelve chapters
+// without anyone placing things by hand.
 //
 // Positions are layout units with y pointing down, like the browser game (LayoutSpace turns them
 // into metres). A box's x and y are its top-left corner; a person's place is their feet.

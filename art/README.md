@@ -36,7 +36,7 @@ The game animates frame by frame, the way hand-drawn 2D games do: every frame is
 - **The hand-over gate:** `draw_frames.js` measures how far the body moves between the last drawing of one move and the first of the next. If anything jumps more than 2.5 game units, it refuses to write the frames and names the hand-over to fix.
 - **The dog's fur** is drawn in the body's own coordinates, so its curls and fluffy edge move with the body instead of swimming across it.
 - **How a frame is drawn:** limbs are drawn as one bending shape. The dog's back, chest and legs merge into one furry silhouette. Faces, the coat and the satchel come from the painted sheets in `characters/`, so the style matches.
-- **What it writes:** one SVG per animation into `animations/`, frames in rows of up to 8 (a very wide sheet is too wide for a phone to paint), and `prototype/web/js/frames_atlas.js`. The atlas says where each frame is, how far each walking cycle travels, and where her hand and the dog's mouth and eye are in each frame.
+- **What it writes:** one SVG per animation into `animations/`, frames in rows of up to 8 (a very wide sheet is too wide for a phone to paint), and `animations/frames_atlas.js`. The atlas says where each frame is, how far each walking cycle travels, and where her hand and the dog's mouth and eye are in each frame.
 - **No sliding feet:** walking and running frames advance with distance covered. The planted foot moves back by the same amount every frame, and the cycle length in the atlas is worked out from that.
 - **Frames:** her frames are 64 × 106 game units with the feet at (30, 99). The dog's are 90 × 84 with the feet at (42, 76).
 - **Two dog sets:** `bodhi_*` is the grown goldendoodle; `bodhi_puppy_*` is the same moves with a puppy's build (`puppy_build` in `tools/draw_frames.js`: a bigger head and paws, shorter legs, a short tail) in a deeper apricot. The game uses the puppy set until about six months and draws either set smaller while she grows. A third set, `biscuit_*`, is the old dog next door: the grown dog's moves in an older build, recoloured grey and white with a blue collar and a smoother coat (`biscuit_changes` in `tools/draw_frames.js`). Only the sets in use are painted, to save memory on a phone.
@@ -44,13 +44,9 @@ The game animates frame by frame, the way hand-drawn 2D games do: every frame is
 After changing a pose or a painted part:
 ```
 node art/tools/draw_frames.js
-node prototype/web/tests/frames_check.js
+node art/tools/draw_frames_test.js
 ```
-Expected: a hand-over list with every line `ok`, then `drew 926 frames...`, then `FRAMES CHECK PASSED`. The check fails if:
-- a drawing is cut off at its frame's edge, or sinks through the floor;
-- the game picks the wrong animation;
-- running changes drawing fewer than 24 times a second, which reads as steppy rather than fluid. The current figure is about 45.
-- reversing at a run doesn't skid, or getting up from kneeling pops straight upright.
+Expected: a hand-over list with every line `ok`, then `drew 1078 frames...`, then the test's `ok` lines. Then make the Unity pictures (next section) and look at the result in Unity. (The browser game's frames check was removed with the browser game.)
 
 ## Pictures for the Unity iPhone app
 
@@ -73,25 +69,11 @@ Expected: one line per animation (`her_walk  32 drawings 2030x660` and so on), t
 
 ## After editing a character
 
-From the repository root:
-```
-node art/tools/build_atlas.js
-```
-Expected: one line per character listing its parts, then `wrote prototype/web/js/art_atlas.js`.
-
-Then look at every pose at once:
-```
-node prototype/web/tests/pose_sheet.js
-```
-This writes `pose_sheet.png` into `prototype/web/tests/screenshots/`.
+The painted sheets feed the frame drawings: run `node art/tools/draw_frames.js`, then the Unity picture export above. (The old `build_atlas.js` and pose sheet were for the browser game and were removed with it.)
 
 ## Adding a chapter's painted scenery
 
-1. Paint `far`, `mid` and `near` layers into `scenery/`. Use 1600 × 800 tiles with transparent sky, and put the horizon at y = 500 on the far layer.
-2. In `prototype/web/js/levels.js`, add them to the chapter's `scenery`:
-```
-art: { far: 'art/scenery/name_far.svg', mid: 'art/scenery/name_mid.svg', near: 'art/scenery/name_near.svg' },
-```
+Paint `far`, `mid` and `near` layers into `scenery/`. Use 1600 × 800 tiles with transparent sky, and put the horizon at y = 500 on the far layer. Bringing them into a Unity chapter is still to be built (`docs/unity_art_bible.md`).
 
 ## Rules
 

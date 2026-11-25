@@ -2,7 +2,7 @@
 
 A narrative game about a human and their dog: separated by a disaster, each works toward the other, and the player earns the reunion.
 
-**Current stage:** the whole story is playable as a browser game in `prototype/web/`: Bodhi's first year, from the day he comes home as a puppy to the two of them asleep in their bed, in twelve chapters, with the lost dog next door to find on the way (`docs/story.md`). Open `prototype/web/index.html` to play. The iOS app in `ios/` carries this game; its first build on an iPhone is next (`docs/build_plan.md`). Chapter three's rules also run in engine-independent C++ in `core/`, kept for the later PC game.
+**Current stage:** the game is being built in Unity, for iPhone and iPad. All twelve chapters of Bodhi's first year (`docs/story.md`) exist as rules and chapter data in C# (`rules/`, `game/`), tested with `dotnet test rules_dotnet/Bodhi.Rules.Tests`. Next: create the Unity project on the Mac and play it on a phone (`game/README.md`, "Trying it in Unity"). The earlier browser version was removed on 24 November 2026.
 
 ## Layout
 
@@ -10,7 +10,9 @@ A narrative game about a human and their dog: separated by a disaster, each work
 |---|---|---|
 | `core/` | Game rules in plain C++17: story beats, links between the two routes, the dog's feelings, the playtest log | Anywhere, including cloud sessions |
 | `unreal/` | The Unreal Engine project (not created yet) | Only on the Mac |
-| `prototype/web/` | The playable browser game: story, art, sound, robot playtest | Anywhere |
+| `rules/`, `look/`, `game/` | The Unity game as three packages: rules, look, and scenes | C# anywhere; scenes only in Unity on the Mac |
+| `rules_dotnet/` | Tests for the Unity packages that run without Unity | Anywhere |
+| `art/` | Editable SVG art, the drawing tools, the app icon | Anywhere |
 | `docs/` | Design, story, art and production, architecture, cloud session guide | Anywhere |
 
 ## Build and test the core

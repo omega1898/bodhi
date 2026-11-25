@@ -1,5 +1,7 @@
 # From this repository to the App Store
 
+> **Out of date since 24 November 2026.** These steps were for the old Swift app that carried the browser game; it was removed when the game moved to Unity (decision 11 in `docs/architecture.md`). Parts A (Xcode, Homebrew, clone) and C onward (Apple Developer Program, App Store Connect, TestFlight, review) still apply. For building, Unity writes the Xcode project for you: see `game/README.md`, "Trying it in Unity", then in Unity choose File, Build Profiles, iOS, Build, and open the Xcode project it makes. Set your Team in Signing & Capabilities as in step 7.
+
 **The plan:** a real iOS app, written in Swift and built in Xcode, that carries the finished game inside it and runs fully offline. The game, its painted art and its fonts are copied into the app by `ios/bundle_game.sh`. The app itself is two short Swift files in `ios/UntilWeFindHome/`.
 
 **Why this route:** see decision 8 in `docs/architecture.md`.
@@ -89,5 +91,5 @@
 ## I. Before you press "Release"
 
 - **Her written consent:** get her written agreement to appear in the game. See `docs/characters.md`.
-- **The dog's real name and pronouns** in `prototype/web/js/levels.js` (`story_config`).
+- **The dog's real name and pronouns** (the Unity game passes the dog's name into `BackStory` and `BondFeedback` in `game/Logic/`).
 - **Painted scenery:** at the moment only chapter one is painted. Decide whether the first release is chapter one only (the original plan) or all six chapters.

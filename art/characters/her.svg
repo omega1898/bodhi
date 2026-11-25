@@ -5,7 +5,7 @@
      game can rotate each one along a bone. Scale: 10 drawing units = 1 game unit.
      Light: warm key light from the front and above; cool rim light from behind.
      Edit freely in Figma, Illustrator or Inkscape; keep the part names and the joint origins,
-     then run art/tools/build_atlas.js. -->
+     then run art/tools/draw_frames.js. -->
 <svg xmlns="http://www.w3.org/2000/svg" width="1100" height="860" viewBox="0 0 1100 860">
   <defs>
     <!-- Fine paper-like grain, multiplied over every part so flat colour reads as painted. -->

@@ -1,7 +1,7 @@
 # Bodhi game — instructions for Claude Code sessions
 
 ## What this is
-A narrative game about a human and their dog who are separated and reunite. First release: an iOS app on the App Store: a native Swift app carrying the finished game (`prototype/web/`) inside it (decision 8 in `docs/architecture.md`, steps in `docs/app_store.md`). Later: a larger PC game, possibly in Unreal on top of `core/`. Design document: `docs/design.md`. Architecture and decisions: `docs/architecture.md`. The two main characters are based on real people and a real dog: read `docs/characters.md`, and never add photos of them to the repository.
+A narrative game about a human and their dog who are separated and reunite. First release: a Unity game for iPhone and iPad on the App Store (decision 11 in `docs/architecture.md`, plan in `docs/unity_rebuild_spec.md`). The old browser version and its Swift wrapper app were removed on 24 November 2026; the Unity packages are now the only game. Later: possibly a larger PC game on top of `core/`. Design document: `docs/design.md`. Architecture and decisions: `docs/architecture.md`. The two main characters are based on real people and a real dog: read `docs/characters.md`, and never add photos of them to the repository.
 
 ## Who owns it
 The owner is learning programming from zero. Every change must be readable by a beginner:
@@ -13,9 +13,12 @@ The owner is learning programming from zero. Every change must be readable by a 
 ## Layout
 - `core/`: engine-independent C++17 game logic. Builds and tests anywhere, including cloud sessions.
 - `unreal/`: the Unreal Engine project. Created and edited only on the owner's Mac. Cloud sessions cannot run Unreal.
-- `prototype/web/`: the whole story as a playable browser game (canvas, no libraries). The art, story and pacing blueprint for the Unreal version. Test it with `node prototype/web/tests/playtest.js`.
-- `ios/`: the iOS app. `project.yml` (turned into an Xcode project on the Mac by XcodeGen), two Swift files, the app icon, and `bundle_game.sh`, which copies the game in. Cloud sessions can't build it; the Mac does.
-- `art/`: the game's art as editable SVG files: painted character parts, frame-by-frame animations (`art/animations/`, drawn by `art/tools/draw_frames.js`), scenery layers. See `art/README.md`. Check frames with `node prototype/web/tests/frames_check.js`.
+- `rules/`: Unity package `com.bodhi.rules`: the game's rules in plain C# (story, bond, care, puzzles, saves). No Unity code.
+- `look/`: Unity package `com.bodhi.look`: palette and motion maths in plain C#. No Unity code.
+- `game/`: Unity package `com.bodhi.game`: `Logic/` (plain C#, tested with dotnet), `Runtime/` (scene scripts), `Editor/` (build settings: iPhone + iPad, landscape, 120 Hz), `Resources/Frames/` (animation pictures), `Plugins/iOS/` (Apple privacy manifest).
+- `rules_dotnet/`: builds and tests `rules/`, `look/` and `game/Logic/` without Unity: `dotnet test rules_dotnet/Bodhi.Rules.Tests`.
+- `unity/` (not created yet): the Unity project, made on the Mac with Unity Hub. It adds the three packages from disk. Never hand-edit `.unity`, `.prefab` or `.asset` files.
+- `art/`: the game's art as editable SVG files: painted character parts, frame-by-frame animations (`art/animations/`, drawn by `art/tools/draw_frames.js`), scenery layers. See `art/README.md`. Check the drawing tool with `node art/tools/draw_frames_test.js`; turn the drawings into Unity's pictures with `python3 art/tools/export_sprites.py`. The app icon is `art/app_icon/app_icon_1024.png`.
 - `look/`: the Unity version's palette and motion maths in plain C#, from `docs/unity_art_bible.md`, tested along with the rules.
 - `rules/`: the Unity version's game rules in plain C# (no Unity code), as a Unity package. Tested anywhere with `dotnet test rules_dotnet/Bodhi.Rules.Tests`; see `rules/README.md` and `docs/unity_rebuild_spec.md`.
 - `game/`: the Unity version's game scripts, as a Unity package beside `rules/`. Its `Logic/` folder is plain C# tested with the rules; see `game/README.md`.
@@ -36,4 +39,4 @@ The owner is learning programming from zero. Every change must be readable by a 
 ## Working style
 - Work on a branch and open a pull request; never push to `main` directly.
 - Keep each pull request small enough to read in one sitting (roughly under 300 changed lines).
-- If a task needs Unreal, the Mac or art, stop and write down what the owner must do instead of guessing.
+- If a task needs Unity, Unreal, the Mac or art, stop and write down what the owner must do instead of guessing.

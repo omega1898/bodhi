@@ -124,7 +124,7 @@ namespace Bodhi.Game
         public static FrameSet[] all => made ?? (made = make_all());
 
         // Ages at which Bodhi is drawn as a puppy (big head, short legs), as in the browser game's
-        // dog_growth table (prototype/web/js/levels.js). From six months he's drawn grown.
+        // dog_growth table (first tuned in the old browser version). From six months he's drawn grown.
         static readonly string[] puppy_ages = { "eight_weeks", "four_months", "five_months" };
 
         // Which set draws Bodhi at this age ("bodhi_puppy" or "bodhi"); an unknown age is grown.
