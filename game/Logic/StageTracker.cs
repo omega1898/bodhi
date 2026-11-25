@@ -28,6 +28,7 @@ namespace Bodhi.Game
         int events_seen = 0;
 
         public double darkness { get; private set; }
+        public double wind { get; private set; }     // How hard the wind blows now, 0 to 1.
         public string mood { get; private set; }
         public string guest_mode { get; private set; } = "";
         public string dog_carrying { get; private set; } = "";
@@ -54,6 +55,7 @@ namespace Bodhi.Game
             }
             var start_darkness = stage.scenery_setting("darkness");
             darkness = start_darkness.kind == SettingKind.number ? usable_darkness(start_darkness.number) : 0;
+            wind = usable_wind(stage.weather_sound().wind);
             mood = stage.mood ?? "";
             guest_mode = stage.guest != null ? stage.guest.mode ?? "still" : "";
             foreach (var pool in stage.water ?? Array.Empty<StageWater>())
@@ -163,6 +165,10 @@ namespace Bodhi.Game
             {
                 darkness = usable_darkness(staging.darkness.Value);
             }
+            if (staging.wind != null)
+            {
+                wind = usable_wind(staging.wind.Value);
+            }
             if (!string.IsNullOrEmpty(staging.mood))
             {
                 mood = staging.mood;
@@ -243,6 +249,12 @@ namespace Bodhi.Game
         {
             walk_targets.Remove(StageWho.human);
             walk_targets.Remove(StageWho.dog);
+        }
+
+        // Wind between 0 (still) and 1 (a blizzard); nonsense counts as still.
+        static double usable_wind(double value)
+        {
+            return double.IsNaN(value) ? 0 : Math.Max(0, Math.Min(1, value));
         }
 
         // Darkness between 0 and `darkest`; nonsense counts as 0.

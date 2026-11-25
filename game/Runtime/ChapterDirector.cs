@@ -627,14 +627,15 @@ namespace Bodhi.Game
             }
         }
 
-        // What stays true until the story changes it: who's hidden, the dark, what he carries,
-        // the scent trail.
+        // What stays true until the story changes it: who's hidden, the dark, the wind, what he
+        // carries, the scent trail.
         void keep_lasting_staging()
         {
             her.hide(tracker.is_hidden(StageWho.human));
             him.hide(tracker.is_hidden(StageWho.dog));
             him.carry(ball != null && ball.held_by == BallHolder.dog ? "ball" : tracker.dog_carrying);
             hud.set_darkness(tracker.darkness, GreyBox.color_of(scenery_text("darkness_color"), new Color(0.03f, 0.04f, 0.09f)));
+            game_audio.set_weather((float)stage.weather_sound().rain, (float)tracker.wind);  // The wind can rise and fall with the story.
             scent_drawing.enabled = tracker.has_scent && session.run.controlled_character == Character.dog;
             if (scent_drawing.enabled)
             {

@@ -380,6 +380,43 @@ namespace Bodhi.Rules.Tests
             Assert.That(tracker.walk_target(StageWho.dog), Is.EqualTo(777));
         }
 
+        // The wind starts as the chapter's scenery says, and a story moment can raise it (a
+        // blizzard at midnight). Like the dark, it lasts: a Continue comes back to the same wind.
+        [Test]
+        public void the_wind_rises_with_the_story_and_survives_a_continue()
+        {
+            var stage = test_stage();
+            stage.scenery = new[] { StageSetting.of_number("darkness", 0.2), StageSetting.of_number("wind", 0.25) };
+            stage.rules[1].wind = 1.0;
+            var run = started_run();
+            var tracker = new StageTracker(stage, run);
+            Assert.That(tracker.wind, Is.EqualTo(0.25));
+            run.use("lamp_used", dog_is_near: false);
+            tracker.update();
+            Assert.That(tracker.wind, Is.EqualTo(1.0));
+            var resumed = ChapterRun.resume(run.chapter, run.to_save_text(here), out _);
+            var continued = new StageTracker(stage, resumed);
+            continued.update();
+            Assert.That(continued.wind, Is.EqualTo(1.0));
+            Assert.That(new RuleStaging { wind = 0.5 }.is_empty, Is.False, "a wind change is a change");
+        }
+
+        // Break it: wind the data gets wrong is kept between still (0) and a blizzard (1).
+        [Test]
+        public void wind_is_kept_in_range()
+        {
+            foreach (var (written, expected) in new[] { (5.0, 1.0), (-2.0, 0.0), (double.NaN, 0.0), (double.PositiveInfinity, 1.0) })
+            {
+                var run = started_run();
+                var stage = test_stage();
+                stage.rules[1].wind = written;
+                var tracker = new StageTracker(stage, run);
+                run.use("lamp_used", dog_is_near: false);
+                tracker.update();
+                Assert.That(tracker.wind, Is.EqualTo(expected), written.ToString());
+            }
+        }
+
         // Break it: darkness the data gets wrong is kept between 0 and 0.95.
         [Test]
         public void darkness_is_kept_in_range()
