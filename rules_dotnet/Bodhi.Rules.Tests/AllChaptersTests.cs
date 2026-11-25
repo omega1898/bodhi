@@ -179,7 +179,18 @@ namespace Bodhi.Rules.Tests
         public static ChapterRun play(ChapterScript script, bool skip_films)
         {
             var run = new ChapterRun(script);
-            run.start();
+            finish(run, skip_films);
+            return run;
+        }
+
+        // Plays a run to its end, starting it first if nothing has happened yet.
+        public static void finish(ChapterRun run, bool skip_films)
+        {
+            var script = run.chapter;
+            if (run.event_order.Count == 0)
+            {
+                run.start();
+            }
             var sniffed_at = new HashSet<ChapterThing>();
             int switches_without_progress = 0;
             for (double seconds = 0; seconds < longest_game_seconds && !run.is_complete; seconds += step_seconds)
@@ -202,7 +213,6 @@ namespace Bodhi.Rules.Tests
                     switches_without_progress = 0;
                 }
             }
-            return run;
         }
 
         // Does the first useful thing. Only one per step, like a player pressing one button.
