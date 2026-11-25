@@ -1,5 +1,7 @@
 # A Light in the Window: the Christmas story
 
+> **Status:** approved by the owner on 25 November 2026 (see section 11 for what was decided).
+>
 > **What this is:** the story bible for the Christmas game starring Em and Bodhi. Every chapter's scenery, lighting, props, puzzles and captions are built from it, so when it changes, the chapters change with it. It is a proposal written on 25 November 2026; nothing in the code has been changed yet (section 9 lists what would change). How Em and Bodhi look is designed separately (`docs/characters.md`). This document says what happens to them, not how they are drawn.
 
 **At a glance**
@@ -566,6 +568,9 @@ This follows `docs/unity_art_bible.md`: every scene is cold blue dark with **one
 - `art/`: concept paintings per chapter from section 9; the props in each chapter's list; Clementine, Tam, Mina, Ama, Biscuit, Dougie, Nell, Kofi and Pat as supporting figures.
 
 ## 11. Decisions for the owner
+
+**Decided by the owner on 25 November 2026:** build the game from this story; the title is **A Light in the Window** (with "Bodhi" large on the title screen); Chapter One ends on **Hook A, "The whistle in the white"**; the valley has a **Scottish-Highland** feel with a small reindeer herd. Still open: items 3, 4 and 6 to 9 below.
+
 
 1. **The name.** Suggested: "A Light in the Window" for this game, keeping "Bodhi" large on the title. Is "Until We Find Home" the series name, or the flood game's title?
 2. **Hook A or B** for the end of Chapter One. A is recommended.
