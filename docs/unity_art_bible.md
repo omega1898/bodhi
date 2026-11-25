@@ -47,6 +47,15 @@ All the character colours come from the browser game (`prototype/web/js/art.js`)
 
 This is the depth trick of film and of the best 2D games: values get lighter and greyer with distance, and things move slower with distance. Unity does this with ordinary sprite layers on a **Sorting Layer** each, and a small script that moves each layer by its factor. Fog is a gradient sprite per plane, not a post effect, so it costs almost nothing on a phone.
 
+## 3½. The 3D scenes (2.5D)
+
+In November 2026 the owner chose 2.5D: 3D characters, scenery and lighting, with movement still along a side-on path. The title screen is the first 3D scene. It keeps this page's palette and mood (cold blue night, one warm light: Em's lantern, with the cabin's window far off), lit by URP's 3D renderer instead of 2D lights:
+
+- **Materials:** one shader, `Bodhi/Lit`, takes its colours from the meshes, wraps light softly round the dark side, and adds the `moon_rim` edge light on both characters (strength 0.55 to 0.65), as section 2 requires.
+- **Light:** moonlight (cool, soft shadows, 30 m of shadow distance); a faint green fill from the aurora; the warm lantern; light from the sky as three colours (overhead, horizon, ground); and fog thickening with distance, so far mountains fade.
+- **Post-processing:** section 5's values, made in code by `WorldLook.make_post_processing`.
+- **Code:** everything is in `game/Runtime/World/` and `game/Resources/Shaders/`; see `game/README.md`.
+
 ## 4. Light (URP's 2D renderer)
 
 Unity's 2D renderer lights flat paintings as if they had shape. Per scene:

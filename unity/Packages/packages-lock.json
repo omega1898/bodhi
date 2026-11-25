@@ -7,7 +7,9 @@
       "dependencies": {
         "com.bodhi.rules": "0.1.0",
         "com.unity.inputsystem": "1.14.0",
-        "com.unity.ugui": "2.0.0"
+        "com.unity.ugui": "2.0.0",
+        "com.bodhi.look": "0.1.0",
+        "com.unity.render-pipelines.universal": "17.3.0"
       }
     },
     "com.bodhi.look": {

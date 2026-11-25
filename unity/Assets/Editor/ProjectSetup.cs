@@ -1,5 +1,5 @@
 // Purpose: sets the Unity project up the same way every time: the game's one scene, the app's
-// name, ID and icon, and the oldest iOS it supports. Doing this in code instead of by clicking
+// name, ID and icon, the oldest iOS it supports, and the graphics settings the 3D scenes need. Doing this in code instead of by clicking
 // through Unity's settings windows means the choices are written down, can be reviewed in a
 // pull request, and can be applied again in one step if anything gets changed by accident.
 //
@@ -30,6 +30,7 @@ namespace Bodhi.Setup
             make_game_scene();
             set_app_details();
             set_app_icon();
+            set_graphics();
             AssetDatabase.SaveAssets();
             Debug.Log("Bodhi project set up: scene " + scene_path + ", app " + bundle_id);
         }
@@ -57,6 +58,68 @@ namespace Bodhi.Setup
             PlayerSettings.iOS.targetOSVersionString = oldest_ios;
             PlayerSettings.bundleVersion = "1.0";      // The version players see on the App Store.
             PlayerSettings.iOS.buildNumber = "1";      // Raise by 1 for every upload to App Store Connect.
+        }
+
+        // The render pipeline's settings for the 3D scenes, on every quality level (the iPhone uses
+        // "Mobile"; the Mac test copy uses "PC"): soft shadow edges; a sharper shadow picture,
+        // reaching 30 metres (the play area, so the shadows stay crisp); HDR, which bloom needs so
+        // only truly bright things glow; and 4x multisampling, which smooths jagged edges and is
+        // cheap on iPhone and iPad graphics chips. Set through Unity's own serialized fields,
+        // because some have no public setter.
+        static void set_graphics()
+        {
+            for (int level = 0; level < QualitySettings.count; level++)
+            {
+                var pipeline = QualitySettings.GetRenderPipelineAssetAt(level);
+                if (pipeline == null)
+                {
+                    continue;
+                }
+                var settings = new SerializedObject(pipeline);
+                set_number(settings, "m_SoftShadowsSupported", 1);
+                set_number(settings, "m_MainLightShadowmapResolution", 2048);
+                set_number(settings, "m_ShadowDistance", 30);
+                set_number(settings, "m_SupportsHDR", 1);
+                set_number(settings, "m_MSAA", 4);
+                settings.ApplyModifiedPropertiesWithoutUndo();
+                EditorUtility.SetDirty(pipeline);
+            }
+
+            // Keep every post-processing effect in the app. URP normally leaves out any effect it
+            // can't find in a saved Volume profile, but the 3D scenes make their profiles in code
+            // (WorldLook), so without this the built app silently loses its bloom (seen in the
+            // Mac test copy's log: "Shader 'Hidden/Universal Render Pipeline/Bloom' ... stripped").
+            if (UnityEngine.Rendering.GraphicsSettings.TryGetRenderPipelineSettings<UnityEngine.Rendering.Universal.URPShaderStrippingSetting>(out var stripping))
+            {
+                stripping.stripUnusedPostProcessingVariants = false;
+            }
+            else
+            {
+                Debug.LogWarning("Couldn't find URP's shader stripping settings; check bloom still works in a build.");
+            }
+        }
+
+        // Sets one serialized number (whole or decimal), or warns if this Unity version names it differently.
+        static void set_number(SerializedObject settings, string name, float value)
+        {
+            var field = settings.FindProperty(name);
+            if (field == null)
+            {
+                Debug.LogWarning("Render pipeline setting " + name + " not found; set it by hand in the URP asset.");
+                return;
+            }
+            if (field.propertyType == SerializedPropertyType.Float)
+            {
+                field.floatValue = value;
+            }
+            else if (field.propertyType == SerializedPropertyType.Boolean)
+            {
+                field.boolValue = value != 0;
+            }
+            else
+            {
+                field.intValue = (int)value;
+            }
         }
 
         // The app icon: one 1024 x 1024 picture, copied from art/app_icon/. Unity makes every
