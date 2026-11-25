@@ -102,6 +102,31 @@ namespace Bodhi.Rules.Tests
             }
         }
 
+        // Chapter Two's yard fence stops Em but not the dogs: they get under the wire, she
+        // can only stand at it at dawn and look at the collar.
+        [Test]
+        public void only_the_dogs_get_under_the_yard_fence()
+        {
+            var fence = ChristmasStages.lamp_in_window().find_solid("yard_fence");
+            Assert.That(StageLook.solid_blocks(fence, Character.human), Is.True);
+            Assert.That(StageLook.solid_blocks(fence, Character.dog), Is.False);
+        }
+
+        // The cruellest near miss: when Em pulls Biscuit's collar off the wire, the lorry with
+        // both dogs in it is still standing in the yard below her. Then it goes.
+        [Test]
+        public void the_lorry_is_still_there_when_she_finds_the_collar()
+        {
+            var stage = ChristmasStages.lamp_in_window();
+            var lorry = stage.props.Single(prop => prop.kind == "lorry");
+            var run = new ChapterRun(ChristmasChapters.lamp_in_window());
+            ChapterRobot.finish(run, skip_films: false, stop_when: playing => playing.has_happened("collar_found"));
+            Assert.That(StageLook.prop_is_showing(lorry, run), Is.True, "still in the yard");
+            ChapterRobot.finish(run, skip_films: false);
+            Assert.That(run.is_complete, Is.True);
+            Assert.That(StageLook.prop_is_showing(lorry, run), Is.False, "gone down the valley");
+        }
+
         // A Christmas session's new game starts First Snow, and its memory box holds only the
         // Christmas chapters.
         [Test]
@@ -113,7 +138,7 @@ namespace Bodhi.Rules.Tests
             Assert.That(session.run.chapter.title, Is.EqualTo("First Snow"));
             var box = MemoryBox.build(session.campaign, "Bodhi");
             Assert.That(box.chapters.Select(chapter => chapter.id), Is.EqualTo(ChristmasChapters.all().Select(chapter => chapter.id)));
-            Assert.That(box.keepsake_total, Is.EqualTo(3));
+            Assert.That(box.keepsake_total, Is.EqualTo(3 * ChristmasChapters.all().Length), "three a chapter");
         }
 
         // Break it: a save from the flood story, part way through its year with its keepsakes,

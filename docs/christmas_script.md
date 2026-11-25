@@ -190,32 +190,95 @@ Kept plain, because they are instructions: Go out into the snow with {dog}. / Th
 
 Each chapter keeps the plot in the bible (section 4). These are the lines that carry it: how it opens, where it turns, how it closes. The rest is written when the chapter is built, in the same voice.
 
-### Chapter Two: The Lamp in the Window (14 December, night, to dawn)
+### Chapter Two: The Lamp in the Window (14 December, night, to dawn), in full
 
-*Underneath:* the first choice Bodhi ever makes for someone else: home is up the hill, and the old dog can't stand. And the old saying turns out to have a second half nobody says any more.
+Written in full on 25 November 2026, when the chapter was built. The chapter's question: *will Bodhi find Biscuit, and will anyone find Bodhi?*
 
-| Beat | Voice | Line |
+*Underneath:* the first choice Bodhi ever makes for someone else. Home is up the hill, a light he can see, and the old dog can't stand. The player is offered both, and the story lets him try to go before he stays. Em carries the empty collar in her pocket, so the bell rings every time she moves. At dawn, Mina holds out her hand for Biscuit's collar and Em doesn't give it to her: she has made a promise, and she means to keep it herself. Then the old saying turns out to have a second half. And the cruellest near miss in the game: Em is at the yard fence, bent over Biscuit's collar, when the lorry with both dogs in it drives away below her.
+
+#### The blizzard (Bodhi)
+
+| # | Beat | Voice | Caption |
+|---|---|---|---|
+| 1 | Opens (film) | B | Snow to the chest. Wind in the ears. The old dog's smell: here. Gone. Here. |
+| 2 | | B | Behind: her whistle, torn up small. Ahead: the old dog, thin as a thread. |
+| 3 | | B | Ahead, then. |
+| 4 | Scent, first | B | Here. The old dog stood here. Not long. |
+| 5 | | B | Wind steals it. Wait. Nose low. |
+| 6 | Scent, second | B | Wind gives it back. Fear, and old blanket, and toast. That way. |
+| 7 | Scent, third | B | Closer. Warm now. Warm and very tired. |
+| 8 | The hollow | B | Under the fallen tree. The old dog. Cold, cold, shaking. |
+| 9 | | B | He doesn't get up. He always gets up. |
+| 10 | Dug out | B | Dig. Dig. Snow in the eyes. Dig. |
+| 11 | Lying close (film) | B | Lie close. Closer. Be the blanket. |
+| 12 | | B | His heart, slow and far away. |
+| 13 | | B | Shaking. Less. Less. |
+| 14 | | B | Stopped. |
+
+#### The porch (Em), two in the morning
+
+| # | Beat | Voice | Caption |
+|---|---|---|---|
+| 15 | Home | Em | 'We'll freeze, Em,' Ama said. 'First light.' She was right. I hated her for it. |
+| 16 | | Em | They went down the lane with the torch. I went in and didn't take my coat off. |
+| 17 | The lamp | Em | I turned the lamp up. Then I turned it up again. |
+| 18 | | Em | His collar was in my coat pocket. Every time I moved, the bell rang. |
+| 19 | The whistle (film) | Em | Every hour I went out on the porch and whistled. |
+| 20 | | Em | Every hour, the wind took it before it was finished. |
+| 21 | | Em | Three o'clock. Four. Five. The stove went out, and I didn't notice. |
+
+#### The hill (Bodhi)
+
+| # | Beat | Voice | Caption |
+|---|---|---|---|
+| 22 | The wind drops | B | The wind lies down. All at once, like a dog. |
+| 23 | | B | The old dog lifts his head. Stands. Falls. Stands. |
+| 24 | The yard lamp | B | Down there: a light. Orange. Wrong orange. Not hers. But warm. Go. |
+| 25 | He sits | B | He sits down in the snow. He won't. |
+| 26 | Nudged | B | Nose under his chin. Up. Up, old dog. |
+| 27 | | B | Up. |
+| 28 | Under the fence | B | Under the wire. Belly flat. The old dog, slower. Through. |
+| 29 | The lorry | B | Logs. Up. Under the flapping cloth: trees, lying down. |
+| 30 | | B | Out of the wind. Pine and diesel. The old dog, beside. |
+| 31 | The cab | B | The cab. A crack of window. Ham, under the seat. Reach. Reach. |
+| 32 | | B | Half for the old dog. The bigger half. |
+| 33 | Her light (film) | B | Up the hill, through the trees. A light. Very small. Very far. Hers. |
+| 34 | | B | Go to it? |
+| 35 | If he tries | B | Down. Go. Her light. Behind: the old dog, trying to stand. Falling. |
+| 36 | | B | Back. |
+| 37 | He stays | B | The old dog can't stand. |
+| 38 | | B | Stay, then. Stay. |
+
+#### Dawn (Em)
+
+| # | Beat | Voice | Caption |
+|---|---|---|---|
+| 39 | Dawn | Em | The snow stopped at six. The world was new and smooth and blue, and empty. |
+| 40 | | Em | Ama came up with Mina at first light. Nobody said anything. We went down the lane. |
+| 41 | The wire (film) | Em | On the fence wire at the top of the yard: Biscuit's blue collar. 'If found, call Ama.' |
+| 42 | | Em | Ama read it twice, as if it might say something else the second time. |
+| 43 | | Em | Mina held out her hand for it. I didn't give it to her. |
+| 44 | The promise | Em | 'I'll bring him home in this,' I told her. I had no right to promise it. |
+| 45 | The old words | Em | 'A light for the hill,' I said. It was all I had. |
+| 46 | | Em | 'And the hill brings them home,' said Mina. |
+| 47 | | Em | 'There's a second half,' she said. 'Gran taught me. Nobody says it now.' |
+| 48 | Closes | Em | Down in the yard an engine started. A lorry went down the valley road. |
+| 49 | | Em | I didn't even look up. |
+| 50 | | B | The floor shakes. Pine and diesel. Her light, getting small. |
+
+Then the title card *Chapter Three: Kell Bridge*, 15 December.
+
+#### Keepsakes
+
+| Keepsake | Found by | Text |
 |---|---|---|
-| Opens | B | Snow to the chest. Wind in the ears. The old dog's smell: here. Gone. Here. |
-| The wind turns | B | Wind steals it. Wait. Nose low. Wind gives it back. |
-| The hollow | B | Under the fallen tree. The old dog. Cold, cold, shaking. |
-| Warming him | B | Lie close. Closer. Be the blanket. |
-| | B | Shaking. Less. Less. Stopped. |
-| Called off | Em | 'We'll freeze, Em,' Ama said. 'First light.' She was right. I hated her for it. |
-| The porch | Em | I didn't go to bed. I turned the lamp up. Then I turned it up again. |
-| | Em | Every hour I went out on the porch and whistled. Every hour, the wind took it. |
-| The yard lamp | B | A light. Orange. Wrong orange. Not hers. But warm. Go. |
-| The sandwich | B | Under the seat: the ham. Half for the old dog. The bigger half. |
-| Her light | B | Up the hill. A light. Very small. Very far. Hers. |
-| The choice | B | Go to it? The old dog can't stand. Stay, then. Stay. |
-| The wire | Em | On the fence wire at dawn: Biscuit's blue collar. 'If found, call Ama.' |
-| | Em | Ama read it twice, as if it might say something else the second time. |
-| The promise | Em | 'I'll bring him home in this,' I told Mina. I had no right to promise it. |
-| The old words | Em | 'A light for the hill,' I said at the window. |
-| | Em | 'And the hill brings them home,' said Mina. |
-| | Em | 'There's a second half,' she said. 'Gran taught me. Nobody says it now.' |
-| Closes | Em | At first light a lorry went down the valley road. I didn't even look up. |
-| | B | The floor shakes. Pine and diesel. Her light, getting small. |
+| The bird feeder by the lane | Em | A bird feeder on a pine by the lane, full to the top. Someone fills it every morning. Even this one. |
+| Dougie's note, on his dashboard | Bodhi | Taped to Dougie's dashboard, in a child's capitals: 'DRIVE SLOW. HOME BY CHRISTMAS. M x' |
+| The mitten on the yard gate | Em | A child's red mitten on the yard gate post, put up high so its owner would see it. |
+
+#### Objectives, in order
+
+Follow Biscuit's scent. Sniff when the wind takes it. / Dig Biscuit out. / Lie close to Biscuit. Keep him warm. / Turn up the lamp. / Whistle for {dog} from the porch. / Lead Biscuit down the hill. Wait for him. / Nudge Biscuit up. / Lead him to the light. / Climb the logs onto the lorry. / Find something to eat. / Go to her light, or stay with Biscuit. / Search the lane.
 
 ### Chapter Three: Kell Bridge (15 December)
 

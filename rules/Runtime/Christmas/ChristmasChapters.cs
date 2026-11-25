@@ -12,6 +12,7 @@ namespace Bodhi.Rules
             return new[]
             {
                 first_snow(),
+                lamp_in_window(),
             };
         }
     }
