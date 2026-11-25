@@ -108,7 +108,7 @@ async function wait_until(page, check, limit_seconds, description) {
 }
 
 // Chapters that set how Bodhi starts (care_start) are played with those needs, since their
-// story is about looking after her. Every other chapter starts with her fed and clean, so a
+// story is about looking after him. Every other chapter starts with him fed and clean, so a
 // "Feed" or "Towel" prompt never takes the place of a step the robot is about to press.
 const chapters_with_their_own_care = new Set([0, 11]);
 

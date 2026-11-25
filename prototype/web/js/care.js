@@ -1,21 +1,21 @@
-// Purpose: looking after Bodhi. She gets hungry as time passes and dirty in water and mud; she
+// Purpose: looking after Bodhi. He gets hungry as time passes and dirty in water and mud; he
 // can be fed from the food in the bag, and towelled clean. Neither ever ends the game or blocks
 // the story: like a real dog, a hungry or muddy Bodhi just behaves differently (slower, nosing
-// the bag, muddy paws), and looking after her warms the bond between them. The design asks for
+// the bag, muddy paws), and looking after him warms the bond between them. The design asks for
 // "ordinary affection: sharing food, drying muddy paws" between the frightening parts.
 'use strict';
 
-// How fast her needs change.
+// How fast his needs change.
 const care_rates = {
     minutes_from_fed_to_hungry: 8,   // For a grown dog. A young puppy gets hungry sooner.
     dirt_per_second_in_water: 0.08,  // Wading or swimming: muddy within about ten seconds.
     dirt_per_second_in_mud: 0.2,     // A mud puddle (water marked `mud: true`): much faster.
 };
-const hungry_from = 0.7;         // From here she slows a little, whines and noses the bag.
-const feed_from = 0.25;          // She'll eat once she's at least this hungry.
+const hungry_from = 0.7;         // From here he slows a little, whines and noses the bag.
+const feed_from = 0.25;          // He'll eat once he's at least this hungry.
 const offer_food_from = 0.45;    // "Feed" is offered from here, so it doesn't nag after every snack.
-const dirty_from = 0.55;         // From here her paws and legs show the mud.
-const clean_from = 0.2;          // Towelling her only does something above this.
+const dirty_from = 0.55;         // From here his paws and legs show the mud.
+const clean_from = 0.2;          // Towelling him only does something above this.
 const largest_food_carried = 9;  // Meals the bag holds.
 const hungry_whine_seconds = 30; // How often a hungry dog reminds you.
 
@@ -40,7 +40,7 @@ function checked_care(care) {
     };
 }
 
-// True when she's hungry enough to show it.
+// True when he's hungry enough to show it.
 function dog_is_hungry(care) {
     return care.hunger >= hungry_from;
 }
@@ -50,8 +50,8 @@ function care_speed_scale(care) {
     return dog_is_hungry(care) ? 0.88 : 1;
 }
 
-// Moves her needs on by one step of the world. Paused during scripted scenes, so a film
-// doesn't make her hungry.
+// Moves his needs on by one step of the world. Paused during scripted scenes, so a film
+// doesn't make him hungry.
 function update_care(delta_seconds) {
     const world = game.world;
     const care = world.care;
@@ -63,7 +63,7 @@ function update_care(delta_seconds) {
     const puppy_appetite = 1.5 - 0.5 * clamp_between(dog.size_scale || 1, 0.3, 1);
     care.hunger = clamp_between(care.hunger + delta_seconds / (care_rates.minutes_from_fed_to_hungry * 60) * puppy_appetite, 0, 1);
 
-    // Water and mud: dirtier the longer she's in it. She shakes herself off after climbing out.
+    // Water and mud: dirtier the longer he's in it. He shakes himself off after climbing out.
     const water = dog.in_water ? water_under(dog) : null;
     if (water) {
         const rate = water.mud ? care_rates.dirt_per_second_in_mud : care_rates.dirt_per_second_in_water;
@@ -77,7 +77,7 @@ function update_care(delta_seconds) {
     }
     dog.dirt = care.dirt;  // The drawing reads this for the muddy paws.
 
-    // A hungry dog reminds you now and then. The first time in a chapter, she says why.
+    // A hungry dog reminds you now and then. The first time in a chapter, he says why.
     world.hungry_whine_timer = (world.hungry_whine_timer === undefined ? 4 : world.hungry_whine_timer) - delta_seconds;
     if (dog_is_hungry(care) && world.hungry_whine_timer <= 0 && !world.reunion) {
         world.hungry_whine_timer = hungry_whine_seconds;
@@ -100,7 +100,7 @@ function water_under(character) {
     return null;
 }
 
-// Out of the water, she shakes herself off: a spray of drops both ways, and a little wiggle.
+// Out of the water, he shakes himself off: a spray of drops both ways, and a little wiggle.
 function shake_off(dog) {
     const world = game.world;
     for (let index = 0; index < 22; index++) {
@@ -117,8 +117,8 @@ function shake_off(dog) {
     fire_event('dog_shook_off');
 }
 
-// What looking after her would mean right now, if anything, for the "use" button: feeding if
-// she's hungry and there's food, towelling if she's dirty. Only when they're together and she
+// What looking after him would mean right now, if anything, for the "use" button: feeding if
+// he's hungry and there's food, towelling if he's dirty. Only when they're together and she
 // isn't busy with the story.
 function find_care_prompt(character, dog, together) {
     const care = game.world.care;
@@ -134,7 +134,7 @@ function find_care_prompt(character, dog, together) {
     return null;
 }
 
-// She kneels and puts down a bowl; the dog eats with her head in it, tail going.
+// She kneels and puts down a bowl; the dog eats with his head in it, tail going.
 // `from_bag` is false for a meal at home, which doesn't use the food in the bag.
 function feed_dog(from_bag) {
     const world = game.world;
@@ -162,7 +162,7 @@ function feed_dog(from_bag) {
     fire_event('dog_fed');
 }
 
-// She kneels and towels the dog down (or bathes her, when `bath` is true, which gets her
+// She kneels and towels the dog down (or bathes him, when `bath` is true, which gets him
 // completely clean). The dog leans into it.
 function clean_dog(bath) {
     const world = game.world;
@@ -199,7 +199,7 @@ function pick_up_food(meals) {
     fire_event('food_found');
 }
 
-// A few words for the pause screen and the corner of the screen: how she is right now.
+// A few words for the pause screen and the corner of the screen: how he is right now.
 // The corner shows only what needs attention, so a well looked-after dog adds nothing to it.
 function care_summary(care, only_needs) {
     const parts = [];

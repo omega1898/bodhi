@@ -253,7 +253,7 @@ function fill_memory_box() {
 
 // Bodhi's growth stage in a chapter (dog_growth in levels.js). A chapter without one, or naming
 // a stage that doesn't exist, gets the grown dog, and sizes are kept within sensible limits,
-// so a typing mistake in the level data can't make her vanish or fill the screen.
+// so a typing mistake in the level data can't make him vanish or fill the screen.
 function growth_stage_of(level) {
     const stage = (level && dog_growth[level.dog_age]) || dog_growth.one_year;
     return {
@@ -264,8 +264,8 @@ function growth_stage_of(level) {
     };
 }
 
-// Makes a character in its starting position. `stage` (the dog only) sets how big she is,
-// which drawings show her, and how high she jumps.
+// Makes a character in its starting position. `stage` (the dog only) sets how big he is,
+// which drawings show him, and how high he jumps.
 function make_character(kind, x, y, stage) {
     const spec = character_specs[kind];
     const size = stage ? stage.size : 1;
@@ -335,7 +335,7 @@ function build_world(level) {
         objective: '',
         scheduled: [],
         bond: Object.assign({ fear: 0.05, closeness: 0.3 }, level.bond || {}),
-        // A copy: restarting the chapter starts from the same needs. A chapter can set how she
+        // A copy: restarting the chapter starts from the same needs. A chapter can set how he
         // starts it (`care_start`), for example the first, before there's food in the bag.
         care: checked_care(Object.assign({}, game.care, level.care_start || {})),
         revealed: new Set(),
@@ -1191,7 +1191,7 @@ function drop_ball_for(human, dog) {
     ball.y = human.y + human.height - 6;
     ball.velocity_x = 0;
     ball.velocity_y = 0;
-    // Having brought it back, she waits for it to be thrown again. Without this a small dog,
+    // Having brought it back, he waits for it to be thrown again. Without this a small dog,
     // standing close enough to the dropped ball, picked it straight back up, forever.
     ball.waiting_for_throw = true;
     dog.carrying = null;
@@ -1297,7 +1297,7 @@ function update_answer(delta_seconds) {
 }
 
 // The name a hidden thing is remembered by once the dog has sniffed it out: a keepsake's name,
-// or for anything else (food she can smell), the event it fires.
+// or for anything else (food he can smell), the event it fires.
 function reveal_name(item) {
     return item.keepsake || item.event;
 }
@@ -1367,8 +1367,8 @@ function interactable_available(item, character) {
     if (item.hidden && !world.revealed.has(reveal_name(item))) {
         return false;
     }
-    // Some things need the dog right there: a bath, a bowl, her bed. "Right there" is wider than
-    // the gap she follows at (up to about 120 when she settles), so a following dog always counts.
+    // Some things need the dog right there: a bath, a bowl, his bed. "Right there" is wider than
+    // the gap he follows at (up to about 120 when he settles), so a following dog always counts.
     if (item.needs_dog && !dog_is_near(item.x, 150)) {
         return false;
     }
@@ -1428,7 +1428,7 @@ function find_current_prompt() {
     if (character.kind === 'human' && ball && !ball.held_by && Math.abs(ball.x - center_x(character)) < 40 && Math.abs(ball.y - (character.y + character.height)) < 40) {
         return { x: ball.x, y: ball.y - 40, text: 'Pick up the ball', control: 'act', action: 'pick_up' };
     }
-    // Looking after her comes before petting: feeding when she's hungry, towelling when the mud
+    // Looking after him comes before petting: feeding when he's hungry, towelling when the mud
     // shows. (After the ball, so it never interrupts a game of fetch.)
     const together = Math.abs(center_x(other) - center_x(character)) < 70 && Math.abs((other.y + other.height) - (character.y + character.height)) < 30;
     const care_prompt = find_care_prompt(character, world.characters.dog, together);
@@ -1497,7 +1497,7 @@ function use_action() {
         if (item.keepsake) {
             record_keepsake(item);
         }
-        // Things that look after the dog: food to carry, a meal, a treat she found, a bath.
+        // Things that look after the dog: food to carry, a meal, a treat he found, a bath.
         if (item.food) {
             pick_up_food(item.food);
         }
@@ -1933,7 +1933,7 @@ function update_camera(delta_seconds) {
     camera.center_y = smooth_follow(camera.center_y, camera.anchor_y, camera, 'velocity_y', 0.45, delta_seconds);
 }
 
-// Shows how Bodhi is, in the corner, only when she needs something. Writes to the page only
+// Shows how Bodhi is, in the corner, only when he needs something. Writes to the page only
 // when the words change.
 function update_care_status() {
     const text = care_summary(game.world.care, true);
@@ -1950,7 +1950,7 @@ function finish_level() {
         return;
     }
     world.complete = true;
-    game.care = checked_care(world.care);  // How she is now carries into the next chapter.
+    game.care = checked_care(world.care);  // How he is now carries into the next chapter.
     // The save moves on to the start of the next chapter; after the last one, the story is done.
     if (game.level_index + 1 < levels.length) {
         save_chapter_start(game.level_index + 1);
@@ -2402,7 +2402,7 @@ function hide_screen(element) {
 // Shows the title screen with the chapter list.
 function show_title() {
     game.screen = 'title';
-    use_dog_drawings('bodhi');  // The title scene shows her grown.
+    use_dog_drawings('bodhi');  // The title scene shows him grown.
     document.body.classList.remove('cutscene');
     show_caption('');
     document.body.classList.remove('playing');
