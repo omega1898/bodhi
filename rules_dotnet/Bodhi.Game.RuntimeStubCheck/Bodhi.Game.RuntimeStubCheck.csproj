@@ -21,7 +21,12 @@
   <ItemGroup>
     <Compile Include="../../rules/Runtime/**/*.cs" Link="Rules/%(RecursiveDir)%(Filename)%(Extension)" />
     <Compile Include="../../game/Logic/**/*.cs" Link="Logic/%(RecursiveDir)%(Filename)%(Extension)" />
-    <Compile Include="../../game/Runtime/**/*.cs" Link="Runtime/%(RecursiveDir)%(Filename)%(Extension)" />
+    <!-- The 3D scenes (World/, Title/, Characters/) use far more of Unity than these stand-ins
+         copy: meshes, lights, particles, post-processing. Copying all of that would be a lot of
+         pretend code that could drift from the real thing, so they're left out here and checked
+         by compiling the real Unity project on the Mac (unity/, see unity/Assets/Editor/). The
+         rest of Runtime only sees TitleWorld, which TitleStandIns.cs stands in for. -->
+    <Compile Include="../../game/Runtime/**/*.cs" Exclude="../../game/Runtime/World/**;../../game/Runtime/Title/**;../../game/Runtime/Characters/**" Link="Runtime/%(RecursiveDir)%(Filename)%(Extension)" />
     <Compile Include="../../game/Editor/**/*.cs" Link="Editor/%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 

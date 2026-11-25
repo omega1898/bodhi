@@ -1,0 +1,19 @@
+# Purpose: folders and files Unity rebuilds by itself. Committing them bloats the repository
+# and causes conflicts, so only Assets/, Packages/ and ProjectSettings/ are kept.
+/Library/
+/Temp/
+/Obj/
+/Build/
+/Builds/
+/Logs/
+/UserSettings/
+/MemoryCaptures/
+/Recordings/
+# Code-editor project files Unity writes for Visual Studio and Rider.
+*.csproj
+*.sln
+*.slnx
+*.pidb
+*.userprefs
+# The Xcode project Unity writes when it builds for iOS.
+/ios_build/
