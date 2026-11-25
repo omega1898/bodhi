@@ -18,6 +18,7 @@ The Unity project will show the rules on screen. It reads them, and never the ot
 - `CompanionBehavior`: how far behind her Bodhi trails, how often he looks back, and whether he is wary of water.
 - `StoryMemory`: facts one chapter records for later ones, such as being swept away by the river.
 - `HintCoach`: after 3 minutes without progress, a gentle hint, then a plain one, always toward a step that really leads to the goal.
+- `ChapterScript`, `ChapterRun`: any chapter written as data (things to use, zones, story rules), and the one engine that plays it: rules, timers, film scenes, calls, sniffing, the reunion.
 
 ## Why it is a package and not a folder inside the Unity project
 

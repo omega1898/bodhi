@@ -134,6 +134,12 @@ namespace Bodhi.Rules
             return true;
         }
 
+        // He eats something he found (an apple from the orchard): half his hunger goes.
+        public void eat_treat()
+        {
+            hunger = Math.Max(0.0, hunger - 0.5);
+        }
+
         // Towels him (most of the mud comes off) or bathes him (all of it comes off).
         public void clean(bool bath)
         {
