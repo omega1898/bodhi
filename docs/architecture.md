@@ -76,6 +76,13 @@ The engine knows where things are and what the player pressed. The core knows wh
 - How it works (`prototype/web/js/save_game.js`): a save holds the chapter's story events in order, where the two of them stand, Bodhi's needs and the bond. Loading builds the chapter fresh and replays the events silently through the same story rules.
 - What breaks otherwise: a save written by one version of the game wouldn't load correctly in the next.
 
+**10. The iOS app plays its sound even when the iPhone is on silent, mixed with the player's own music.**
+- Constraint: the story leans on sound (the call, barks, rain), and many people keep their phone on silent all day. Without setting this, sound from the game's web view follows the silent switch, so those players would hear nothing and never know why.
+- Strongest rejected alternative: Apple's "ambient" setting, which most casual games use. It respects the silent switch, and some players expect that.
+- What breaks otherwise: a silent-mode player misses the story's sound cues on first launch, which is when a narrative game is judged.
+- How it works: `UntilWeFindHomeApp.swift` sets the app's audio session to "playback" with "mix with others" when the app starts. Playback ignores the silent switch; mixing keeps the player's podcast or music going instead of stopping it.
+- Not yet proven: this has not run on an iPhone. The checks in `docs/app_store.md` step 9 test it. If the game's web view doesn't follow the app's setting, the fallback is to switch to ambient and add an on-screen hint to turn sound on.
+
 ## Secure against what, under which assumptions
 
 Malformed or out-of-order events and times from the engine boundary (bad names, oversized names, spoofed internal events, NaN or backwards times) can't crash the core, skip story beats or corrupt the log. This assumes:
