@@ -19,7 +19,10 @@ namespace Bodhi.Game
         static readonly Color words_color = new Color(0.98f, 0.95f, 0.88f);
         static readonly Color button_color = new Color(0.07f, 0.1f, 0.16f, 0.55f);  // `night`, see-through.
 
-        readonly Font font;
+        readonly Font font;            // Body text: Atkinson Hyperlegible, made to be easy to read.
+        readonly Font title_font;      // The name: Young Serif.
+        readonly Font subtitle_font;   // "Until We Find Home": Newsreader italic.
+        readonly Sprite rounded;       // A rounded panel for the buttons.
         readonly RectTransform canvas;
         readonly TitleWorld world;             // The 3D scene behind the title.
         readonly Image black;                  // Covers the scene while the opening fades it up.
@@ -40,7 +43,11 @@ namespace Bodhi.Game
         public TitleScreens(Transform parent, Camera game_camera)
         {
             world = new TitleWorld(parent, game_camera);
-            font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            var built_in = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            font = load_font("Fonts/atkinson_hyperlegible_normal_700", built_in);
+            title_font = load_font("Fonts/young_serif_normal_400", built_in);
+            subtitle_font = load_font("Fonts/newsreader_italic_400", built_in);
+            rounded = rounded_sprite();
             var holder = new GameObject("Title screens", typeof(RectTransform));
             holder.transform.SetParent(parent, false);
             var canvas_part = holder.AddComponent<Canvas>();
@@ -59,13 +66,13 @@ namespace Bodhi.Game
 
             // The name sits high over the aurora, the shell's largest words, with a soft dark
             // shadow so it reads against the bright sky (craft-game-floors' title treatment).
-            title = make_text(canvas, "title", 104, 0.1f, 0.66f, 0.9f, 0.9f);
+            title = make_text(canvas, "title", 118, 0.1f, 0.66f, 0.9f, 0.92f);
+            title.font = title_font;
             title.text = OpeningTitle.title_text;
-            title.fontStyle = FontStyle.Bold;
             add_shadow(title, 3);
-            subtitle = make_text(canvas, "subtitle", 30, 0.1f, 0.585f, 0.9f, 0.68f);
-            subtitle.text = OpeningTitle.subtitle_text.ToUpperInvariant();
-            subtitle.fontStyle = FontStyle.Italic;
+            subtitle = make_text(canvas, "subtitle", 38, 0.1f, 0.58f, 0.9f, 0.69f);
+            subtitle.font = subtitle_font;
+            subtitle.text = OpeningTitle.subtitle_text;
             add_shadow(subtitle, 2);
             var buttons_holder = new GameObject("buttons", typeof(RectTransform));
             buttons_holder.transform.SetParent(canvas, false);
@@ -259,6 +266,36 @@ namespace Bodhi.Game
             return color;
         }
 
+        // One of the game's fonts from game/Resources/Fonts (all free under the SIL Open Font
+        // Licence, whose texts sit beside them), or the built-in font if it's missing.
+        static Font load_font(string path, Font otherwise)
+        {
+            var loaded = Resources.Load<Font>(path);
+            return loaded != null ? loaded : otherwise;
+        }
+
+        // A rounded panel with a thin light edge, made in code: "sliced" by Unity so the corners
+        // stay round at any button size.
+        static Sprite rounded_sprite()
+        {
+            const int size = 64, corner = 28;
+            var picture = new Texture2D(size, size, TextureFormat.RGBA32, false);
+            for (int y = 0; y < size; y++)
+            {
+                for (int x = 0; x < size; x++)
+                {
+                    float dx = Mathf.Max(0, Mathf.Max(corner - x - 0.5f, x + 0.5f - (size - corner)));
+                    float dy = Mathf.Max(0, Mathf.Max(corner - y - 0.5f, y + 0.5f - (size - corner)));
+                    float inside = corner - Mathf.Sqrt(dx * dx + dy * dy);  // Pixels inside the rounded edge.
+                    float fill = Mathf.Clamp01(inside);
+                    float rim = Mathf.Clamp01(1.6f - Mathf.Abs(inside - 1.2f)) * 0.6f;  // A thin light edge.
+                    picture.SetPixel(x, y, new Color(1, 1, 1, Mathf.Clamp01(fill * 0.9f + rim)));
+                }
+            }
+            picture.Apply();
+            return Sprite.Create(picture, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f), 100, 0, SpriteMeshType.FullRect, new Vector4(corner, corner, corner, corner));
+        }
+
         // A soft round dot, made in code, for paw prints, the hold ring and the ball at home.
         public static Sprite round_sprite()
         {
@@ -280,10 +317,12 @@ namespace Bodhi.Game
         Button make_button(Transform parent, string label, float x, float y, Action on_click)
         {
             var image = make_image(parent, label, button_color, x, y, x, y);
-            image.rectTransform.sizeDelta = new Vector2(270, 64);  // Four fit across with gaps.
+            image.sprite = rounded;
+            image.type = Image.Type.Sliced;
+            image.rectTransform.sizeDelta = new Vector2(260, 66);  // Four fit across with gaps.
             var button = image.gameObject.AddComponent<Button>();
             button.onClick.AddListener(() => on_click());
-            var words = make_text(image.transform, "label", 30, 0, 0, 1, 1);
+            var words = make_text(image.transform, "label", 28, 0, 0, 1, 1);
             words.text = label;
             return button;
         }

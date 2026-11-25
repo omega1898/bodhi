@@ -27,7 +27,7 @@ namespace Bodhi.Game
         static readonly Color jeans = new Color(0.2f, 0.26f, 0.4f);
         static readonly Color boots = new Color(0.32f, 0.21f, 0.14f);
 
-        readonly Transform root, hips, spine, chest, neck, head, hair;
+        readonly Transform root, hips, spine, chest, neck, head, hair, coat_skirt, scarf_end;
         readonly Transform left_hand, right_hand, left_foot_bone, right_foot_bone;
         readonly Limb left_leg, right_leg;
         readonly Transform left_upper_arm, right_upper_arm, left_forearm, right_forearm;
@@ -40,6 +40,9 @@ namespace Bodhi.Game
         bool placed = false;
         readonly Spring hair_swing = new Spring(0);
         readonly Spring hair_sway = new Spring(0);
+        readonly Spring skirt_swing = new Spring(0), skirt_sway = new Spring(0);
+        readonly Spring scarf_swing = new Spring(0), scarf_sway = new Spring(0);
+        float last_hips_roll;
         float last_head_pitch, last_facing;
 
         // The middle of her two hands, in world space: where a ball she's holding sits.
@@ -50,6 +53,12 @@ namespace Bodhi.Game
 
         // Her root (feet on the snow, turned the way she faces).
         public Transform body => root;
+
+        // Her two ankles, in world space (for footprints in the snow).
+        public Vector3[] foot_points => new[] { left_foot_bone.position, right_foot_bone.position };
+
+        // Her mouth, in world space (where her breath mists in the cold).
+        public Vector3 mouth_point => head.position + head.forward * 0.1f + head.up * 0.04f;
 
         // Builds Em under `parent`.
         public static HumanFigure build_em(Transform parent)
@@ -68,6 +77,8 @@ namespace Bodhi.Game
             neck = Limb.bone("neck", chest, new Vector3(0, 0.235f, 0));
             head = Limb.bone("head", neck, new Vector3(0, 0.085f, 0.01f));
             hair = Limb.bone("hair", head, new Vector3(0, 0.12f, -0.03f));
+            coat_skirt = Limb.bone("coat skirt", hips, new Vector3(0, 0.06f, 0));  // Hangs from her waist.
+            scarf_end = Limb.bone("scarf end", chest, new Vector3(-0.05f, 0.19f, 0.1f));
 
             var coat = PaletteColours.her_coat;
             var coat_dark = Color.Lerp(coat, Color.black, 0.25f);
@@ -77,7 +88,7 @@ namespace Bodhi.Game
 
             // The coat: its skirt flares from the waist to mid-thigh; then the waist and the chest.
             var skirt = new MeshKit();
-            skirt.add_round_shape(new Vector3(0, -0.31f, 0), Quaternion.identity, new[]
+            skirt.add_round_shape(new Vector3(0, -0.37f, 0), Quaternion.identity, new[]
             {
                 new MeshKit.Ring(0, 0, coat_dark),
                 new MeshKit.Ring(0.002f, 0.175f, coat_dark),
@@ -86,8 +97,8 @@ namespace Bodhi.Game
                 new MeshKit.Ring(0.32f, 0.155f, coat),
                 new MeshKit.Ring(0.4f, 0.14f, coat),
             }, 16, new Vector3(1, 1, 0.76f));
-            skirt.add_ball(new Vector3(0, 0.05f, 0), new Vector3(0.152f, 0.022f, 0.118f), coat_dark, 10);  // Her belt.
-            part("coat skirt", hips, skirt, material);
+            skirt.add_ball(new Vector3(0, -0.01f, 0), new Vector3(0.152f, 0.022f, 0.118f), coat_dark, 10);  // Her belt.
+            part("coat skirt", coat_skirt, skirt, material);
 
             var waist = new MeshKit();
             waist.add_ball(new Vector3(0, 0.06f, 0), new Vector3(0.14f, 0.12f, 0.105f), coat, 10);
@@ -104,8 +115,11 @@ namespace Bodhi.Game
             // The rust scarf, wound round her neck, its knot and one end hanging down the front.
             torso.add_ball(new Vector3(0, 0.24f, 0), new Vector3(0.1f, 0.055f, 0.092f), scarf, 10, 0.006f, 0.03f);
             torso.add_ball(new Vector3(-0.045f, 0.205f, 0.085f), new Vector3(0.04f, 0.045f, 0.03f), scarf, 6);
-            torso.add_tube(new Vector3(-0.05f, 0.19f, 0.1f), new Vector3(-0.065f, -0.02f, 0.118f), 0.034f, 0.03f, scarf, Color.Lerp(scarf, Color.black, 0.15f), 8);
             part("chest", chest, torso, material);
+            var scarf_tail = new MeshKit();
+            scarf_tail.add_tube(Vector3.zero, new Vector3(-0.012f, -0.21f, 0.018f), 0.034f, 0.03f, scarf, Color.Lerp(scarf, Color.black, 0.15f), 10, 0.003f, 0.02f);
+            scarf_tail.add_ball(new Vector3(-0.012f, -0.23f, 0.018f), new Vector3(0.034f, 0.02f, 0.03f), Color.Lerp(scarf, new Color(0.9f, 0.8f, 0.6f), 0.3f), 6, 0.006f, 0.01f);  // Fringe.
+            part("scarf end", scarf_end, scarf_tail, material);
 
             var neck_part = new MeshKit();
             neck_part.add_tube(Vector3.zero, new Vector3(0, 0.09f, 0.008f), 0.045f, 0.043f, skin, skin, 8);
@@ -230,6 +244,27 @@ namespace Bodhi.Game
             current.right_foot = delta <= 0 ? target.right_foot : right_foot;
             apply(current);
             swing_hair(delta);
+            swing_cloth(delta);
+        }
+
+        // Her coat skirt and the end of her scarf swing behind her movement: they trail back as
+        // she speeds up, sway as her hips rock from step to step, and settle when she stops.
+        // Springs give that lag and settle (overlapping action, as animators call it).
+        void swing_cloth(float delta)
+        {
+            if (delta <= 0)
+            {
+                return;
+            }
+            float hips_rock = (current.hips_roll - last_hips_roll) / delta;
+            last_hips_roll = current.hips_roll;
+            skirt_swing.update(speed_now * 5 - current.hips_pitch * 0.5f, 90, 7, delta);
+            skirt_sway.update(-current.hips_roll * 0.9f - hips_rock * 0.02f, 80, 6, delta);
+            coat_skirt.localRotation = Quaternion.Euler((float)skirt_swing.value, 0, (float)skirt_sway.value);
+            float lean = current.spine_pitch + current.chest_pitch + current.hips_pitch;
+            scarf_swing.update(-lean * 0.85f + speed_now * 14, 60, 4, delta);
+            scarf_sway.update(-current.chest_yaw * 0.4f - hips_rock * 0.03f, 50, 3.5f, delta);
+            scarf_end.localRotation = Quaternion.Euler((float)scarf_swing.value, 0, (float)scarf_sway.value);
         }
 
         // The pose for what she's doing now.
