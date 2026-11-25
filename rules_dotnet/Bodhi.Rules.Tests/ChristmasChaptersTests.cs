@@ -193,6 +193,40 @@ namespace Bodhi.Rules.Tests
             Assert.That(run.objective, Is.EqualTo("Whistle for {dog}."));
         }
 
+        // Chapter Two's choice: he can walk away toward her light, but the old dog can't follow,
+        // and he comes back. Only lying down beside Biscuit moves the night on to dawn.
+        [Test]
+        public void chapter_two_lets_him_try_to_leave_but_only_staying_brings_dawn()
+        {
+            var run = new ChapterRun(ChristmasChapters.lamp_in_window());
+            ChapterRobot.finish(run, skip_films: false, stop_when: playing => playing.has_happened("her_light_seen"));
+            Assert.That(run.controlled_character, Is.EqualTo(Character.dog));
+            Assert.That(run.objective, Is.EqualTo("Go to her light, or stay with Biscuit."));
+            Assert.That(run.report_zone("tried_to_leave", false, true), Is.True);
+            for (int step = 0; step < 240; step++)
+            {
+                run.pass_time(0.25);
+            }
+            Assert.That(run.has_happened("dawn"), Is.False, "trying to leave changes nothing");
+            Assert.That(run.use("stayed", true), Is.True);
+            for (int step = 0; step < 40 && !run.has_happened("dawn"); step++)
+            {
+                run.pass_time(0.25);
+            }
+            Assert.That(run.has_happened("dawn"), Is.True);
+            Assert.That(run.controlled_character, Is.EqualTo(Character.human), "dawn is hers");
+        }
+
+        // Break it: once he has stayed, walking away again does nothing; the zone is switched off.
+        [Test]
+        public void after_staying_he_cannot_try_to_leave()
+        {
+            var run = new ChapterRun(ChristmasChapters.lamp_in_window());
+            ChapterRobot.finish(run, skip_films: true, stop_when: playing => playing.has_happened("her_light_seen"));
+            Assert.That(run.use("stayed", true), Is.True);
+            Assert.That(run.report_zone("tried_to_leave", false, true), Is.False);
+        }
+
         // Break it: each call gives a fresh copy, so one playthrough can't change another's chapter.
         [Test]
         public void each_copy_of_a_chapter_is_separate()

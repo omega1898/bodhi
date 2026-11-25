@@ -10,6 +10,7 @@ namespace Bodhi.Game
             return new[]
             {
                 first_snow(),
+                lamp_in_window(),
             };
         }
 
@@ -19,6 +20,7 @@ namespace Bodhi.Game
             switch (chapter_id)
             {
                 case "first_snow": return first_snow();
+                case "lamp_in_window": return lamp_in_window();
                 default: return null;
             }
         }
