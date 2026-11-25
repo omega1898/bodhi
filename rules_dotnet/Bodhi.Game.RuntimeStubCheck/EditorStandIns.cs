@@ -46,6 +46,27 @@ namespace UnityEditor
         public void SetPlatformTextureSettings(TextureImporterPlatformSettings settings) { }
     }
 
+    public enum ModelImporterMaterialImportMode { None, ImportStandard, ImportViaMaterialDescription }
+    public enum ModelImporterAnimationType { None, Legacy, Generic, Human }
+    public enum ModelImporterMeshCompression { Off, Low, Medium, High }
+    public enum ModelImporterNormals { Import, Calculate, None }
+
+    // Stand-in for the importer that brings in 3D models (game/Editor/ModelImport.cs).
+    public class ModelImporter : AssetImporter
+    {
+        public ModelImporterMaterialImportMode materialImportMode { get; set; }
+        public ModelImporterAnimationType animationType { get; set; }
+        public bool importAnimation { get; set; }
+        public bool optimizeGameObjects { get; set; }
+        public bool importBlendShapes { get; set; }
+        public bool importCameras { get; set; }
+        public bool importLights { get; set; }
+        public bool isReadable { get; set; }
+        public ModelImporterMeshCompression meshCompression { get; set; }
+        public ModelImporterNormals importNormals { get; set; }
+        public float globalScale { get; set; }
+    }
+
     public class AssetPostprocessor
     {
         public string assetPath => "";

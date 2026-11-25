@@ -79,3 +79,13 @@ Paint `far`, `mid` and `near` layers into `scenery/`. Use 1600 × 800 tiles with
 
 - **No photos of the real people or the real dog** go in this repository (`docs/characters.md`).
 - **Use drawings and descriptions only.**
+
+## 3D models (Blender)
+
+The 3D characters are built by scripts in `blender/`, run in Blender without opening its window. Each script builds a model from nothing (body grown round a skeleton, curls, colours, bones), saves pictures of it to check, and exports it into `game/Resources/Models/`, where the game puts it on the matching code-built figure (`game/Runtime/Characters/SkinnedModel.cs`):
+
+```
+blender -b --factory-startup -P art/blender/build_bodhi.py -- game/Resources/Models/bodhi.fbx previews/
+```
+
+Blender is free (`brew install --cask blender`). Change the joints, thicknesses or colours at the top of a script and run it again; the exported model replaces the old one. Never edit the `.fbx` by hand.

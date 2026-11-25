@@ -73,6 +73,7 @@ namespace Bodhi.Game
             snowman = new Snowman(root.transform);
             em = HumanFigure.build_em(root.transform);
             bodhi = DogFigure.build_bodhi(root.transform);
+            bodhi.wear(Resources.Load<GameObject>("Models/bodhi"));  // His real model, if it's been made.
             root.SetActive(false);
         }
 
