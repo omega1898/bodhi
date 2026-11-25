@@ -177,14 +177,14 @@ Then the title card *Chapter Two: The Lamp in the Window*, 14 December, night, a
 | Keepsake | Found by | Text |
 |---|---|---|
 | Mina's card | Em | Line 28. |
-| The stolen bauble, under the sofa | Bodhi | The oldest bauble in the cabin, red glass. He had hidden it with great care. |
+| The stolen bauble, under the sofa (finding it is a step of the chapter, so nobody misses it) | Bodhi | The oldest bauble in the cabin, red glass. He had hidden it with great care. |
 | The puppy book | Em | My puppy book, folded at 'First winter': 'Most puppies love snow. Some eat it.' I'd underlined the next line twice, and then forgotten it. |
 
 The underlined line is read in Chapter Six, when Em buckles the collar back on: *"Check the collar after a bath. Wet curls shrink."*
 
 ### Objectives, in order
 
-Kept plain, because they are instructions: Go out into the snow with {dog}. / Throw a snowball for {dog}. / Switch to {dog}. Sniff to find it. / Whistle for {dog}. / Build a snowman: roll the bottom ball. / Find sticks for its arms. / Take the sled down to the timber yard. / Let {dog} choose a tree. / Pull the tree home. / Towel him dry. / Give him his dinner. / Decorate the tree. / Hang up his stocking. / Light the lamp in the window. / Time for bed. / Take the lantern. Keep {dog} on his lead. / Follow {dog}. Find Biscuit. / Whistle for {dog}.
+Kept plain, because they are instructions: Go out into the snow with {dog}. / Throw a snowball for {dog}. / Switch to {dog}. Sniff to find it. / Whistle for {dog}. / Build a snowman: roll the bottom ball. / Find sticks for its arms. / Take the sled down to the timber yard. / Let {dog} choose a tree. / Pull the tree home. / Towel him dry. / Give him his dinner. / Decorate the tree. / Switch to {dog}. Find the bauble. / Hang up his stocking. / Light the lamp in the window. / Time for bed. / Take the lantern. Keep {dog} on his lead. / Follow {dog}. Find Biscuit. / Whistle for {dog}.
 
 ## 4. Chapters Two to Twelve: the key scenes
 
