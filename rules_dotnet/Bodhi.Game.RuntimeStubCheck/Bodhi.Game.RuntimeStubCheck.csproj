@@ -1,4 +1,5 @@
-<!-- Purpose: a stand-in compile check for the Unity scene scripts (game/Runtime). Unity isn't
+<!-- Purpose: a stand-in compile check for the Unity scene scripts (game/Runtime) and Editor
+     scripts (game/Editor). Unity isn't
      available in the cloud, so this compiles those scripts against UnityStandIns.cs: tiny
      hand-written copies of only the Unity types and calls the scripts use. It catches typos,
      wrong names and wrong use of the game's own Logic code. It does NOT prove the scripts
@@ -13,12 +14,15 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <!-- CS0649: the stand-ins' fields are never set; that's expected of stand-ins. -->
     <NoWarn>CS0649;CS0067</NoWarn>
+    <!-- Compile the iOS-only Editor code too, as Unity does when the build target is iPhone. -->
+    <DefineConstants>$(DefineConstants);UNITY_IOS</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Include="../../rules/Runtime/**/*.cs" Link="Rules/%(RecursiveDir)%(Filename)%(Extension)" />
     <Compile Include="../../game/Logic/**/*.cs" Link="Logic/%(RecursiveDir)%(Filename)%(Extension)" />
     <Compile Include="../../game/Runtime/**/*.cs" Link="Runtime/%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="../../game/Editor/**/*.cs" Link="Editor/%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 
 </Project>

@@ -49,7 +49,9 @@ namespace Bodhi.Game
         // Makes everything that lasts the whole game, then shows the title.
         void Awake()
         {
-            Application.targetFrameRate = 60;
+            // As many frames a second as the screen shows (120 on ProMotion iPhones), so movement
+            // is as smooth as the screen allows. See FramePacing.
+            Application.targetFrameRate = FramePacing.frames_per_second(Screen.currentResolution.refreshRateRatio.value);
             controls = new PlayerControls();
             camera_rig = new CameraRig(transform);
             hud = new GameHud(transform, controls);
@@ -547,12 +549,14 @@ namespace Bodhi.Game
             tracker = new StageTracker(stage, run);
             steering = new CompanionSteering(new System.Random());
             var root = level.root.transform;
-            her = CharacterBody.create("her", Character.human, root, level.space, stage.human_start_x, stage.human_start_feet_y, 1, 1, her_color);
-            him = CharacterBody.create(dog_name, Character.dog, root, level.space, stage.dog_start_x, stage.dog_start_feet_y, run.chapter.dog_size, run.chapter.dog_jump, his_color);
+            string dog_set = FrameSheets.dog_set_for_age(run.chapter.dog_age);
+            SpriteLibrary.prepare(new[] { "her", dog_set, stage.guest != null ? "biscuit" : null });  // Loaded now, not mid-chapter.
+            her = CharacterBody.create("her", Character.human, "her", root, level.space, stage.human_start_x, stage.human_start_feet_y, 1, 1, her_color);
+            him = CharacterBody.create(dog_name, Character.dog, dog_set, root, level.space, stage.dog_start_x, stage.dog_start_feet_y, run.chapter.dog_size, run.chapter.dog_jump, his_color);
             guest = null;
             if (stage.guest != null)
             {
-                guest = CharacterBody.create("guest", Character.dog, root, level.space, stage.guest.x, stage.guest.feet_y, stage.guest.size, 1, guest_color);
+                guest = CharacterBody.create("guest", Character.dog, "biscuit", root, level.space, stage.guest.x, stage.guest.feet_y, stage.guest.size, 1, guest_color);
                 if (!string.IsNullOrEmpty(stage.guest.pose))
                 {
                     guest.strike_pose(stage.guest.pose, 0);
