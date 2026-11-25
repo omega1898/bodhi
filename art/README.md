@@ -46,11 +46,22 @@ After changing a pose or a painted part:
 node art/tools/draw_frames.js
 node prototype/web/tests/frames_check.js
 ```
-Expected: a hand-over list with every line `ok`, then `drew 436 frames...`, then `FRAMES CHECK PASSED`. The check fails if:
+Expected: a hand-over list with every line `ok`, then `drew 926 frames...`, then `FRAMES CHECK PASSED`. The check fails if:
 - a drawing is cut off at its frame's edge, or sinks through the floor;
 - the game picks the wrong animation;
 - running changes drawing fewer than 24 times a second, which reads as steppy rather than fluid. The current figure is about 45.
 - reversing at a run doesn't skid, or getting up from kneeling pops straight upright.
+
+## Pictures for the Unity iPhone app
+
+A phone's graphics chip draws pictures, not SVG, so the frames are turned into PNG pictures once, at the size the iPhone shows them, by `tools/export_sprites.py`. It trims each drawing, fills the colour of its see-through rim from the fur beside it (so no dark fringe shows when the chip blends pixels), and packs each animation into one picture in `game/Resources/Frames/`. It also writes `game/Logic/FrameSheets.Data.cs`, which says where every drawing is in its picture and where its feet are. Needs Python 3 with Pillow and numpy, and ffmpeg.
+
+After running `draw_frames.js`, also run:
+```
+python3 art/tools/export_sprites.py
+python3 art/tools/export_sprites_test.py
+```
+Expected: one line per animation (`her_walk  32 drawings 2030x660` and so on), then `All sprite export tests pass.`
 
 ## How the character parts work (painted sheets)
 

@@ -53,3 +53,15 @@ jobs:
       # recolour must stop the tool.
       - name: Check the drawing tool's colour guards
         run: node art/tools/draw_frames_test.js
+
+      # Tests for the tool that turns the drawings into the iPhone app's pictures: packing,
+      # the colour round each drawing's edge, and each drawing's feet point. They need two
+      # Python picture libraries, installed here on GitHub's machine.
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check the iPhone picture exporter
+        run: |
+          python -m pip install --quiet pillow numpy
+          python art/tools/export_sprites_test.py
