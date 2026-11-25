@@ -63,7 +63,7 @@ namespace Bodhi.Rules
         static readonly string[] engine_event_names =
         {
             "level_started", "cutscene_skipped", "reunion_embrace", "reunion_complete",
-            "dog_petted", "dog_leaned_in", "knelt_by_dog", "dog_sniffed",
+            "dog_petted", "dog_leaned_in", "knelt_by_dog", "dog_sniffed", "dog_fed", "dog_cleaned",
         };
 
         // A timer: after seconds_left, event_name fires.
@@ -288,6 +288,31 @@ namespace Bodhi.Rules
             }
             bond.fear = Math.Max(0, bond.fear - 0.08);
             fire_event(controlled_character == Character.human ? "dog_petted" : "dog_leaned_in");
+            return true;
+        }
+
+        // She looks after him when the game offers it (CareState.offered_care): feeds him a meal
+        // from the bag, or towels most of the mud off. `together` is the scene's answer to "are
+        // they side by side?". Returns false, changing nothing, unless that care is on offer now.
+        public bool give_care(CareOffer offer, bool together)
+        {
+            if (offer == CareOffer.none || controls_locked || reunion_stage != ReunionStage.none
+                || care.offered_care(together, controlled_character, cutscene_playing) != offer)
+            {
+                return false;
+            }
+            if (offer == CareOffer.feed)
+            {
+                care.feed(true, bond);
+                bond.closeness_need = clamp_unit(bond.closeness_need + 0.05);
+                fire_event("dog_fed");  // Counts once; later meals still feed him.
+            }
+            else
+            {
+                care.clean(false);
+                bond.closeness_need = clamp_unit(bond.closeness_need + 0.03);
+                fire_event("dog_cleaned");
+            }
             return true;
         }
 
