@@ -10,15 +10,7 @@ unreal/**/.vs/
 unreal/**/*.xcworkspace
 unreal/**/*.xcodeproj
 
-# The iOS app's generated files: the copied game, the Xcode project XcodeGen makes from
-# ios/project.yml, its Info.plist, and Xcode's per-user files.
-ios/UntilWeFindHome/Game/
-ios/*.xcodeproj/
-ios/UntilWeFindHome/Info.plist
-xcuserdata/
 
-# Screenshots the browser playtest writes on every run.
-prototype/web/tests/screenshots/
 
 # Personal reference photos and videos of real people and pets. Never commit these.
 references/
@@ -32,3 +24,6 @@ rules_dotnet/**/obj/
 rules_dotnet/**/TestResults/
 audio_preview/
 __pycache__/
+
+# Xcode's per-user files, in the Xcode project Unity writes when it builds for iOS.
+xcuserdata/

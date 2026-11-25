@@ -59,7 +59,7 @@ The engine knows where things are and what the player pressed. The core knows wh
 - Strongest rejected alternative: JSON, which matches the playtest log and has tooling.
 - What breaks otherwise: a JSON parser is far more code to make hostile-input safe; decimals could load differently on a French-language phone. The cost: times are kept to the millisecond (rounded down) and feelings to the millionth.
 
-**8. The iOS release is a native app that carries the finished browser game inside it.**
+**8. (Replaced by decision 11 on 24 November 2026.) The iOS release is a native app that carries the finished browser game inside it.**
 - Constraint: the owner wants the game on the App Store soon. The whole story, the painted art, the motion system and the automated tests already exist as a browser game (`prototype/web/`), and one person is building it.
 - Strongest rejected alternatives:
   - Rebuilding in Unreal (the original plan in decision 1): real 3D and the most room to grow, but it means rebuilding everything, learning a heavy engine, and a large app for a 2D game.
@@ -76,12 +76,19 @@ The engine knows where things are and what the player pressed. The core knows wh
 - How it works (`prototype/web/js/save_game.js`): a save holds the chapter's story events in order, where the two of them stand, Bodhi's needs and the bond. Loading builds the chapter fresh and replays the events silently through the same story rules.
 - What breaks otherwise: a save written by one version of the game wouldn't load correctly in the next.
 
-**10. The iOS app plays its sound even when the iPhone is on silent, mixed with the player's own music.**
+**10. The iOS app plays its sound even when the iPhone is on silent, mixed with the player's own music.** (Still wanted, but not yet redone in Unity: it lived in the Swift app removed by decision 11.)
 - Constraint: the story leans on sound (the call, barks, rain), and many people keep their phone on silent all day. Without setting this, sound from the game's web view follows the silent switch, so those players would hear nothing and never know why.
 - Strongest rejected alternative: Apple's "ambient" setting, which most casual games use. It respects the silent switch, and some players expect that.
 - What breaks otherwise: a silent-mode player misses the story's sound cues on first launch, which is when a narrative game is judged.
 - How it works: `UntilWeFindHomeApp.swift` sets the app's audio session to "playback" with "mix with others" when the app starts. Playback ignores the silent switch; mixing keeps the player's podcast or music going instead of stopping it.
 - Not yet proven: this has not run on an iPhone. The checks in `docs/app_store.md` step 9 test it. If the game's web view doesn't follow the app's setting, the fallback is to switch to ambient and add an on-screen hint to turn sound on.
+
+**11. The game is built in Unity only, for iPhone and iPad. The browser version is removed.**
+- Constraint: the owner chose Unity on 24 November 2026, for the smoothness, lighting and depth in `docs/unity_rebuild_spec.md`. Keeping two playable versions meant every change was made twice and the two drifted.
+- Strongest rejected alternative: keep shipping the browser game inside the Swift app (decision 8) while Unity catches up. It's the fastest way onto the App Store, but the owner wants the Unity game, and the browser game would keep pulling work away from it.
+- What breaks otherwise: two sources of truth for the chapters, the motion and the art.
+- The cost, stated honestly: until the Unity project exists on the Mac and runs on a phone, there is no version of the game anyone can play. The twelve chapters' data, first exported from the browser game, is now edited directly in `game/Logic/Chapters/` and `rules/Runtime/Chapters/`.
+- How it works: `rules/`, `look/` and `game/` are Unity packages, tested without Unity by `rules_dotnet/`. `game/Editor/IosDeviceSettings.cs` sets iPhone and iPad, landscape only, full screen, before every iOS build. The app icon is `art/app_icon/app_icon_1024.png`; Apple's privacy manifest is `game/Plugins/iOS/PrivacyInfo.xcprivacy`.
 
 ## Secure against what, under which assumptions
 

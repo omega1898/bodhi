@@ -4,13 +4,13 @@ This is the path to the iOS release, then the PC game. Each milestone ends with 
 
 ## The route
 
-The iOS release is a native Swift app that carries the browser game inside it and runs offline (decision 8 in `docs/architecture.md`; steps in `docs/app_store.md`). Unreal Engine and the C++ rules in `core/` are kept for the later PC game; they are not in the iPhone app.
+**Changed on 24 November 2026:** the game is now built in Unity only, for iPhone and iPad, and the browser version is removed (decision 11 in `docs/architecture.md`; the Unity plan is `docs/unity_rebuild_spec.md`). The milestones below were written for the browser route and are kept as a record; the Unity milestones are in `docs/unity_rebuild_spec.md`. Unreal Engine and the C++ rules in `core/` are kept for the later PC game; they are not in the iPhone app.
 
 ## Who can do what
 
 | Who | Can do | Cannot do |
 |---|---|---|
-| Cloud sessions | The game in `prototype/web/` (story, chapters, mechanics, art drawn in code), the robot tests, `core/`, docs | Build or run the iPhone app, judge how it feels on a phone, sign anything with Apple |
+| Cloud sessions | The Unity packages' C# (`rules/`, `look/`, `game/`) and their dotnet tests, the art tools, `core/`, docs | Build or run the iPhone app, judge how it feels on a phone, sign anything with Apple |
 | You, on the Mac | Xcode, the iPhone build, TestFlight, App Store Connect, playtests with people | — |
 | An artist (later) | Hand-painted scenery, a polished dog and human | — |
 

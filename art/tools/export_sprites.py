@@ -59,11 +59,11 @@ frames_folder = os.path.join(repository, 'game', 'Resources', 'Frames')
 data_file = os.path.join(repository, 'game', 'Logic', 'FrameSheets.Data.cs')
 
 
-# Reads the frame list that draw_frames.js wrote (prototype/web/js/frames_atlas.js) by asking
+# Reads the frame list that draw_frames.js wrote (art/animations/frames_atlas.js) by asking
 # node to print it as JSON, so this tool never has to understand JavaScript itself.
 def read_frame_list():
     script = ("const vm = require('vm'); const fs = require('fs'); const box = {};"
-              "vm.runInNewContext(fs.readFileSync('prototype/web/js/frames_atlas.js', 'utf8') +"
+              "vm.runInNewContext(fs.readFileSync('art/animations/frames_atlas.js', 'utf8') +"
               " ';this.atlas = frames_atlas', box); console.log(JSON.stringify(box.atlas));")
     output = subprocess.run(['node', '-e', script], cwd=repository, check=True, capture_output=True, text=True)
     return json.loads(output.stdout)

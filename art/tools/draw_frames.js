@@ -7,7 +7,7 @@
 // The poses are keyed like an animator keys them (contact, down, passing, up for a walk; a
 // real rotary gallop for the dog), as numbers in the tables below. The output is one SVG file
 // per animation in art/animations/ (each frame editable by hand in any illustration app), and
-// prototype/web/js/frames_atlas.js, which tells the game where each frame is.
+// art/animations/frames_atlas.js, the frame list that export_sprites.py turns into Unity's frames.
 //
 // Run from the repository root:  node art/tools/draw_frames.js
 'use strict';
@@ -18,7 +18,7 @@ const gaits = require('./gaits.js');  // How a real person and a real dog walk, 
 
 const repository_root = path.resolve(__dirname, '..', '..');
 const output_folder = path.join(repository_root, 'art', 'animations');
-const atlas_path = path.join(repository_root, 'prototype', 'web', 'js', 'frames_atlas.js');
+const atlas_path = path.join(repository_root, 'art', 'animations', 'frames_atlas.js');
 const units_to_pixels = 10;  // Drawing units per game unit, the same as the painted sheets.
 
 // ---------- Small geometry helpers ----------
@@ -588,7 +588,7 @@ function body_point(base, axis, along, up) {
 // How the dog is built at each drawn age. Goldendoodle puppies have a big head, big paws,
 // short legs, large ears for their size and a short plume of a tail; the adult drawings take
 // over from about six months, drawn smaller while he is still growing (see dog_growth in
-// prototype/web/js/levels.js).
+// game/Logic/FrameSheets.cs).
 //   head, ear, tail: how big each is compared with the adult.
 //   leg_width: how thick the legs and paws are.  leg_bone: how long each leg bone is.
 //   lower_body: how far the body sinks toward the paws when standing (0 = adult height).

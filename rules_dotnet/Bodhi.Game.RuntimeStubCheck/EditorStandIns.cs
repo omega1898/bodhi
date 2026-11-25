@@ -51,6 +51,48 @@ namespace UnityEditor
         public string assetPath => "";
         public AssetImporter assetImporter => null;
     }
+
+    // For IosDeviceSettings: which devices and screen directions the iOS app allows.
+    public enum iOSTargetDevice { iPhoneOnly, iPadOnly, iPhoneAndiPad }
+
+    public enum UIOrientation { Portrait, PortraitUpsideDown, LandscapeRight, LandscapeLeft, AutoRotation }
+
+    public static class PlayerSettings
+    {
+        public static UIOrientation defaultInterfaceOrientation { get; set; }
+        public static bool allowedAutorotateToPortrait { get; set; }
+        public static bool allowedAutorotateToPortraitUpsideDown { get; set; }
+        public static bool allowedAutorotateToLandscapeLeft { get; set; }
+        public static bool allowedAutorotateToLandscapeRight { get; set; }
+
+        public static class iOS
+        {
+            public static iOSTargetDevice targetDevice { get; set; }
+            public static bool requiresFullScreen { get; set; }
+        }
+    }
+}
+
+namespace UnityEditor.Build
+{
+    public interface IPreprocessBuildWithReport
+    {
+        int callbackOrder { get; }
+        void OnPreprocessBuild(UnityEditor.Build.Reporting.BuildReport report);
+    }
+}
+
+namespace UnityEditor.Build.Reporting
+{
+    public struct BuildSummary
+    {
+        public BuildTarget platform { get; set; }
+    }
+
+    public class BuildReport
+    {
+        public BuildSummary summary { get; set; }
+    }
 }
 
 namespace UnityEditor.Callbacks
