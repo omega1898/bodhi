@@ -218,6 +218,7 @@ namespace Bodhi.Game
         public double camera_x, camera_y;
         public double camera_zoom = 1;
         public double? darkness = null;                 // 0 bright to 0.95 nearly black.
+        public double? wind = null;                     // From now on: 0 still to 1 a blizzard.
         public string mood = "";                        // "" leaves the music as it is.
         public ScentChange scent = ScentChange.none;
         public double scent_x, scent_y;
@@ -234,7 +235,7 @@ namespace Bodhi.Game
         // True if this rule changes nothing on screen.
         public bool is_empty =>
             place.Length == 0 && face.Length == 0 && pose.Length == 0 && walk.Length == 0 && hide.Length == 0
-            && water.Length == 0 && camera == CameraChange.none && darkness == null && mood.Length == 0
+            && water.Length == 0 && camera == CameraChange.none && darkness == null && wind == null && mood.Length == 0
             && scent == ScentChange.none && carry == CarryChange.none && dog_runs_to == null
             && guest_mode.Length == 0 && caption == null && sound.Length == 0 && shake_seconds <= 0
             && !fade_in && effect == null;

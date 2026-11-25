@@ -134,7 +134,7 @@ namespace Bodhi.Game
                     new RuleStaging { pose = new[] { new StagePose { who = StageWho.dog, pose = "sit", seconds = 6 } } },  // 26 tree_chosen
                     new RuleStaging { },  // 27 dougie_agreed
                     new RuleStaging { mood = "hopeful" },  // 28 tree_tied_on
-                    new RuleStaging { place = new[] { new StagePlacement { who = StageWho.human, x = 2860, feet_y = 520 }, new StagePlacement { who = StageWho.dog, x = 2800, feet_y = 520 } }, darkness = 0.35, mood = "tender", fade_in = true },  // 29 home_with_tree
+                    new RuleStaging { place = new[] { new StagePlacement { who = StageWho.human, x = 2860, feet_y = 520 }, new StagePlacement { who = StageWho.dog, x = 2800, feet_y = 520 } }, darkness = 0.35, wind = 0.35, mood = "tender", fade_in = true },  // 29 home_with_tree: heavier later
                     new RuleStaging { },  // 30 towelled_dry
                     new RuleStaging { },  // 31 dinner_given
                     new RuleStaging { },  // 32 tree_decorated
@@ -144,8 +144,8 @@ namespace Bodhi.Game
                     new RuleStaging { darkness = 0.55 },  // 36 lamp_lit
                     new RuleStaging { place = new[] { new StagePlacement { who = StageWho.dog, x = 1660, feet_y = 500 } }, pose = new[] { new StagePose { who = StageWho.dog, pose = "sleep", seconds = 9999 } }, hide = new[] { new StageHiding { who = StageWho.human, hidden = true } }, camera = CameraChange.hold, camera_x = 1700, camera_y = 430, camera_zoom = 1.0, darkness = 0.75, mood = "quiet" },  // 37 went_to_bed
                     new RuleStaging { },  // 38 bed_2
-                    new RuleStaging { pose = new[] { new StagePose { who = StageWho.dog, pose = "stop", seconds = 3 } }, shake_seconds = 0.6, mood = "tense" },  // 39 midnight
-                    new RuleStaging { shake_seconds = 1.2 },  // 40 midnight_2
+                    new RuleStaging { pose = new[] { new StagePose { who = StageWho.dog, pose = "stop", seconds = 3 } }, shake_seconds = 0.6, wind = 0.7, mood = "tense" },  // 39 midnight
+                    new RuleStaging { shake_seconds = 1.2, wind = 1.0 },  // 40 midnight_2: the blizzard
                     new RuleStaging { place = new[] { new StagePlacement { who = StageWho.human, x = 1720, feet_y = 520 }, new StagePlacement { who = StageWho.dog, x = 1780, feet_y = 520 } }, hide = new[] { new StageHiding { who = StageWho.human, hidden = false } }, camera = CameraChange.release, sound = "thud" },  // 41 hammering
                     new RuleStaging { camera = CameraChange.hold, camera_x = 2900, camera_y = 420, camera_zoom = 1.0 },  // 42 night_door_opened
                     new RuleStaging { },  // 43 door_2
