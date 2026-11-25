@@ -17,6 +17,7 @@ namespace Bodhi.Rules
                 strand(),
                 lantern_train(),
                 reindeer_hill(),
+                tams_sled(),
             };
         }
     }

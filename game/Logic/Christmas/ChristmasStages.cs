@@ -15,6 +15,7 @@ namespace Bodhi.Game
                 strand(),
                 lantern_train(),
                 reindeer_hill(),
+                tams_sled(),
             };
         }
 
@@ -29,6 +30,7 @@ namespace Bodhi.Game
                 case "strand": return strand();
                 case "lantern_train": return lantern_train();
                 case "reindeer_hill": return reindeer_hill();
+                case "tams_sled": return tams_sled();
                 default: return null;
             }
         }

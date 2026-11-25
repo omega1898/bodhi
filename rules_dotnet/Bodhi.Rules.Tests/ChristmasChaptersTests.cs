@@ -364,6 +364,23 @@ namespace Bodhi.Rules.Tests
             Assert.That(run.reunion_stage, Is.EqualTo(ReunionStage.approach), "the earlier whistle counts once the gate is open");
         }
 
+        // Chapter Seven's morning is care before plot: the phone can't be answered until she
+        // has towelled him, picked the ice from his paws, fed him and cuddled him.
+        [Test]
+        public void chapter_seven_looks_after_him_before_the_phone()
+        {
+            var run = new ChapterRun(ChristmasChapters.tams_sled());
+            ChapterRobot.finish(run, skip_films: true, stop_when: playing => playing.has_happened("morning"));
+            Assert.That(run.use("phone_answered", true), Is.False);
+            Assert.That(run.use("towelled", true), Is.True);
+            Assert.That(run.use("paws_brushed", true), Is.True);
+            Assert.That(run.use("breakfast", true), Is.True);
+            Assert.That(run.use("phone_answered", true), Is.False, "not without a cuddle");
+            Assert.That(run.pet(), Is.True);
+            Assert.That(run.use("phone_answered", true), Is.True);
+            Assert.That(run.care.dirt, Is.EqualTo(0), "the towel took five days of hill out of his curls");
+        }
+
         // Break it: each call gives a fresh copy, so one playthrough can't change another's chapter.
         [Test]
         public void each_copy_of_a_chapter_is_separate()
